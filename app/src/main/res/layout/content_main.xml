@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.e28.memo.MainActivity"
+    tools:context="com.example.e28.memo.screen.memolist.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/taggedRecyclerView"
+        android:id="@+id/recycler_view_tag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:layout_editor_absoluteX="73dp"
