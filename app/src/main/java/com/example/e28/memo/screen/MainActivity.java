@@ -1,4 +1,4 @@
-package com.example.e28.memo.screen.memolist;
+package com.example.e28.memo.screen;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
