@@ -2,8 +2,27 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_trash"
+        android:icon="@android:drawable/ic_menu_delete"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:title="@string/action_trash"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_highlight"
+        android:icon="@android:drawable/btn_star"
+        android:orderInCategory="100"
+        android:title="@string/action_highlight"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_reminder"
+        android:icon="@android:drawable/ic_popup_reminder"
+        android:orderInCategory="100"
+        android:title="@string/action_reminder"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_tag"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:orderInCategory="100"
+        android:title="@string/action_tag"
+        app:showAsAction="always" />
 </menu>
