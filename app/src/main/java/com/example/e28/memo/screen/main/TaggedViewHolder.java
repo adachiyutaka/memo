@@ -1,4 +1,4 @@
-package com.example.e28.memo.screen.memolist.recyclerview;
+package com.example.e28.memo.screen.main;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
@@ -17,6 +17,5 @@ public class TaggedViewHolder extends RecyclerView.ViewHolder {
         super(itemView);
         tagNameView = (TextView) itemView.findViewById(R.id.text_name_tag);
         tagSummaryView = (TextView) itemView.findViewById(R.id.text_tag_summary);
-
     }
 }

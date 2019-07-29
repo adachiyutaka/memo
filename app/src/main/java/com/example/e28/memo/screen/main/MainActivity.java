@@ -1,11 +1,8 @@
-package com.example.e28.memo.screen;
+package com.example.e28.memo.screen.main;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -16,9 +13,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.e28.memo.R;
-import com.example.e28.memo.screen.memolist.recyclerview.TagItem;
-import com.example.e28.memo.screen.memolist.recyclerview.TaggedRecyclerViewAdapter;
-import com.example.e28.memo.screen.memolist.recyclerview.TaggedViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,7 +90,19 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_trash) {
+            return true;
+        }
+
+        if (id == R.id.action_reminder) {
+            return true;
+        }
+
+        if (id == R.id.action_highlight) {
+            return true;
+        }
+
+        if (id == R.id.action_tag) {
             return true;
         }
 

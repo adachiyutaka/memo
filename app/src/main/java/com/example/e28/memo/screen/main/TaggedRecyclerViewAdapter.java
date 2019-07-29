@@ -1,4 +1,4 @@
-package com.example.e28.memo.screen.memolist.recyclerview;
+package com.example.e28.memo.screen.main;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.e28.memo.R;
-
 import java.util.List;
 
 /**

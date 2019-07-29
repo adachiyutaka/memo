@@ -1,4 +1,4 @@
-package com.example.e28.memo.screen.memolist.recyclerview;
+package com.example.e28.memo.screen.main;
 
 /**
  * Created by User on 2019/07/16.

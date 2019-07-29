@@ -11,8 +11,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.e28.memo.R;
-import com.example.e28.memo.screen.memolist.recyclerview.TagItem;
-import com.example.e28.memo.screen.memolist.recyclerview.TaggedRecyclerViewAdapter;
+import com.example.e28.memo.screen.main.TagItem;
+import com.example.e28.memo.screen.main.TaggedRecyclerViewAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +73,7 @@ public class TrashActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_trash) {
             return true;
         }
 

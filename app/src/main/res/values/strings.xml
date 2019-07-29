@@ -14,4 +14,12 @@
     <string name="action_highlight">固定</string>
     <string name="action_reminder">リマインダー</string>
     <string name="action_tag">タグ</string>
+    <string name="pref_title_wake_up">起動</string>
+    <string name="pref_sub_title_wake_up">起動時の設定</string>
+    <string name="pref_summary_wake_up">起動時の設定</string>
+
+    <string name="pref_title_wake_up">起動</string>
+    <string name="pref_sub_title_wake_up">起動時の設定</string>
+    <string name="pref_summary_wake_up">起動時の設定</string>
+
 </resources>
