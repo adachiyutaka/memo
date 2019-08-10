@@ -11,8 +11,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.e28.memo.R;
-import com.example.e28.memo.screen.main.TagItem;
-import com.example.e28.memo.screen.main.TaggedRecyclerViewAdapter;
+import com.example.e28.memo.screen.memolist.TagItem;
+import com.example.e28.memo.screen.memolist.TaggedRecyclerViewAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

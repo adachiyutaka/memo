@@ -14,12 +14,24 @@
     <string name="action_highlight">固定</string>
     <string name="action_reminder">リマインダー</string>
     <string name="action_tag">タグ</string>
-    <string name="pref_title_wake_up">起動</string>
-    <string name="pref_sub_title_wake_up">起動時の設定</string>
-    <string name="pref_summary_wake_up">起動時の設定</string>
 
-    <string name="pref_title_wake_up">起動</string>
-    <string name="pref_sub_title_wake_up">起動時の設定</string>
-    <string name="pref_summary_wake_up">起動時の設定</string>
+    <string name="pref_title_root">詳細設定</string>
+
+    <string name="pref_title_start_up">起動</string>
+    <string name="pref_sub_title_start_up">起動時の設定</string>
+    <string name="pref_summary_start_up">起動時の設定</string>
+    <string name="pref_title__start_up_disuse">使用しない</string>
+    <string name="pref_title__start_up_3_tap">3タップで起動</string>
+
+    <string name="pref_title_reminder">リマインダー</string>
+    <string name="pref_key_reminder">リマインダー</string>
+    <string name="pref_summary_reminder_morning">時間を指定</string>
+    <string name="pref_sub_title_reminder_morning">朝</string>
+    <string name="pref_summary_reminder_afternoon">時間を指定</string>
+    <string name="pref_sub_title_reminder_afternoon">昼</string>
+    <string name="pref_summary_reminder_evening">時間を指定</string>
+    <string name="pref_sub_title_reminder_evening">夕方</string>
+    <string name="pref_summary_reminder_night">時間を指定</string>
+    <string name="pref_sub_title_reminder_night">夜</string>
 
 </resources>

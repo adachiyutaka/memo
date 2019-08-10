@@ -1,24 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/pref_title_root">
+
     <PreferenceCategory
-        android:title="@string/pref_title_wake_up"
-        android:key="pref_key_storage_settings">
-        <CheckBoxPreference
-            android:key="pref_key_wake_up"
-            android:summary="@string/pref_summary_wake_up"
-            android:title="@string/pref_sub_title_wake_up"
-            android:defaultValue="false"/>
+        android:title="@string/pref_sub_title_start_up"
+        android:key="pref_key_start_up">
+        <SwitchPreference
+            android:key="start_up_disuse"
+            android:title="@string/pref_title__start_up_disuse" />
     </PreferenceCategory>
-    <PreferenceCategory
-        android:title="@string/pref_title_reminder"
-        android:key="pref_key_storage_settings">
+
+<!--
+        <ListPreference
+        android:key="pref_key_lock_screen"
+        android:summary="@string/pref_summary_lock_screen"
+        android:title="@string/pref_sub_title_lock_screen"
+        android:entries="@array/entry_lock_screen"
+        android:entryValues="@array/entry_start_lock_screen"/>
+-->
+
+    <PreferenceCategory android:title="@string/pref_title_reminder">
         <EditTextPreference
             android:key="pref_key_reminder"
             android:summary="@string/pref_summary_reminder_morning"
             android:title="@string/pref_sub_title_reminder_morning"
             android:defaultValue="false"/>
+        <!--
         <EditTextPreference
             android:key="pref_key_wake_up"
             android:summary="@string/pref_summary_reminder_afternoon"
@@ -34,5 +42,6 @@
             android:summary="@string/pref_summary_reminder_night"
             android:title="@string/pref_sub_title_reminder_night"
             android:defaultValue="false"/>
+         -->
     </PreferenceCategory>
 </PreferenceScreen>

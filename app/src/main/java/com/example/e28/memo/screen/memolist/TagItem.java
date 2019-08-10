@@ -1,4 +1,4 @@
-package com.example.e28.memo.screen.main;
+package com.example.e28.memo.screen.memolist;
 
 /**
  * Created by User on 2019/07/16.

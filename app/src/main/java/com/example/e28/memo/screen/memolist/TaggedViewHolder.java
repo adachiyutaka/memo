@@ -1,4 +1,4 @@
-package com.example.e28.memo.screen.main;
+package com.example.e28.memo.screen.memolist;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;

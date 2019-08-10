@@ -1,4 +1,4 @@
-package com.example.e28.memo.screen.main;
+package com.example.e28.memo.screen.memolist;
 
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;

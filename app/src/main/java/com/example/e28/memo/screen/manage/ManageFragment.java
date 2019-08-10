@@ -1,7 +1,7 @@
 package com.example.e28.memo.screen.manage;
 
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
+import android.support.v7.preference.PreferenceFragmentCompat;
 
 import com.example.e28.memo.R;
 
@@ -9,12 +9,9 @@ import com.example.e28.memo.R;
  * Created by User on 2019/07/29.
  */
 
-public class ManageFragment extends PreferenceFragment {
+public class ManageFragment extends PreferenceFragmentCompat {
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getPreferenceManager().setSharedPreferencesName("settings");
-
-        addPreferencesFromResource(R.layout.fragment_preference_manage);
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        setPreferencesFromResource(R.xml.fragment_preference_manage, rootKey);
     }
 }
