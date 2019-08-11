@@ -1,5 +1,6 @@
 package com.example.e28.memo.screen.memolist;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +14,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.e28.memo.R;
+import com.example.e28.memo.screen.manage.ManageActivity;
+import com.example.e28.memo.screen.reminder.ReminderDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,6 +98,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         if (id == R.id.action_reminder) {
+            new ReminderDialogFragment().show(getSupportFragmentManager(), "reminder");
             return true;
         }
 
@@ -124,7 +128,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.switch_style_tag_group) {
 
         } else if (id == R.id.nav_manage) {
-
+            Intent intent = new Intent(this, com.example.e28.memo.screen.manage.ManageActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_delete) {
 
         }
