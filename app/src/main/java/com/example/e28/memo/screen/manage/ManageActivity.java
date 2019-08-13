@@ -18,7 +18,7 @@ public class ManageActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage);
 
-        //toolbar
+       //toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -41,13 +41,14 @@ public class ManageActivity extends AppCompatActivity{
             super.onBackPressed();
         }
     }
+/*
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
-    }
+    }*/
 
     /*
     // PreferenceScreenがクリックされた時に呼び出されます
