@@ -24,4 +24,20 @@ public class Memo extends RealmObject {
     public boolean isHighlight;
     public boolean isChecked;
     public boolean isTrash;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
 }

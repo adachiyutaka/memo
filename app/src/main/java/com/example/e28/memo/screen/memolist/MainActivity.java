@@ -133,7 +133,8 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, com.example.e28.memo.screen.manage.ManageActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_delete) {
-
+            Intent intent = new Intent(this, com.example.e28.memo.screen.WriteActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
