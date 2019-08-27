@@ -14,16 +14,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.e28.memo.R;
+import com.example.e28.memo.model.Memo;
 import com.example.e28.memo.screen.manage.ManageActivity;
 import com.example.e28.memo.screen.reminder.ReminderDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
-    TaggedRecyclerViewAdapter adapter = new TaggedRecyclerViewAdapter(this.createDataset());
 
     //とりあえずのデータセット
     private List<TagItem> createDataset() {
@@ -56,6 +58,10 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         //recyclerView
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<Memo> memoRealmResults = realm.where(Memo.class).findAll();
+        TaggedRecyclerViewAdapter adapter = new TaggedRecyclerViewAdapter(memoRealmResults);
+
         RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view_tag);
 
         LinearLayoutManager llm = new LinearLayoutManager(this);

@@ -32,17 +32,6 @@ public class TagActivity extends AppCompatActivity {
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        //recyclerView
-        RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view_tag);
-        TaggedRecyclerViewAdapter adapter = new TaggedRecyclerViewAdapter(this.createDataset());
-
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-
-        rv.setHasFixedSize(true);
-
-        rv.setLayoutManager(llm);
-
-        rv.setAdapter(adapter);
     }
 
     private List<TagItem> createDataset() {

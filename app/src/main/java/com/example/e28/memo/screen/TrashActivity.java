@@ -11,11 +11,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.e28.memo.R;
-import com.example.e28.memo.screen.memolist.TagItem;
-import com.example.e28.memo.screen.memolist.TaggedRecyclerViewAdapter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TrashActivity extends AppCompatActivity {
 
@@ -31,31 +26,6 @@ public class TrashActivity extends AppCompatActivity {
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-        //recyclerView
-        RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view_tag);
-        TaggedRecyclerViewAdapter adapter = new TaggedRecyclerViewAdapter(this.createDataset());
-
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-
-        rv.setHasFixedSize(true);
-
-        rv.setLayoutManager(llm);
-
-        rv.setAdapter(adapter);
-    }
-
-    private List<TagItem> createDataset() {
-
-        List<TagItem> dataset = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            TagItem data = new TagItem();
-            data.setTagName("タグ" + i);
-            data.setTagSummary("メモ" + i);
-
-            dataset.add(data);
-        }
-        return dataset;
     }
 
     @Override

@@ -31,26 +31,36 @@ public class WriteActivity extends AppCompatActivity {
     String memoInputBuf;
     String memoViewBuf;
     Realm realm;
+    Memo Memo;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        realm = Realm.getDefaultInstance(); //Realmのインスタンスを生成
-
         setContentView(R.layout.activity_write);
         num =(EditText)findViewById(R.id.memoNumber);
         memoInput=(EditText)findViewById(R.id.memoInput);
         numInput=(EditText)findViewById(R.id.numInput);
 
+        // Realmのインスタンスを生成
+        realm = Realm.getDefaultInstance();
+
+        // Memoに新しいIdをセットする
+        Memo.setId(getRealmMemoNextId());
+
+        // 保存ボタンでの保存と新規作成
         Button btnSave = (Button) this.findViewById(R.id.buttonSave);
         btnSave.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Update();
+                Memo.setText(memoInput.getText().toString());
+                saveRealmMemo(Memo);
+                // メモ入力エリアの表示をクリア
+                memoInput.getEditableText().clear();
+                // 新しいメモのidをセット
+                Memo.setId(getRealmMemoNextId());
             }
         });
-
+/*
         Button btnLoad = (Button) this.findViewById(R.id.buttonLoad);
         btnLoad.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,40 +68,62 @@ public class WriteActivity extends AppCompatActivity {
                 Load();
             }
         });
+ */
     }
 
-    public void Update(){
-        memoInputBuf = memoInput.getText().toString();
-        numBuf = Long.parseLong(numInput.getText().toString());
-
-//        numBuf = getRealmInvoiceModelNextId();
-
-        // Realmの処理ここから
-        //トランザクション
-        realm.beginTransaction(); //トランザクション開始
-        Memo memo =realm.createObject(Memo.class, numBuf); //realmのオブジェクトを作る
-        memo.setText(memoInputBuf); //変数comment_bufを入れる
-        realm.commitTransaction(); //トランザクションコミット
-        // Realmの処理ここまで
-
-        Toast.makeText(this,"更新しました",Toast.LENGTH_SHORT).show();
+    public void saveRealmMemo(final Memo Memo){
+        try {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    realm.copyToRealmOrUpdate(Memo);
+                }
+            });
+        } finally {
+            Log.d("realm","saveMemo:success");
+            realm.close();
+        }
     }
 
+    public void saveMemo(final Memo Memo){
+        Memo.setText(memoInput.getText().toString());
+        saveRealmMemo(Memo);
+    }
+
+/*
     public void Load(){
         numBuf = Long.parseLong(num.getText().toString());
-        
+
         // Realmの処理ここから
         Memo memo = realm.where(Memo.class)
                     .equalTo("id", numBuf)
                     .findFirst();
-
         memoViewBuf = memo.getText();
-
         Toast.makeText(this, memoViewBuf, Toast.LENGTH_LONG).show();
+    }
+*/
+
+    public long getRealmMemoNextId() {
+        // 初期化
+        long nextId = 0;
+        // userIdの最大値を取得
+        Number maxId = realm.where(Memo.class).max("id");
+        // 1度もデータが作成されていない場合はNULLが返ってくるため、NULLチェックをする
+        if(maxId != null) {
+            nextId = maxId.intValue() + 1;
+        }
+        return nextId;
     }
 
     @Override
-    public void onDestroy(){ //閉じる処理
+    protected void onPause() {
+        super.onPause();
+        // 他のActivityに遷移したタイミングで保存
+        saveMemo(Memo);
+    }
+
+    @Override
+    public void onDestroy(){
         super.onDestroy();
         realm.close();
     }
