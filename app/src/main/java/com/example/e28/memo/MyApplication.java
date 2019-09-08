@@ -1,7 +1,6 @@
 package com.example.e28.memo;
 
 import android.app.Application;
-
 import io.realm.Realm;
 
 /**
@@ -14,6 +13,5 @@ public class MyApplication extends Application {
         super.onCreate();
 
         Realm.init(this);
-
     }
 }

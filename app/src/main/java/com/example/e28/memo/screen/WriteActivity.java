@@ -31,7 +31,7 @@ public class WriteActivity extends AppCompatActivity {
     String memoInputBuf;
     String memoViewBuf;
     Realm realm;
-    Memo Memo;
+    Memo memo = new Memo();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,19 +45,19 @@ public class WriteActivity extends AppCompatActivity {
         realm = Realm.getDefaultInstance();
 
         // Memoに新しいIdをセットする
-        Memo.setId(getRealmMemoNextId());
+        memo.setId(getRealmMemoNextId());
 
         // 保存ボタンでの保存と新規作成
         Button btnSave = (Button) this.findViewById(R.id.buttonSave);
         btnSave.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Memo.setText(memoInput.getText().toString());
-                saveRealmMemo(Memo);
+                memo.setText(memoInput.getText().toString());
+                saveRealmMemo(memo);
                 // メモ入力エリアの表示をクリア
                 memoInput.getEditableText().clear();
                 // 新しいメモのidをセット
-                Memo.setId(getRealmMemoNextId());
+                memo.setId(getRealmMemoNextId());
             }
         });
 /*
@@ -71,12 +71,12 @@ public class WriteActivity extends AppCompatActivity {
  */
     }
 
-    public void saveRealmMemo(final Memo Memo){
+    public void saveRealmMemo(final Memo memo){
         try {
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    realm.copyToRealmOrUpdate(Memo);
+                    realm.copyToRealmOrUpdate(memo);
                 }
             });
         } finally {
@@ -85,9 +85,9 @@ public class WriteActivity extends AppCompatActivity {
         }
     }
 
-    public void saveMemo(final Memo Memo){
-        Memo.setText(memoInput.getText().toString());
-        saveRealmMemo(Memo);
+    public void saveMemo(final Memo memo){
+        memo.setText(memoInput.getText().toString());
+        saveRealmMemo(memo);
     }
 
 /*
@@ -106,11 +106,11 @@ public class WriteActivity extends AppCompatActivity {
     public long getRealmMemoNextId() {
         // 初期化
         long nextId = 0;
-        // userIdの最大値を取得
+
         Number maxId = realm.where(Memo.class).max("id");
         // 1度もデータが作成されていない場合はNULLが返ってくるため、NULLチェックをする
         if(maxId != null) {
-            nextId = maxId.intValue() + 1;
+            nextId = maxId.longValue() + 1;
         }
         return nextId;
     }
@@ -119,7 +119,7 @@ public class WriteActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         // 他のActivityに遷移したタイミングで保存
-        saveMemo(Memo);
+        saveMemo(memo);
     }
 
     @Override
