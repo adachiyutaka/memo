@@ -118,8 +118,15 @@ public class WriteActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+
+        // TODO: 2019/09/08 メモ内容が空白、タグなどは設定されている場合の処理を後で加える
         // 他のActivityに遷移したタイミングで保存
-        saveMemo(memo);
+        // メモの内容が空白の場合、保存しない
+        if (!memo.getText().isEmpty()) {
+            return;
+        } else {
+            saveMemo(memo);
+        }
     }
 
     @Override

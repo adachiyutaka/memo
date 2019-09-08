@@ -7,7 +7,7 @@
 <!--
     <include
         android:id="@+id/include"
-        layout="@layout/app_bar_main"
+        layout="@laylayout_mainmain"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 -->

@@ -27,6 +27,8 @@ import io.realm.RealmResults;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    TaggedRecyclerViewAdapter adapter;
+
     //とりあえずのデータセット
     private List<TagItem> createDataset() {
 
@@ -60,7 +62,7 @@ public class MainActivity extends AppCompatActivity
         //recyclerView
         Realm realm = Realm.getDefaultInstance();
         RealmResults<Memo> memoRealmResults = realm.where(Memo.class).findAll();
-        TaggedRecyclerViewAdapter adapter = new TaggedRecyclerViewAdapter(memoRealmResults);
+        adapter = new TaggedRecyclerViewAdapter(memoRealmResults);
 
         RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view_tag);
 
@@ -71,6 +73,13 @@ public class MainActivity extends AppCompatActivity
         rv.setLayoutManager(llm);
 
         rv.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        adapter.notifyDataSetChanged();
     }
 
     @Override

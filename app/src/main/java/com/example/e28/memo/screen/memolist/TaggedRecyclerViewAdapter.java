@@ -1,9 +1,7 @@
 package com.example.e28.memo.screen.memolist;
 
-import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import com.example.e28.memo.R;
 import com.example.e28.memo.model.Memo;
