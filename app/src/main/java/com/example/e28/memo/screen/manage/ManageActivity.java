@@ -32,6 +32,7 @@ public class ManageActivity extends AppCompatActivity{
         }
     }
 
+    // TODO: 2019/09/08 onBackPressedでクラッシュするので解決する 
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

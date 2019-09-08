@@ -12,22 +12,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-
 import com.example.e28.memo.R;
 import com.example.e28.memo.model.Memo;
-import com.example.e28.memo.screen.manage.ManageActivity;
-import com.example.e28.memo.screen.reminder.ReminderDialogFragment;
-
 import java.util.ArrayList;
 import java.util.List;
-
+;
 import io.realm.Realm;
 import io.realm.RealmResults;
-
+;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    Realm realm;
     TaggedRecyclerViewAdapter adapter;
+
 
     //とりあえずのデータセット
     private List<TagItem> createDataset() {
@@ -44,7 +42,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -60,7 +58,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         //recyclerView
-        Realm realm = Realm.getDefaultInstance();
+        realm = Realm.getDefaultInstance();
         RealmResults<Memo> memoRealmResults = realm.where(Memo.class).findAll();
         adapter = new TaggedRecyclerViewAdapter(memoRealmResults);
 
@@ -155,5 +153,12 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        // Activityが破棄される際にrealmのインスタンスを閉じる
+        realm.close();
     }
 }
