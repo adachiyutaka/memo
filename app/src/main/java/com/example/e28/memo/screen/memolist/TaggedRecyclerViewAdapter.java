@@ -16,7 +16,7 @@ import io.realm.RealmResults;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.widget.TextView;
+import android.widget.EditText;
 
 /**
  * Created by User on 2019/07/16.
@@ -25,10 +25,10 @@ public class TaggedRecyclerViewAdapter extends RecyclerView.Adapter<TaggedRecycl
     public RealmResults<Memo> memoRealmResults;
 
     public class TaggedViewHolder extends RecyclerView.ViewHolder {
-        public TextView memoTextView;
+        public EditText memoEditText;
         public TaggedViewHolder(View itemView) {
             super(itemView);
-            memoTextView = (TextView) itemView.findViewById(R.id.text_memo);
+            memoEditText = itemView.findViewById(R.id.text_memo);
         }
     }
 
@@ -46,7 +46,7 @@ public class TaggedRecyclerViewAdapter extends RecyclerView.Adapter<TaggedRecycl
 
     @Override
     public void onBindViewHolder(TaggedViewHolder viewHolder, int position) {
-        viewHolder.memoTextView.setText(memoRealmResults.get(position).getText());
+        viewHolder.memoEditText.setText(memoRealmResults.get(position).getText());
     }
 
     @Override

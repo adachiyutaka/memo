@@ -21,19 +21,16 @@ import io.realm.Realm;
 
 public class WriteActivity extends AppCompatActivity {
 
-    EditText numInput;
-    EditText memoInput;
-    EditText num;
     Realm realm;
     Memo memo = new Memo();
+
+    EditText memoInput;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write);
-        num =(EditText)findViewById(R.id.memoNumber);
-        memoInput=(EditText)findViewById(R.id.memoInput);
-        numInput=(EditText)findViewById(R.id.numInput);
+        memoInput = findViewById(R.id.memoInput);
 
         // Realmのインスタンスを生成
         realm = Realm.getDefaultInstance();

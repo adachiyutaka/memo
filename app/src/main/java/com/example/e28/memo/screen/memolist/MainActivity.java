@@ -14,8 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import com.example.e28.memo.R;
 import com.example.e28.memo.model.Memo;
-import java.util.ArrayList;
-import java.util.List;
 ;
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -24,22 +22,8 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     Realm realm;
+
     TaggedRecyclerViewAdapter adapter;
-
-
-    //とりあえずのデータセット
-    private List<TagItem> createDataset() {
-
-        List<TagItem> dataset = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            TagItem data = new TagItem();
-            data.setTagName("タグ" + i);
-            data.setTagSummary("メモ" + i);
-
-            dataset.add(data);
-        }
-        return dataset;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {;
@@ -48,13 +32,13 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         //recyclerView
@@ -62,15 +46,15 @@ public class MainActivity extends AppCompatActivity
         RealmResults<Memo> memoRealmResults = realm.where(Memo.class).findAll();
         adapter = new TaggedRecyclerViewAdapter(memoRealmResults);
 
-        RecyclerView rv = (RecyclerView) findViewById(R.id.recycler_view_tag);
+        RecyclerView recyclerView = findViewById(R.id.recycler_view_tag);
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
 
-        rv.setHasFixedSize(true);
+        recyclerView.setHasFixedSize(true);
 
-        rv.setLayoutManager(llm);
+        recyclerView.setLayoutManager(llm);
 
-        rv.setAdapter(adapter);
+        recyclerView.setAdapter(adapter);
     }
 
     @Override
@@ -82,7 +66,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -150,7 +134,7 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
