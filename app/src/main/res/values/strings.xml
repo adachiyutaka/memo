@@ -33,5 +33,6 @@
     <string name="pref_sub_title_reminder_evening">夕方</string>
     <string name="pref_summary_reminder_night">時間を指定</string>
     <string name="pref_sub_title_reminder_night">夜</string>
+    <string name="memo_card_date" />
 
 </resources>

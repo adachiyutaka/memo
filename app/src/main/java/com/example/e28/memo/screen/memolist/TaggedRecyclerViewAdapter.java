@@ -17,6 +17,11 @@ import io.realm.RealmResults;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.widget.EditText;
+import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by User on 2019/07/16.
@@ -26,12 +31,13 @@ public class TaggedRecyclerViewAdapter extends RecyclerView.Adapter<TaggedRecycl
 
     public class TaggedViewHolder extends RecyclerView.ViewHolder {
         public EditText memoEditText;
+        public TextView memoDate;
         public TaggedViewHolder(View itemView) {
             super(itemView);
             memoEditText = itemView.findViewById(R.id.text_memo);
+            memoDate = itemView.findViewById(R.id.memo_card_date);
         }
     }
-
 
     public TaggedRecyclerViewAdapter(RealmResults<Memo> memoRealmResults) {
         this.memoRealmResults = memoRealmResults;
@@ -46,7 +52,13 @@ public class TaggedRecyclerViewAdapter extends RecyclerView.Adapter<TaggedRecycl
 
     @Override
     public void onBindViewHolder(TaggedViewHolder viewHolder, int position) {
+
         viewHolder.memoEditText.setText(memoRealmResults.get(position).getText());
+
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd_HH:mm", Locale.JAPAN);
+        try {
+            viewHolder.memoDate.setText(sdf.format(memoRealmResults.get(position).getCreatedAt()));
+        } catch (NullPointerException e) {}
     }
 
     @Override

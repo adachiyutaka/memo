@@ -7,18 +7,27 @@
     android:padding="8dp"
     android:orientation="vertical">
 
-    <EditText android:id="@+id/text_memo"
+    <EditText
+        android:id="@+id/text_memo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         tools:text="memoaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"/>
 
+    <TextView
+        android:id="@+id/memo_card_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_memo"
+        android:textAlignment="textEnd" />
+
     <View
+        android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="2dp"
         android:layout_alignParentBottom="true"
-        android:background="@android:color/darker_gray"/>
+        android:background="@android:color/darker_gray" />
 
 </RelativeLayout>

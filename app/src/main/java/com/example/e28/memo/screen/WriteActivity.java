@@ -1,6 +1,7 @@
 package com.example.e28.memo.screen;
 
 import java.lang.Number;
+import java.util.Date;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,6 +15,7 @@ import com.example.e28.memo.R;
 import com.example.e28.memo.model.Memo;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 
 /**
  * Created by User on 2019/08/14.
@@ -63,6 +65,7 @@ public class WriteActivity extends AppCompatActivity {
             return;
         } else {
             memo.setText(memoInputStr);
+            memo.setCreatedAt(new Date(System.currentTimeMillis()));
             saveRealmMemo(memo);
         }
     }
