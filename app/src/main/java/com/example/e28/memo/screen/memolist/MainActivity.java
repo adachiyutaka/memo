@@ -1,7 +1,11 @@
 package com.example.e28.memo.screen.memolist;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.design.widget.NavigationView;
@@ -14,16 +18,24 @@ import android.view.Menu;
 import android.view.MenuItem;
 import com.example.e28.memo.R;
 import com.example.e28.memo.model.Memo;
-;
+
 import io.realm.Realm;
 import io.realm.RealmResults;
-;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     Realm realm;
 
     TaggedRecyclerViewAdapter adapter;
+
+    // DB変更の有無を受信してrecyclerViewを更新するレシーバー
+    private BroadcastReceiver listUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            adapter.notifyDataSetChanged();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {;
@@ -55,13 +67,9 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setLayoutManager(llm);
 
         recyclerView.setAdapter(adapter);
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        adapter.notifyDataSetChanged();
+        // recyclerView更新用のレシーバーを作成
+        LocalBroadcastManager.getInstance(this).registerReceiver(listUpdateReceiver, new IntentFilter("LIST_UPDATE"));
     }
 
     @Override
@@ -142,7 +150,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onDestroy(){
         super.onDestroy();
-        // Activityが破棄される際にrealmのインスタンスを閉じる
+
+        // realmのインスタンスを閉じる
         realm.close();
+        // recyclerView更新用のレシーバーを破棄
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(listUpdateReceiver);
     }
 }

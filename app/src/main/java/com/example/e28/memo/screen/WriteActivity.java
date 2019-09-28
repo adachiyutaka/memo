@@ -2,9 +2,11 @@ package com.example.e28.memo.screen;
 
 import java.lang.Number;
 import java.util.Date;
-
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -15,7 +17,6 @@ import com.example.e28.memo.R;
 import com.example.e28.memo.model.Memo;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 /**
  * Created by User on 2019/08/14.
@@ -25,12 +26,12 @@ public class WriteActivity extends AppCompatActivity {
 
     Realm realm;
     Memo memo = new Memo();
-
     EditText memoInput;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_write);
         memoInput = findViewById(R.id.memoInput);
 
@@ -41,7 +42,7 @@ public class WriteActivity extends AppCompatActivity {
         memo.setId(getRealmMemoNextId());
 
         // 保存ボタンでの保存と新規作成
-        Button btnSave = (Button) this.findViewById(R.id.buttonSave);
+        Button btnSave = findViewById(R.id.buttonSave);
         btnSave.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -55,6 +56,16 @@ public class WriteActivity extends AppCompatActivity {
                 memo.setId(getRealmMemoNextId());
             }
         });
+
+        Button btnTag = findViewById(R.id.buttonTag);
+        btnTag.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent intent = new Intent(WriteActivity.this, com.example.e28.memo.screen.tagdialog.TagDialogActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
     public void saveMemo(final Memo memo){
@@ -78,6 +89,10 @@ public class WriteActivity extends AppCompatActivity {
                     realm.copyToRealmOrUpdate(memo);
                 }
             });
+
+            // recyclerViewの更新を求めるintentを送る
+            Intent intent = new Intent("LIST_UPDATE");
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         } finally {
             Log.d("realm","saveMemo:success");
         }

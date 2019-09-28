@@ -52,12 +52,16 @@ public class TaggedRecyclerViewAdapter extends RecyclerView.Adapter<TaggedRecycl
 
     @Override
     public void onBindViewHolder(TaggedViewHolder viewHolder, int position) {
+        Memo memo = memoRealmResults.get(position);
 
-        viewHolder.memoEditText.setText(memoRealmResults.get(position).getText());
+        // ViewHolderにMemo.textの文章をセット
+        viewHolder.memoEditText.setText(memo.getText());
 
+        // ViewHolderにMemo.createdAtの時刻をセット
+        // createdAtの内容がNullの場合は何もセットしない
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd_HH:mm", Locale.JAPAN);
         try {
-            viewHolder.memoDate.setText(sdf.format(memoRealmResults.get(position).getCreatedAt()));
+            viewHolder.memoDate.setText(sdf.format(memo.getCreatedAt()));
         } catch (NullPointerException e) {}
     }
 
