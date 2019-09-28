@@ -40,6 +40,14 @@ public class Memo extends RealmObject {
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
+    
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 
     public String getText() {
         return text;
@@ -48,4 +56,23 @@ public class Memo extends RealmObject {
     public void setText(String text) {
         this.text = text;
     }
+
+
+    
+    public boolean getIsTagged() {
+        return isTagged;
+    }
+
+    public void setIsTagged(boolean isTagged) {
+        this.isTagged = isTagged;
+    }
+
+    public RealmList<Tag> getTagList() {
+        return tagList;
+    }
+
+    public void setTagList(RealmList<Tag> tagList) {
+        this.tagList = tagList;
+    }
+
 }
