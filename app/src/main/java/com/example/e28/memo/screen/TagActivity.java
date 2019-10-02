@@ -4,15 +4,11 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.e28.memo.R;
-import com.example.e28.memo.screen.memolist.TagItem;
-import com.example.e28.memo.screen.memolist.TaggedRecyclerViewAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,19 +28,6 @@ public class TagActivity extends AppCompatActivity {
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-    }
-
-    private List<TagItem> createDataset() {
-
-        List<TagItem> dataset = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            TagItem data = new TagItem();
-            data.setTagName("タグ" + i);
-            data.setTagSummary("メモ" + i);
-
-            dataset.add(data);
-        }
-        return dataset;
     }
 
     @Override

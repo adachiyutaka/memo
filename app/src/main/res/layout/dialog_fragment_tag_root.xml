@@ -10,20 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        tools:text="aaa" />
-
-    <android.support.v7.widget.AppCompatCheckBox
-        android:id="@+id/tag2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        tools:text="aaa"/>
-
-    <android.support.v7.widget.AppCompatCheckBox
-        android:id="@+id/tag3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        tools:text="aaa"/>
+        android:text="買い物"
+        />
 
 </android.widget.LinearLayout>

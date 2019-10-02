@@ -32,10 +32,13 @@ public class TaggedRecyclerViewAdapter extends RecyclerView.Adapter<TaggedRecycl
     public class TaggedViewHolder extends RecyclerView.ViewHolder {
         public EditText memoEditText;
         public TextView memoDate;
+        public TextView memoTag;
+
         public TaggedViewHolder(View itemView) {
             super(itemView);
             memoEditText = itemView.findViewById(R.id.text_memo);
             memoDate = itemView.findViewById(R.id.memo_card_date);
+            memoTag = itemView.findViewById(R.id.memo_card_tag);
         }
     }
 
@@ -63,6 +66,10 @@ public class TaggedRecyclerViewAdapter extends RecyclerView.Adapter<TaggedRecycl
         try {
             viewHolder.memoDate.setText(sdf.format(memo.getCreatedAt()));
         } catch (NullPointerException e) {}
+
+        // タグがある場合は、ViewHolderにMemo.tagの文章をセット
+        boolean isTagged = memo.getIsTagged();
+        if(isTagged){viewHolder.memoTag.setText("買い物");}
     }
 
     @Override

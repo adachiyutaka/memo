@@ -20,7 +20,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/text_memo"
-        android:textAlignment="textEnd" />
+        android:textAlignment="textEnd"
+        tools:text="date"/>
+
+    <TextView
+        android:id="@+id/memo_card_tag"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_memo"
+        android:textAlignment="textStart"
+        tools:text="tag"/>
 
     <View
         android:id="@+id/view"
