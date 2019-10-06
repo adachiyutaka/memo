@@ -6,6 +6,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 
 import com.example.e28.memo.R;
@@ -38,6 +39,8 @@ public class TagDialogActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_fragment_tag_root);
         final CheckBox chkbox = findViewById(R.id.tag1);
+        final Button finishbtn = findViewById(R.id.button);
+
 
         // Realmのインスタンスを生成
         realm = Realm.getDefaultInstance();
@@ -62,13 +65,19 @@ public class TagDialogActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (chkbox.isChecked() == true) {
                     editedTagIdList.add(testtag.getId());
-                    intent.putExtra(WriteActivity.TAG_LIST, editedTagIdList);
-                    setResult(RESULT_OK, intent);
                 } else {
                     editedTagIdList.remove(testtag.getId());
-                    intent.putExtra(WriteActivity.TAG_LIST, editedTagIdList);
-                    setResult(RESULT_OK, intent);
                 }
+            }
+        });
+
+        finishbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(TagDialogActivity.this, WriteActivity.class);
+                intent.putExtra(WriteActivity.TAG_LIST, editedTagIdList);
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
     }

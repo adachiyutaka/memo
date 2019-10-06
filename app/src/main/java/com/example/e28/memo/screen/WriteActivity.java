@@ -15,10 +15,8 @@ import android.widget.EditText;
 
 import com.example.e28.memo.R;
 import com.example.e28.memo.model.Memo;
-import com.example.e28.memo.model.Tag;
 
 import io.realm.Realm;
-import io.realm.RealmList;
 
 /**
  * Created by User on 2019/08/14.
@@ -33,7 +31,7 @@ public class WriteActivity extends AppCompatActivity {
     EditText memoInput;
 
     public static final String TAG_LIST = "com.example.e28.memo.screen.TAG_LIST";
-    static final int RESULT_TAG_LIST = 0;
+    public static final int RESULT_TAG_LIST = 0;
 
 
     @Override
@@ -95,8 +93,8 @@ public class WriteActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == RESULT_TAG_LIST && null != data) {
-            tagIdList = (ArrayList<Long>) data.getSerializableExtra("TAG_LIST");
+        if (requestCode == RESULT_TAG_LIST && null != data) {
+            tagIdList = (ArrayList<Long>) data.getSerializableExtra(TAG_LIST);
             Log.d("tagIdList", "" + tagIdList.size());
         }
         if (!tagIdList.isEmpty()) {
