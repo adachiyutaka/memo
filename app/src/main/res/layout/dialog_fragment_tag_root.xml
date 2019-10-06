@@ -5,19 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.AppCompatCheckBox
-        android:id="@+id/tag1"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view_tag"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:text="買い物"
-        />
+        android:layout_height="200dp" />
 
     <Button
         android:id="@+id/button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="OK"
-        />
+        android:text="OK" />
 
 </android.widget.LinearLayout>

@@ -15,8 +15,10 @@ import android.widget.EditText;
 
 import com.example.e28.memo.R;
 import com.example.e28.memo.model.Memo;
+import com.example.e28.memo.model.Tag;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 
 /**
  * Created by User on 2019/08/14.
@@ -30,7 +32,7 @@ public class WriteActivity extends AppCompatActivity {
     ArrayList<Long> tagIdList = new ArrayList<>();
     EditText memoInput;
 
-    public static final String TAG_LIST = "com.example.e28.memo.screen.TAG_LIST";
+    public static final String TAG_ID_LIST = "com.example.e28.memo.screen.TAG_LIST";
     public static final int RESULT_TAG_LIST = 0;
 
 
@@ -70,7 +72,7 @@ public class WriteActivity extends AppCompatActivity {
             @Override
             public void onClick(View v){
                 Intent intent = new Intent(WriteActivity.this, com.example.e28.memo.screen.tagdialog.TagDialogActivity.class);
-                intent.putExtra(TAG_LIST, memoId);
+                intent.putExtra(TAG_ID_LIST, memoId);
                 startActivityForResult(intent, RESULT_TAG_LIST);
             }
         });
@@ -93,24 +95,22 @@ public class WriteActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        // タグのIDリストをExtraから得る
         if (requestCode == RESULT_TAG_LIST && null != data) {
-            tagIdList = (ArrayList<Long>) data.getSerializableExtra(TAG_LIST);
-            Log.d("tagIdList", "" + tagIdList.size());
+            tagIdList = (ArrayList<Long>) data.getSerializableExtra(TAG_ID_LIST);
+            // タグのIDリストからタグのリストを作成
+            RealmList<Tag> tagRealmList = new RealmList<>();
+            for (Long id : tagIdList) {
+                tagRealmList.add(realm.where(Tag.class).equalTo("id", id).findFirst());
+            }
+            memo.setTagList(tagRealmList);
         }
+        // 1つでもタグがセットされている場合、IsTaggedをセットする
         if (!tagIdList.isEmpty()) {
             memo.setIsTagged(true);
         }
     }
-
-        // タグが変更された場合に、保存する
-//        if(resultCode == RESULT_OK && requestCode == RESULT_TAG_LIST && null != data) {
-//            tagIdList = (ArrayList<Long>)data.getSerializableExtra("TAG_LIST");
-//            RealmList<Tag> tagRealmList = new RealmList<>();
-//            for (Long id : tagIdList) {
-//                tagRealmList.add(realm.where(Tag.class).equalTo("id", id).findFirst());
-//            }
-//            memo.setTagList(tagRealmList);
-//        }
 
     public void saveMemo(){
         String memoInputStr = memoInput.getText().toString();

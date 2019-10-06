@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity
         RealmResults<Memo> memoRealmResults = realm.where(Memo.class).findAll();
         adapter = new TaggedRecyclerViewAdapter(memoRealmResults);
 
-        RecyclerView recyclerView = findViewById(R.id.recycler_view_tag);
+        RecyclerView recyclerView = findViewById(R.id.recycler_view_memos);
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
 

@@ -1,50 +1,42 @@
-package com.example.e28.memo.screen.memolist;
+package com.example.e28.memo.screen.tagdialog;
 
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.e28.memo.R;
 import com.example.e28.memo.model.Memo;
 import com.example.e28.memo.model.Tag;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 import io.realm.RealmList;
 import io.realm.RealmResults;
 
-
 /**
  * Created by User on 2019/07/16.
  */
 
-
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.widget.EditText;
-import android.widget.TextView;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
 /**
  * Created by User on 2019/07/16.
  */
-public class TaggedRecyclerViewAdapter extends RecyclerView.Adapter<TaggedRecyclerViewAdapter.TaggedViewHolder> {
+public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerViewAdapter.TaggedViewHolder> {
     public RealmResults<Memo> memoRealmResults;
 
     public class TaggedViewHolder extends RecyclerView.ViewHolder {
         public EditText memoEditText;
-        public TextView memoDate;
-        public TextView memoTag;
 
         public TaggedViewHolder(View itemView) {
             super(itemView);
-            memoEditText = itemView.findViewById(R.id.text_memo);
-            memoDate = itemView.findViewById(R.id.memo_card_date);
-            memoTag = itemView.findViewById(R.id.memo_card_tag);
+            tagChk = itemView.findViewById(R.id.);
         }
     }
 
-    public TaggedRecyclerViewAdapter(RealmResults<Memo> memoRealmResults) {
+    public TagRecyclerViewAdapter(RealmResults<Memo> memoRealmResults) {
         this.memoRealmResults = memoRealmResults;
     }
 

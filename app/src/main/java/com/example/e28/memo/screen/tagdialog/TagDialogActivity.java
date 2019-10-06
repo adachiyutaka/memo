@@ -17,6 +17,7 @@ import com.example.e28.memo.screen.WriteActivity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.ToDoubleBiFunction;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -32,13 +33,18 @@ public class TagDialogActivity extends AppCompatActivity {
     Memo memo = new Memo();
     ArrayList<Long> tagIdList = new ArrayList();
     ArrayList<Long> editedTagIdList = new ArrayList();
-    Tag testtag = new Tag();
+    Tag testtag1 = new Tag();
+    Tag testtag2 = new Tag();
+    Tag testtag3 = new Tag();
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_fragment_tag_root);
-        final CheckBox chkbox = findViewById(R.id.tag1);
+        final CheckBox chkbox1 = findViewById(R.id.tag1);
+        final CheckBox chkbox2 = findViewById(R.id.tag2);
+        final CheckBox chkbox3 = findViewById(R.id.tag3);
         final Button finishbtn = findViewById(R.id.button);
 
 
@@ -47,7 +53,7 @@ public class TagDialogActivity extends AppCompatActivity {
 
         // intentで渡されたMEMO_IDからUnmanagedの状態でMemoインスタンスを作成
         intent = getIntent();
-        memo = realm.where(Memo.class).equalTo("id", intent.getLongExtra(WriteActivity.TAG_LIST, -1)).findFirst();
+        memo = realm.where(Memo.class).equalTo("id", intent.getLongExtra(WriteActivity.TAG_ID_LIST, -1)).findFirst();
 //        memo = realm.copyFromRealm(realm.where(Memo.class).equalTo("id", getIntent().getLongExtra("MEMO_ID", -1)).findFirst());
 //        if (memo.getTagList().size() != 0) {
 //            for (Tag tag : memo.getTagList()) {
@@ -56,17 +62,55 @@ public class TagDialogActivity extends AppCompatActivity {
 //        }
 
         // とりあえずのタグ
-        testtag.setId(0);
-        testtag.setName("買い物");
+        testtag1.setId(0);
+        testtag1.setName("買い物");
+        testtag2.setId(1);
+        testtag2.setName("あとでやる");
+        testtag3.setId(2);
+        testtag3.setName("アイディア");
+        try {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    realm.copyToRealmOrUpdate(testtag1);
+                    realm.copyToRealmOrUpdate(testtag2);
+                    realm.copyToRealmOrUpdate(testtag3);
+                }
+            });
+        } finally {
+            Log.d("realm","testTagSave:success");
+        }
 
         // 各タグのチェック状態読み取り
-        chkbox.setOnClickListener(new View.OnClickListener() {
+        chkbox1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (chkbox.isChecked() == true) {
-                    editedTagIdList.add(testtag.getId());
+                if (chkbox1.isChecked() == true) {
+                    editedTagIdList.add(testtag1.getId());
                 } else {
-                    editedTagIdList.remove(testtag.getId());
+                    editedTagIdList.remove(testtag1.getId());
+                }
+            }
+        });
+
+        chkbox2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (chkbox2.isChecked() == true) {
+                    editedTagIdList.add(testtag2.getId());
+                } else {
+                    editedTagIdList.remove(testtag2.getId());
+                }
+            }
+        });
+
+        chkbox3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (chkbox3.isChecked() == true) {
+                    editedTagIdList.add(testtag3.getId());
+                } else {
+                    editedTagIdList.remove(testtag3.getId());
                 }
             }
         });
@@ -75,25 +119,25 @@ public class TagDialogActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(TagDialogActivity.this, WriteActivity.class);
-                intent.putExtra(WriteActivity.TAG_LIST, editedTagIdList);
+                intent.putExtra(WriteActivity.TAG_ID_LIST, editedTagIdList);
                 setResult(RESULT_OK, intent);
                 finish();
             }
         });
     }
 
-//    @Override
-//    public void onPause(){
-//        super.onPause();
-//        // タグが登録されている場合は
-//        if (!Objects.equals(editedTagIdList, tagIdList)) {
-//            // タグに変更がある場合は保存する
-//            intent.putExtra(WriteActivity.TAG_LIST, editedTagIdList);
-//            setResult(RESULT_OK, intent);
-//        }else{
-//            // タグに変更がない場合は保存しない
-//        }
-//    }
+    @Override
+    public void onPause(){
+        super.onPause();
+        // タグが登録されている場合は
+        if (!Objects.equals(editedTagIdList, tagIdList)) {
+            // タグに変更がある場合は保存する
+            intent.putExtra(WriteActivity.TAG_ID_LIST, editedTagIdList);
+            setResult(RESULT_OK, intent);
+        }else{
+            // タグに変更がない場合は保存しない
+        }
+    }
 
     // 保存処理
 //    public void saveMemo(final Memo memo) {
