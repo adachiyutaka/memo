@@ -8,13 +8,13 @@
     android:padding="8dp"
     android:orientation="vertical">
 
-
     <CheckBox
-        android:id="@+id/checkBox"
+        android:id="@+id/tag_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         tools:text="タグの名前"
         />
+
 </RelativeLayout>

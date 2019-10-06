@@ -1,9 +1,12 @@
 package com.example.e28.memo.screen.tagdialog;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +16,7 @@ import com.example.e28.memo.R;
 import com.example.e28.memo.model.Memo;
 import com.example.e28.memo.model.Tag;
 import com.example.e28.memo.screen.WriteActivity;
+import com.example.e28.memo.screen.memolist.TaggedRecyclerViewAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +25,7 @@ import java.util.function.ToDoubleBiFunction;
 
 import io.realm.Realm;
 import io.realm.RealmList;
+import io.realm.RealmResults;
 
 /**
  * Created by User on 2019/08/11.
@@ -36,6 +41,7 @@ public class TagDialogActivity extends AppCompatActivity {
     Tag testtag1 = new Tag();
     Tag testtag2 = new Tag();
     Tag testtag3 = new Tag();
+    TagListRecyclerViewAdapter adapter;
 
 
     @Override
@@ -80,6 +86,33 @@ public class TagDialogActivity extends AppCompatActivity {
         } finally {
             Log.d("realm","testTagSave:success");
         }
+
+        RealmResults<Tag> memoRealmResults = realm.where(Tag.class).findAll();
+        adapter = new TagListRecyclerViewAdapter(memoRealmResults){
+        // onItemClick()をオーバーライドして
+        // クリックイベントの処理を記述する
+            @Override
+            void onItemClick(CheckBox tagChk, int position, Tag tag) {
+                if (tagChk.isChecked() == true) {
+                    editedTagIdList.add(testtag1.getId());
+                } else {
+                    editedTagIdList.remove(testtag1.getId());
+                }
+            }
+        };
+
+        RecyclerView recyclerView = findViewById(R.id.recycler_view_tag);
+
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+
+        recyclerView.setHasFixedSize(true);
+
+        recyclerView.setLayoutManager(llm);
+
+        recyclerView.setAdapter(adapter);
+
+        // recyclerView更新用のレシーバーを作成
+        // LocalBroadcastManager.getInstance(this).registerReceiver(listUpdateReceiver, new IntentFilter("LIST_UPDATE"));
 
         // 各タグのチェック状態読み取り
         chkbox1.setOnClickListener(new View.OnClickListener() {

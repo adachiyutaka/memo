@@ -50,9 +50,9 @@ public class TaggedRecyclerViewAdapter extends RecyclerView.Adapter<TaggedRecycl
 
     @Override
     public TaggedViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View inflate = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_tag, parent,false);
-        TaggedViewHolder vh = new TaggedViewHolder(inflate);
-        return vh;
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_tag, parent,false);
+        TaggedViewHolder viewHolder = new TaggedViewHolder(view);
+        return viewHolder;
     }
 
     @Override
