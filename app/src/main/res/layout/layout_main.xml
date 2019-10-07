@@ -25,7 +25,7 @@
 
     <!-- content -->
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view_tag"
+        android:id="@+id/recycler_view_memos"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

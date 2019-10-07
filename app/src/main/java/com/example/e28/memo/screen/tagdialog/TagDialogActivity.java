@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 
 import com.example.e28.memo.R;
 import com.example.e28.memo.model.Memo;
@@ -19,6 +20,7 @@ import com.example.e28.memo.screen.WriteActivity;
 import com.example.e28.memo.screen.memolist.TaggedRecyclerViewAdapter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.ToDoubleBiFunction;
@@ -48,11 +50,13 @@ public class TagDialogActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_fragment_tag_root);
-        final CheckBox chkbox1 = findViewById(R.id.tag1);
-        final CheckBox chkbox2 = findViewById(R.id.tag2);
-        final CheckBox chkbox3 = findViewById(R.id.tag3);
+//        final CheckBox chkbox1 = findViewById(R.id.tag1);
+//        final CheckBox chkbox2 = findViewById(R.id.tag2);
+//        final CheckBox chkbox3 = findViewById(R.id.tag3);
+        final EditText tagEditText = findViewById(R.id.edit_text_tag_name);
+        Button savebtn = findViewById(R.id.button_save);
+        RecyclerView recyclerView = findViewById(R.id.recycler_view_tag);
         final Button finishbtn = findViewById(R.id.button);
-
 
         // Realmのインスタンスを生成
         realm = Realm.getDefaultInstance();
@@ -84,69 +88,61 @@ public class TagDialogActivity extends AppCompatActivity {
                 }
             });
         } finally {
-            Log.d("realm","testTagSave:success");
+            Log.d("realm", "testTagSave:success");
         }
+        // とりあえずのタグ
+
 
         RealmResults<Tag> memoRealmResults = realm.where(Tag.class).findAll();
-        adapter = new TagListRecyclerViewAdapter(memoRealmResults){
-        // onItemClick()をオーバーライドして
-        // クリックイベントの処理を記述する
-            @Override
-            void onItemClick(CheckBox tagChk, int position, Tag tag) {
-                if (tagChk.isChecked() == true) {
-                    editedTagIdList.add(testtag1.getId());
-                } else {
-                    editedTagIdList.remove(testtag1.getId());
+            adapter = new TagListRecyclerViewAdapter(memoRealmResults) {
+                // onItemClick()をオーバーライドして
+                // クリックイベントの処理を記述する
+                @Override
+                void onItemClick(CheckBox tagChk, int position, Tag tag) {
+                    if (tagChk.isChecked() == true) {
+                        editedTagIdList.add(tag.getId());
+                    } else {
+                        editedTagIdList.remove(tag.getId());
+                    }
                 }
-            }
         };
 
-        RecyclerView recyclerView = findViewById(R.id.recycler_view_tag);
-
+        // recyclerViewの設定
         LinearLayoutManager llm = new LinearLayoutManager(this);
-
         recyclerView.setHasFixedSize(true);
-
         recyclerView.setLayoutManager(llm);
-
         recyclerView.setAdapter(adapter);
+
+        // 新規タグ作成
+        savebtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String tagName = tagEditText.getText().toString();
+                if (!tagName.isEmpty()) {
+                    final Tag tag = new Tag();
+                    tag.setId(getRealmTagNextId());
+                    tag.setCreatedAt(new Date(System.currentTimeMillis()));
+                    tag.setName(tagName);
+
+                    try {
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                realm.copyToRealmOrUpdate(tag);
+                            }
+                        });
+                    } finally {
+                        Log.d("realm", "testTagSave:success");
+                    }
+
+                    // recyclerViewの更新
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
 
         // recyclerView更新用のレシーバーを作成
         // LocalBroadcastManager.getInstance(this).registerReceiver(listUpdateReceiver, new IntentFilter("LIST_UPDATE"));
-
-        // 各タグのチェック状態読み取り
-        chkbox1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (chkbox1.isChecked() == true) {
-                    editedTagIdList.add(testtag1.getId());
-                } else {
-                    editedTagIdList.remove(testtag1.getId());
-                }
-            }
-        });
-
-        chkbox2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (chkbox2.isChecked() == true) {
-                    editedTagIdList.add(testtag2.getId());
-                } else {
-                    editedTagIdList.remove(testtag2.getId());
-                }
-            }
-        });
-
-        chkbox3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (chkbox3.isChecked() == true) {
-                    editedTagIdList.add(testtag3.getId());
-                } else {
-                    editedTagIdList.remove(testtag3.getId());
-                }
-            }
-        });
 
         finishbtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -170,6 +166,26 @@ public class TagDialogActivity extends AppCompatActivity {
         }else{
             // タグに変更がない場合は保存しない
         }
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+
+        // realmのインスタンスを閉じる
+        realm.close();
+    }
+
+    public long getRealmTagNextId() {
+        // 初期化
+        long nextId = 0;
+
+        Number maxId = realm.where(Tag.class).max("id");
+        // 1度もデータが作成されていない場合はNULLが返ってくるため、NULLチェックをする
+        if (maxId != null) {
+            nextId = maxId.longValue() + 1;
+        }
+        return nextId;
     }
 
     // 保存処理

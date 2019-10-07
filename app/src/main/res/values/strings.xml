@@ -8,6 +8,7 @@
     <string name="switch_style_column">2カラム</string>
     <string name="switch_style_sort">新しい順</string>
     <string name="switch_style_tag_group">タグでまとめて表示</string>
+    <string name="nav_tag">タグの編集</string>
     <string name="nav_manage">詳細設定</string>
     <string name="nav_delete">ごみ箱</string>
     <string name="action_trash">ごみ箱</string>
@@ -34,5 +35,8 @@
     <string name="pref_summary_reminder_night">時間を指定</string>
     <string name="pref_sub_title_reminder_night">夜</string>
     <string name="memo_card_date" />
+
+    <string name="hint_tag">タグ名を入力</string>>
+    <string name="save_tag">保存</string>
 
 </resources>

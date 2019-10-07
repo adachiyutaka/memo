@@ -134,6 +134,9 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.switch_style_tag_group) {
 
+        } else if (id == R.id.nav_tag) {
+            Intent intent = new Intent(this, com.example.e28.memo.screen.tag.TagActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_manage) {
             Intent intent = new Intent(this, com.example.e28.memo.screen.manage.ManageActivity.class);
             startActivity(intent);

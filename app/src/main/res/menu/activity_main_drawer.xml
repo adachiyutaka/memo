@@ -18,6 +18,11 @@
             android:title="@string/switch_style_tag_group" />
 
         <item
+            android:id="@+id/nav_tag"
+            android:icon="@android:drawable/ic_menu_sort_by_size"
+            android:title="@string/nav_tag" />
+
+        <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"
             android:title="@string/nav_manage" />
@@ -25,5 +30,4 @@
             android:id="@+id/nav_delete"
             android:icon="@android:drawable/ic_menu_delete"
             android:title="@string/nav_delete" />
-
 </menu>

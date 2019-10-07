@@ -9,7 +9,7 @@
     android:orientation="vertical">
 
     <CheckBox
-        android:id="@+id/tag_checkbox"
+        android:id="@+id/checkbox_tag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"

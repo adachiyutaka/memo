@@ -1,21 +1,17 @@
-package com.example.e28.memo.screen.tagdialog;
+package com.example.e28.memo.screen.tag;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ImageButton;
 
 import com.example.e28.memo.R;
-import com.example.e28.memo.model.Memo;
 import com.example.e28.memo.model.Tag;
 
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-
-import io.realm.RealmResults;
 import io.realm.RealmResults;
 
 /**
@@ -25,20 +21,24 @@ import io.realm.RealmResults;
 /**
  * Created by User on 2019/07/16.
  */
-public class TagListRecyclerViewAdapter extends RecyclerView.Adapter<TagListRecyclerViewAdapter.TagCardViewHolder> {
+public class TagEditRecyclerViewAdapter extends RecyclerView.Adapter<TagEditRecyclerViewAdapter.TagCardViewHolder> {
     public RealmResults<Tag> tagRealmResults;
 
     // ViewHolderクラスの設定（インナークラス）
     public class TagCardViewHolder extends RecyclerView.ViewHolder {
-        public CheckBox tagChk;
+        public EditText tagEditText;
+        public ImageButton deleteBtn;
+        public Button saveBtn;
 
         public TagCardViewHolder(View itemView) {
             super(itemView);
-            tagChk = itemView.findViewById(R.id.checkbox_tag);
+            tagEditText = itemView.findViewById(R.id.edit_text_tag);
+            deleteBtn = itemView.findViewById(R.id.button_delete);
+            saveBtn = itemView.findViewById(R.id.button_save);
         }
     }
 
-    public TagListRecyclerViewAdapter(RealmResults<Tag> tagRealmResults) {
+    public TagEditRecyclerViewAdapter(RealmResults<Tag> tagRealmResults) {
         this.tagRealmResults = tagRealmResults;
     }
 
@@ -47,12 +47,22 @@ public class TagListRecyclerViewAdapter extends RecyclerView.Adapter<TagListRecy
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_tag, parent,false);
         final TagCardViewHolder viewHolder = new TagCardViewHolder(view);
         // ViewHolderにクリックイベントを登録
-        viewHolder.tagChk.setOnClickListener(new View.OnClickListener() {
+
+        viewHolder..setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int position = viewHolder.getAdapterPosition();
                 //処理はonItemClick()に丸投げ
-                onItemClick(viewHolder.tagChk, position, tagRealmResults.get(position));
+                onDeleteClick(tagRealmResults.get(position));
+            }
+        });
+
+        viewHolder.saveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int position = viewHolder.getAdapterPosition();
+                //処理はonItemClick()に丸投げ
+                onSaveClick(viewHolder.tagEditText, position, tagRealmResults.get(position));
             }
         });
         return viewHolder;
@@ -63,7 +73,7 @@ public class TagListRecyclerViewAdapter extends RecyclerView.Adapter<TagListRecy
         Tag tag = tagRealmResults.get(position);
 
         // ViewHolderにTag.Nameをセット
-        viewHolder.tagChk.setText(tag.getName());
+        viewHolder.tagEditText.setText(tag.getName());
     }
 
     @Override
@@ -71,7 +81,11 @@ public class TagListRecyclerViewAdapter extends RecyclerView.Adapter<TagListRecy
         return tagRealmResults.size();
     }
 
-    void onItemClick(CheckBox tagChk, int position, Tag tag) {
+    void onDeleteClick(Tag tag) {
+        // アダプタのインスタンス側からこのメソッドをオーバーライドして
+        // クリックイベントの処理を設定する
+    }
+    void onSaveClick(EditText editText, int position, Tag tag) {
         // アダプタのインスタンス側からこのメソッドをオーバーライドして
         // クリックイベントの処理を設定する
     }
