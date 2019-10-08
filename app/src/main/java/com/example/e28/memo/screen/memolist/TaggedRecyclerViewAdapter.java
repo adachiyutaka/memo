@@ -35,12 +35,14 @@ public class TaggedRecyclerViewAdapter extends RecyclerView.Adapter<TaggedRecycl
         public EditText memoEditText;
         public TextView memoDate;
         public TextView memoTag;
+        public TextView memoHighLight;
 
         public TaggedViewHolder(View itemView) {
             super(itemView);
             memoEditText = itemView.findViewById(R.id.text_memo);
             memoDate = itemView.findViewById(R.id.memo_card_date);
             memoTag = itemView.findViewById(R.id.memo_card_tag);
+            memoHighLight = itemView.findViewById(R.id.memo_card_highlight);
         }
     }
 
@@ -70,13 +72,16 @@ public class TaggedRecyclerViewAdapter extends RecyclerView.Adapter<TaggedRecycl
             viewHolder.memoDate.setText(sdf.format(memo.getCreatedAt()));
         } catch (NullPointerException e) {}
 
-        // タグがある場合は、ViewHolderにMemo.tagの文章をセット
-        boolean isTagged = memo.getIsTagged();
-        RealmList<Tag> tagRealmList = memo.getTagList();
-        for (Tag tag : tagRealmList) {
+        // ハイライトがある場合は、★を表示
+        if(memo.getIsHighlight()){
+            viewHolder.memoHighLight.setText("★");
+        }
+
+        // タグがある場合は、ViewHolderにMemo.tagListの中身をにつなげた文章をセット
+        for (Tag tag : memo.getTagList()) {
             tagStr += ", " + tag.getName();
         }
-        if(isTagged){
+        if(memo.getIsTagged()){
             viewHolder.memoTag.setText(tagStr);
         }
     }

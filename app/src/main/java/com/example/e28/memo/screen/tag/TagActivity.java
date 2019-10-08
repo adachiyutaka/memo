@@ -90,7 +90,8 @@ public class TagActivity extends AppCompatActivity {
                     tag.setUpdatedAt(new Date(System.currentTimeMillis()));
                     tag.setName(tagName);
                     saveRealmTag(tag, id);
-                    // recyclerViewの更新
+                    // 記入欄をクリア
+                    tagEditText.getEditableText().clear();
                 } else {
 
                 }

@@ -56,8 +56,6 @@ public class Memo extends RealmObject {
     public void setText(String text) {
         this.text = text;
     }
-
-
     
     public boolean getIsTagged() {
         return isTagged;
@@ -73,6 +71,14 @@ public class Memo extends RealmObject {
 
     public void setTagList(RealmList<Tag> tagList) {
         this.tagList = tagList;
+    }
+    
+    public boolean getIsHighlight() {
+        return isHighlight;
+    }
+
+    public void setIsHighlight(boolean isHighlight) {
+        this.isHighlight = isHighlight;
     }
 
 }

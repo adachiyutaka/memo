@@ -11,7 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ToggleButton;
 
 import com.example.e28.memo.R;
 import com.example.e28.memo.model.Memo;
@@ -31,10 +33,10 @@ public class WriteActivity extends AppCompatActivity {
     long memoId;
     ArrayList<Long> tagIdList = new ArrayList<>();
     EditText memoInput;
+    ToggleButton highlightBtn;
 
     public static final String TAG_ID_LIST = "com.example.e28.memo.screen.TAG_LIST";
     public static final int RESULT_TAG_LIST = 0;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,10 +61,11 @@ public class WriteActivity extends AppCompatActivity {
                 saveMemo();
                 // メモ入力エリアの表示をクリア
                 memoInput.getEditableText().clear();
+                highlightBtn.setChecked(false);
 
-                // TODO: 2019/09/08 空白のデータ郡（タグなど）を追加する 
-                // 新しいメモのidと空白のデータをセット
+                // 新しいMemoモデルと新しいidをセット
                 memoId = getRealmMemoNextId();
+                memo = new Memo();
             }
         });
 
@@ -74,6 +77,18 @@ public class WriteActivity extends AppCompatActivity {
                 Intent intent = new Intent(WriteActivity.this, com.example.e28.memo.screen.tagdialog.TagDialogActivity.class);
                 intent.putExtra(TAG_ID_LIST, memoId);
                 startActivityForResult(intent, RESULT_TAG_LIST);
+            }
+        });
+
+        // ハイライトボタンでハイライトの設定
+        highlightBtn = findViewById(R.id.toggleButton);
+        highlightBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    memo.setIsHighlight(true);
+                } else {
+                    memo.setIsHighlight(false);
+                }
             }
         });
     }
