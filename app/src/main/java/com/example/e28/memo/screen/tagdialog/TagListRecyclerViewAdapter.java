@@ -51,7 +51,6 @@ public class TagListRecyclerViewAdapter extends RecyclerView.Adapter<TagListRecy
             @Override
             public void onClick(View v) {
                 int position = viewHolder.getAdapterPosition();
-                //処理はonItemClick()に丸投げ
                 onItemClick(viewHolder.tagChk, position, tagRealmResults.get(position));
             }
         });
@@ -61,7 +60,6 @@ public class TagListRecyclerViewAdapter extends RecyclerView.Adapter<TagListRecy
     @Override
     public void onBindViewHolder(TagCardViewHolder viewHolder, int position) {
         Tag tag = tagRealmResults.get(position);
-
         // ViewHolderにTag.Nameをセット
         viewHolder.tagChk.setText(tag.getName());
     }

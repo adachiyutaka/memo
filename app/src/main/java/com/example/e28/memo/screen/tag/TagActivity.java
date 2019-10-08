@@ -32,8 +32,6 @@ import io.realm.RealmResults;
 public class TagActivity extends AppCompatActivity {
 
     Realm realm;
-    Intent intent;
-    Memo memo = new Memo();
     TagEditRecyclerViewAdapter adapter;
 
     Tag testtag1 = new Tag();
@@ -79,21 +77,20 @@ public class TagActivity extends AppCompatActivity {
             // クリックイベントの処理を記述する
 
             @Override
-            void onDeleteClick(Tag tag) {
-                    deleteRealmTag(tag);
+            void onDeleteClick(long id) {
+                    deleteRealmTag(id);
                     // recyclerViewの更新
-                    adapter.notifyDataSetChanged();
             }
 
             @Override
-            void onSaveClick(EditText tagEditText, int position, Tag tag) {
+            void onSaveClick(EditText tagEditText, int position, long id) {
                 String tagName = tagEditText.getText().toString();
                 if (!tagName.isEmpty()) {
+                    Tag tag = new Tag();
                     tag.setUpdatedAt(new Date(System.currentTimeMillis()));
                     tag.setName(tagName);
-                    saveRealmTag(tag);
+                    saveRealmTag(tag, id);
                     // recyclerViewの更新
-                    adapter.notifyDataSetChanged();
                 } else {
 
                 }
@@ -113,23 +110,9 @@ public class TagActivity extends AppCompatActivity {
                 String tagName = tagEditText.getText().toString();
                 if (!tagName.isEmpty()) {
                     final Tag tag = new Tag();
-                    tag.setId(getRealmTagNextId());
                     tag.setCreatedAt(new Date(System.currentTimeMillis()));
                     tag.setName(tagName);
-
-                    try {
-                        realm.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-                                realm.copyToRealmOrUpdate(tag);
-                            }
-                        });
-                    } finally {
-                        Log.d("realm", "testTagSave:success");
-                    }
-
-                    // recyclerViewの更新
-                    adapter.notifyDataSetChanged();
+                    saveRealmTag(tag, getRealmTagNextId());
                 }
             }
         });
@@ -144,30 +127,33 @@ public class TagActivity extends AppCompatActivity {
         realm.close();
     }
 
-    void deleteRealmTag(final Tag tag) {
+    void deleteRealmTag(final long id) {
         try {
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    final RealmResults<Tag> result = realm.where(Tag.class).equalTo("id",tag.getId()).findAll();
-                    result.get(0).removeFromRealm();
+                    final RealmResults<Tag> result = realm.where(Tag.class).equalTo("id", id).findAll();
+                    result.deleteFirstFromRealm();
                 }
             });
+            adapter.notifyDataSetChanged();
         } finally {
-            Log.d("realm", "testTagSave:success");
+            Log.d("realm", "delete:success");
         }
     }
 
-    void saveRealmTag(final Tag tag) {
+    void saveRealmTag(final Tag tag, final long id) {
         try {
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
+                    tag.setId(id);
                     realm.copyToRealmOrUpdate(tag);
                 }
             });
+            adapter.notifyDataSetChanged();
         } finally {
-            Log.d("realm", "testTagSave:success");
+            Log.d("realm", "Save:success");
         }
     }
 

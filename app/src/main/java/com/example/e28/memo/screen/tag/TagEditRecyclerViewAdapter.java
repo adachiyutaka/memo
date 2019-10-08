@@ -44,16 +44,15 @@ public class TagEditRecyclerViewAdapter extends RecyclerView.Adapter<TagEditRecy
 
     @Override
     public TagCardViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_tag, parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_tag_edit, parent,false);
         final TagCardViewHolder viewHolder = new TagCardViewHolder(view);
         // ViewHolderにクリックイベントを登録
 
-        viewHolder..setOnClickListener(new View.OnClickListener() {
+        viewHolder.deleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int position = viewHolder.getAdapterPosition();
-                //処理はonItemClick()に丸投げ
-                onDeleteClick(tagRealmResults.get(position));
+                onDeleteClick(tagRealmResults.get(position).getId());
             }
         });
 
@@ -62,7 +61,7 @@ public class TagEditRecyclerViewAdapter extends RecyclerView.Adapter<TagEditRecy
             public void onClick(View v) {
                 int position = viewHolder.getAdapterPosition();
                 //処理はonItemClick()に丸投げ
-                onSaveClick(viewHolder.tagEditText, position, tagRealmResults.get(position));
+                onSaveClick(viewHolder.tagEditText, position, tagRealmResults.get(position).getId());
             }
         });
         return viewHolder;
@@ -71,7 +70,6 @@ public class TagEditRecyclerViewAdapter extends RecyclerView.Adapter<TagEditRecy
     @Override
     public void onBindViewHolder(TagCardViewHolder viewHolder, int position) {
         Tag tag = tagRealmResults.get(position);
-
         // ViewHolderにTag.Nameをセット
         viewHolder.tagEditText.setText(tag.getName());
     }
@@ -81,11 +79,11 @@ public class TagEditRecyclerViewAdapter extends RecyclerView.Adapter<TagEditRecy
         return tagRealmResults.size();
     }
 
-    void onDeleteClick(Tag tag) {
+    void onDeleteClick(long id) {
         // アダプタのインスタンス側からこのメソッドをオーバーライドして
         // クリックイベントの処理を設定する
     }
-    void onSaveClick(EditText editText, int position, Tag tag) {
+    void onSaveClick(EditText editText, int position, long id) {
         // アダプタのインスタンス側からこのメソッドをオーバーライドして
         // クリックイベントの処理を設定する
     }
