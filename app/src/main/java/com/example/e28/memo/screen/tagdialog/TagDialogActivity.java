@@ -1,9 +1,7 @@
 package com.example.e28.memo.screen.tagdialog;
 
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,16 +15,12 @@ import com.example.e28.memo.R;
 import com.example.e28.memo.model.Memo;
 import com.example.e28.memo.model.Tag;
 import com.example.e28.memo.screen.WriteActivity;
-import com.example.e28.memo.screen.memolist.TaggedRecyclerViewAdapter;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
-import java.util.function.ToDoubleBiFunction;
 
 import io.realm.Realm;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 
 /**
@@ -37,22 +31,18 @@ public class TagDialogActivity extends AppCompatActivity {
 
     Realm realm;
     Intent intent;
-    Memo memo = new Memo();
-    ArrayList<Long> tagIdList = new ArrayList();
-    ArrayList<Long> editedTagIdList = new ArrayList();
+    TagListRecyclerViewAdapter adapter;
+    ArrayList<Long> tagIdList = new ArrayList<>();
+    ArrayList<Long> editedTagIdList = tagIdList;
     Tag testtag1 = new Tag();
     Tag testtag2 = new Tag();
     Tag testtag3 = new Tag();
-    TagListRecyclerViewAdapter adapter;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_fragment_tag_root);
-//        final CheckBox chkbox1 = findViewById(R.id.tag1);
-//        final CheckBox chkbox2 = findViewById(R.id.tag2);
-//        final CheckBox chkbox3 = findViewById(R.id.tag3);
         final EditText tagEditText = findViewById(R.id.edit_text_tag_name);
         Button savebtn = findViewById(R.id.button_save);
         RecyclerView recyclerView = findViewById(R.id.recycler_view_tag);
@@ -61,15 +51,9 @@ public class TagDialogActivity extends AppCompatActivity {
         // Realmのインスタンスを生成
         realm = Realm.getDefaultInstance();
 
-        // intentで渡されたMEMO_IDからUnmanagedの状態でMemoインスタンスを作成
+        // intentからタグidリストを受け取る
         intent = getIntent();
-        memo = realm.where(Memo.class).equalTo("id", intent.getLongExtra(WriteActivity.TAG_ID_LIST, -1)).findFirst();
-//        memo = realm.copyFromRealm(realm.where(Memo.class).equalTo("id", getIntent().getLongExtra("MEMO_ID", -1)).findFirst());
-//        if (memo.getTagList().size() != 0) {
-//            for (Tag tag : memo.getTagList()) {
-//                tagIdList.add(tag.getId());
-//            }
-//        }
+        tagIdList = (ArrayList<Long>) intent.getSerializableExtra(WriteActivity.TAG_ID_LIST);
 
         // とりあえずのタグ
         testtag1.setId(0);
@@ -93,37 +77,41 @@ public class TagDialogActivity extends AppCompatActivity {
         // とりあえずのタグ
 
 
+        // すべてのタグのリストをリサイクラービューのアダプターにセット
         RealmResults<Tag> memoRealmResults = realm.where(Tag.class).findAll();
-            adapter = new TagListRecyclerViewAdapter(memoRealmResults) {
-                // onItemClick()をオーバーライドして
-                // クリックイベントの処理を記述する
-                @Override
-                void onItemClick(CheckBox tagChk, int position, Tag tag) {
-                    if (tagChk.isChecked() == true) {
-                        editedTagIdList.add(tag.getId());
-                    } else {
-                        editedTagIdList.remove(tag.getId());
-                    }
+        adapter = new TagListRecyclerViewAdapter(memoRealmResults, editedTagIdList) {
+            // onItemClick()をオーバーライドして
+            // クリックイベントの処理を記述する
+            @Override
+            void onItemClick(CheckBox tagChk, int position, Tag tag) {
+                if (tagChk.isChecked() == true) {
+                    // チェックが入った場合に、editedTagListに該当タグを追加
+                    editedTagIdList.add(tag.getId());
+                } else {
+                    // チェックが外れた場合に、editedTagListから該当タグを削除
+                    editedTagIdList.remove(tag.getId());
                 }
+            }
         };
 
-        // recyclerViewの設定
+        // recyclerViewの設定、アダプターのセット
         LinearLayoutManager llm = new LinearLayoutManager(this);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(llm);
         recyclerView.setAdapter(adapter);
 
-        // 新規タグ作成
+        // 新規タグ作成の保存ボタン
         savebtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String tagName = tagEditText.getText().toString();
                 if (!tagName.isEmpty()) {
+                    // 新しいタグを生成し、Realmに保存
                     final Tag tag = new Tag();
-                    tag.setId(getRealmTagNextId());
+                    long newTagId = getRealmTagNextId();
+                    tag.setId(newTagId);
                     tag.setCreatedAt(new Date(System.currentTimeMillis()));
                     tag.setName(tagName);
-
                     try {
                         realm.executeTransaction(new Realm.Transaction() {
                             @Override
@@ -134,7 +122,10 @@ public class TagDialogActivity extends AppCompatActivity {
                     } finally {
                         Log.d("realm", "testTagSave:success");
                     }
-
+                    // editedTagIdListに新しいタグのを追加
+                    editedTagIdList.add(newTagId);
+                    // タグ名の入力エリアをクリアー
+                    tagEditText.getEditableText().clear();
                     // recyclerViewの更新
                     adapter.notifyDataSetChanged();
                 }

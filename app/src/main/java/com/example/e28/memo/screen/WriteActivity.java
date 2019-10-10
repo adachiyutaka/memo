@@ -21,6 +21,8 @@ import com.example.e28.memo.model.Tag;
 
 import io.realm.Realm;
 import io.realm.RealmList;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 
 /**
  * Created by User on 2019/08/14.
@@ -75,7 +77,12 @@ public class WriteActivity extends AppCompatActivity {
             @Override
             public void onClick(View v){
                 Intent intent = new Intent(WriteActivity.this, com.example.e28.memo.screen.tagdialog.TagDialogActivity.class);
-                intent.putExtra(TAG_ID_LIST, memoId);
+                // Memoが持つタグのidリストを生成し、中身が0でない場合はintentで渡す
+                if (memo.getTagList() != null) {
+                    for (Tag tag : memo.getTagList()) {
+                        tagIdList.add(tag.getId());
+                        intent.putExtra(TAG_ID_LIST, tagIdList);}
+                }
                 startActivityForResult(intent, RESULT_TAG_LIST);
             }
         });
@@ -98,6 +105,8 @@ public class WriteActivity extends AppCompatActivity {
         super.onPause();
         // Activityが隠れた際に入力された内容を自動保存する
         saveMemo();
+        // タグの内容をすべて消す
+        tagIdList = new ArrayList<>();
     }
 
     @Override
@@ -125,13 +134,16 @@ public class WriteActivity extends AppCompatActivity {
         if (!tagIdList.isEmpty()) {
             memo.setIsTagged(true);
         }
+        saveMemo();
+        Log.d("onActivity_save", "onActivityResult: save done. isTagged" + memo.getIsTagged());
     }
+
 
     public void saveMemo(){
         String memoInputStr = memoInput.getText().toString();
-        // TODO: 2019/09/08 メモ内容が空白、タグなどは設定されている場合の処理を後で加える
-        // memoInputに何も入力されていない場合、保存しない
-        if (memoInputStr.isEmpty()) {
+        // TODO: 2019/10/10 ハイライト、リマインダー、TODOが設定されている場合の処理を後で加える
+        // memoInputに何も入力されおらず、い場合、保存しない
+        if (memoInputStr.isEmpty() && !memo.getIsTagged()) {
             return;
         } else {
             memo.setText(memoInputStr);

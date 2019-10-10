@@ -12,7 +12,10 @@ import com.example.e28.memo.R;
 import com.example.e28.memo.model.Memo;
 import com.example.e28.memo.model.Tag;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 
 import io.realm.RealmResults;
@@ -27,6 +30,8 @@ import io.realm.RealmResults;
  */
 public class TagListRecyclerViewAdapter extends RecyclerView.Adapter<TagListRecyclerViewAdapter.TagCardViewHolder> {
     public RealmResults<Tag> tagRealmResults;
+    ArrayList<Long> editedTagIdList;
+
 
     // ViewHolderクラスの設定（インナークラス）
     public class TagCardViewHolder extends RecyclerView.ViewHolder {
@@ -38,8 +43,9 @@ public class TagListRecyclerViewAdapter extends RecyclerView.Adapter<TagListRecy
         }
     }
 
-    public TagListRecyclerViewAdapter(RealmResults<Tag> tagRealmResults) {
+    public TagListRecyclerViewAdapter(RealmResults<Tag> tagRealmResults, ArrayList<Long> tagIdList) {
         this.tagRealmResults = tagRealmResults;
+        this.editedTagIdList = tagIdList;
     }
 
     @Override
@@ -62,6 +68,9 @@ public class TagListRecyclerViewAdapter extends RecyclerView.Adapter<TagListRecy
         Tag tag = tagRealmResults.get(position);
         // ViewHolderにTag.Nameをセット
         viewHolder.tagChk.setText(tag.getName());
+        // Memoの持つタグに該当する場合は、チェック済みにしておく
+        if (editedTagIdList.contains(tag.getId())){
+        viewHolder.tagChk.setChecked(true);}
     }
 
     @Override
