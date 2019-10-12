@@ -69,8 +69,10 @@ public class TagListRecyclerViewAdapter extends RecyclerView.Adapter<TagListRecy
         // ViewHolderにTag.Nameをセット
         viewHolder.tagChk.setText(tag.getName());
         // Memoの持つタグに該当する場合は、チェック済みにしておく
-        if (editedTagIdList.contains(tag.getId())){
-        viewHolder.tagChk.setChecked(true);}
+        if (editedTagIdList != null) {
+            if (editedTagIdList.contains(tag.getId())){
+            viewHolder.tagChk.setChecked(true);}
+        }
     }
 
     @Override

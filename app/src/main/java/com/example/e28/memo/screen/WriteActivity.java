@@ -81,8 +81,8 @@ public class WriteActivity extends AppCompatActivity {
                 if (memo.getTagList() != null) {
                     for (Tag tag : memo.getTagList()) {
                         tagIdList.add(tag.getId());
-                        intent.putExtra(TAG_ID_LIST, tagIdList);}
-                }
+                    }
+                intent.putExtra(TAG_ID_LIST, tagIdList);}
                 startActivityForResult(intent, RESULT_TAG_LIST);
             }
         });
@@ -135,7 +135,6 @@ public class WriteActivity extends AppCompatActivity {
             memo.setIsTagged(true);
         }
         saveMemo();
-        Log.d("onActivity_save", "onActivityResult: save done. isTagged" + memo.getIsTagged());
     }
 
 

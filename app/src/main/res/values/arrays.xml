@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="entries_lock_screen">
+        <item>メモ入力画面のみ</item>
+        <item>ハイライト、TODOも表示</item>
+        <item>すべて表示</item>
+    </string-array>
+    <string-array name="entry_values_preference_theme">
+        <item>write</item>
+        <item>mark</item>
+        <item>all</item>
+    </string-array>
+
+</resources>

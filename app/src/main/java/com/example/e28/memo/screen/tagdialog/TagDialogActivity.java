@@ -32,8 +32,8 @@ public class TagDialogActivity extends AppCompatActivity {
     Realm realm;
     Intent intent;
     TagListRecyclerViewAdapter adapter;
-    ArrayList<Long> tagIdList = new ArrayList<>();
-    ArrayList<Long> editedTagIdList = tagIdList;
+    ArrayList<Long> tagIdList;
+    ArrayList<Long> editedTagIdList = new ArrayList<>();
     Tag testtag1 = new Tag();
     Tag testtag2 = new Tag();
     Tag testtag3 = new Tag();
@@ -51,9 +51,17 @@ public class TagDialogActivity extends AppCompatActivity {
         // Realmのインスタンスを生成
         realm = Realm.getDefaultInstance();
 
-        // intentからタグidリストを受け取る
-        intent = getIntent();
-        tagIdList = (ArrayList<Long>) intent.getSerializableExtra(WriteActivity.TAG_ID_LIST);
+        // 遷移先にタグidリストを送るためのintent生成
+        intent = new Intent(TagDialogActivity.this, WriteActivity.class);
+
+        // 遷移元からタグidリストを受け取る
+        Intent receiveIntent = getIntent();
+        tagIdList = (ArrayList<Long>) receiveIntent.getSerializableExtra(WriteActivity.TAG_ID_LIST);
+        if (tagIdList != null) {
+            editedTagIdList = tagIdList;
+        } else {
+            tagIdList = new ArrayList<>();
+        }
 
         // とりあえずのタグ
         testtag1.setId(0);
@@ -120,10 +128,11 @@ public class TagDialogActivity extends AppCompatActivity {
                             }
                         });
                     } finally {
-                        Log.d("realm", "testTagSave:success");
+                        Log.d("realm", "TagSave:success");
                     }
-                    // editedTagIdListに新しいタグのを追加
+                    // editedTagIdListに新しいタグを追加
                     editedTagIdList.add(newTagId);
+                    putExtraTagIdList();
                     // タグ名の入力エリアをクリアー
                     tagEditText.getEditableText().clear();
                     // recyclerViewの更新
@@ -138,9 +147,7 @@ public class TagDialogActivity extends AppCompatActivity {
         finishbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(TagDialogActivity.this, WriteActivity.class);
-                intent.putExtra(WriteActivity.TAG_ID_LIST, editedTagIdList);
-                setResult(RESULT_OK, intent);
+                putExtraTagIdList();
                 finish();
             }
         });
@@ -152,8 +159,7 @@ public class TagDialogActivity extends AppCompatActivity {
         // タグが登録されている場合は
         if (!Objects.equals(editedTagIdList, tagIdList)) {
             // タグに変更がある場合は保存する
-            intent.putExtra(WriteActivity.TAG_ID_LIST, editedTagIdList);
-            setResult(RESULT_OK, intent);
+            putExtraTagIdList();
         }else{
             // タグに変更がない場合は保存しない
         }
@@ -165,6 +171,11 @@ public class TagDialogActivity extends AppCompatActivity {
 
         // realmのインスタンスを閉じる
         realm.close();
+    }
+
+    public void putExtraTagIdList() {
+        intent.putExtra(WriteActivity.TAG_ID_LIST, editedTagIdList);
+        setResult(RESULT_OK, intent);
     }
 
     public long getRealmTagNextId() {
