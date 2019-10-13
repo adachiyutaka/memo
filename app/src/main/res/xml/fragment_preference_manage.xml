@@ -20,25 +20,25 @@
 
     <PreferenceCategory android:title="@string/pref_title_reminder">
         <EditTextPreference
-            android:key="pref_key_reminder"
+            android:key="pref_key_reminder_morning"
             android:summary="@string/pref_summary_reminder_morning"
             android:title="@string/pref_sub_title_reminder_morning"
-            android:defaultValue="false"/>
+            android:defaultValue="8"/>
         <EditTextPreference
-            android:key="pref_key_wake_up"
+            android:key="pref_key_reminder_afternoon"
             android:summary="@string/pref_summary_reminder_afternoon"
             android:title="@string/pref_sub_title_reminder_afternoon"
-            android:defaultValue="false"/>
+            android:defaultValue="13"/>
         <EditTextPreference
-            android:key="pref_key_wake_up"
+            android:key="pref_key_reminder_evening"
             android:summary="@string/pref_summary_reminder_evening"
             android:title="@string/pref_sub_title_reminder_evening"
-            android:defaultValue="false"/>
+            android:defaultValue="18"/>
         <EditTextPreference
-            android:key="pref_key_wake_up"
+            android:key="pref_key_reminder_night"
             android:summary="@string/pref_summary_reminder_night"
             android:title="@string/pref_sub_title_reminder_night"
-            android:defaultValue="false"/>
+            android:defaultValue="21"/>
 
     </PreferenceCategory>
 </PreferenceScreen>

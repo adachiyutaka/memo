@@ -45,36 +45,10 @@ public class ManageActivity extends AppCompatActivity implements PreferenceFragm
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             // ActionBarの矢印がクリックされたとき、Backボタンと同等の処理をする
-            // 前のFragmentに戻るのではなくActivity自体を終了させたい場合は代わりに finish();
+            // TODO: 2019.10.13 そもそも矢印が表示されていない
             onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
-/*
-    // TODO: 2019/09/08 onBackPressedでクラッシュするので解決する 
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    /*
-    // PreferenceScreenがクリックされた時に呼び出されます
-    @Override
-    public boolean onPreferenceStartScreen(PreferenceFragmentCompat caller, PreferenceScreen pref) {
-        // Fragmentの切り替えと、addToBackStackで戻るボタンを押した時に前のFragmentに戻るようにする
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, SettingsFragment.newInstance(pref.getKey()))
-                .addToBackStack(null)
-                .commit();
-        return true;
-    }
-
-    */
 }
