@@ -19,7 +19,7 @@
         android:entryValues="@array/entries_lock_screen"/>
 
     <PreferenceCategory android:title="@string/pref_title_reminder">
-        <EditTextPreference
+        <Preference
             android:key="pref_key_reminder_morning"
             android:summary="@string/pref_summary_reminder_morning"
             android:title="@string/pref_sub_title_reminder_morning"
