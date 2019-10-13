@@ -8,18 +8,13 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
-
 import com.example.e28.memo.R;
-import com.example.e28.memo.model.Memo;
 import com.example.e28.memo.model.Tag;
 import com.example.e28.memo.screen.WriteActivity;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
-
 import io.realm.Realm;
 import io.realm.RealmResults;
 
@@ -32,6 +27,7 @@ public class TagDialogActivity extends AppCompatActivity {
     Realm realm;
     Intent intent;
     TagListRecyclerViewAdapter adapter;
+    RealmResults<Tag> tagRealmResults;
     ArrayList<Long> tagIdList;
     ArrayList<Long> editedTagIdList = new ArrayList<>();
     Tag testtag1 = new Tag();
@@ -86,21 +82,21 @@ public class TagDialogActivity extends AppCompatActivity {
 
 
         // すべてのタグのリストをリサイクラービューのアダプターにセット
-        RealmResults<Tag> memoRealmResults = realm.where(Tag.class).findAll();
-        adapter = new TagListRecyclerViewAdapter(memoRealmResults, editedTagIdList) {
-            // onItemClick()をオーバーライドして
-            // クリックイベントの処理を記述する
+        tagRealmResults = realm.where(Tag.class).findAll();
+        adapter = new TagListRecyclerViewAdapter(tagRealmResults, editedTagIdList);
+
+        adapter.setOnTagCheckListener(new TagListRecyclerViewAdapter.OnTagCheckListener() {
             @Override
-            void onItemClick(CheckBox tagChk, int position, Tag tag) {
-                if (tagChk.isChecked() == true) {
-                    // チェックが入った場合に、editedTagListに該当タグを追加
-                    editedTagIdList.add(tag.getId());
-                } else {
-                    // チェックが外れた場合に、editedTagListから該当タグを削除
-                    editedTagIdList.remove(tag.getId());
+            public void onChangeCheck(boolean isChecked, int position) {
+                Log.d("RECYCLERVIEW", "onClick: positionは" + position + "isChecked : " + isChecked);
+                long tagId = tagRealmResults.get(position).getId();
+                if(isChecked){
+                    editedTagIdList.add(tagId);
+                }else {
+                    editedTagIdList.remove(tagId);
                 }
             }
-        };
+        });
 
         // recyclerViewの設定、アダプターのセット
         LinearLayoutManager llm = new LinearLayoutManager(this);
@@ -169,6 +165,7 @@ public class TagDialogActivity extends AppCompatActivity {
     public void onDestroy(){
         super.onDestroy();
 
+        adapter.deleteOnTagCheckListener();
         // realmのインスタンスを閉じる
         realm.close();
     }

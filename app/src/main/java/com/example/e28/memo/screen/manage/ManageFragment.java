@@ -10,11 +10,7 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.util.Log;
 import android.widget.TimePicker;
-import android.widget.Toast;
-
 import com.example.e28.memo.R;
-
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import static android.content.Context.MODE_PRIVATE;

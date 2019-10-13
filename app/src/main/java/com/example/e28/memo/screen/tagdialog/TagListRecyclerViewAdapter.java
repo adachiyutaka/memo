@@ -1,24 +1,12 @@
 package com.example.e28.memo.screen.tagdialog;
-
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.TextView;
-
 import com.example.e28.memo.R;
-import com.example.e28.memo.model.Memo;
 import com.example.e28.memo.model.Tag;
-
-import java.lang.reflect.Array;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Locale;
-
-import io.realm.RealmResults;
 import io.realm.RealmResults;
 
 /**
@@ -31,7 +19,7 @@ import io.realm.RealmResults;
 public class TagListRecyclerViewAdapter extends RecyclerView.Adapter<TagListRecyclerViewAdapter.TagCardViewHolder> {
     public RealmResults<Tag> tagRealmResults;
     ArrayList<Long> editedTagIdList;
-
+    private OnTagCheckListener listener;
 
     // ViewHolderクラスの設定（インナークラス）
     public class TagCardViewHolder extends RecyclerView.ViewHolder {
@@ -57,7 +45,13 @@ public class TagListRecyclerViewAdapter extends RecyclerView.Adapter<TagListRecy
             @Override
             public void onClick(View v) {
                 int position = viewHolder.getAdapterPosition();
-                onItemClick(viewHolder.tagChk, position, tagRealmResults.get(position));
+                if (viewHolder.tagChk.isChecked() == true) {
+                    // チェックが入った場合に、editedTagListに該当タグを追加
+                    listener.onChangeCheck(true, position);
+                } else {
+                    // チェックが外れた場合に、editedTagListから該当タグを削除
+                    listener.onChangeCheck(false, position);
+                }
             }
         });
         return viewHolder;
@@ -80,8 +74,15 @@ public class TagListRecyclerViewAdapter extends RecyclerView.Adapter<TagListRecy
         return tagRealmResults.size();
     }
 
-    void onItemClick(CheckBox tagChk, int position, Tag tag) {
-        // アダプタのインスタンス側からこのメソッドをオーバーライドして
-        // クリックイベントの処理を設定する
+    public void setOnTagCheckListener(OnTagCheckListener listener) {
+        this.listener = listener;
+    }
+
+    public void deleteOnTagCheckListener() {
+        this.listener = null;
+    }
+
+    public interface OnTagCheckListener {
+        void onChangeCheck(boolean isChecked, int position);
     }
 }
