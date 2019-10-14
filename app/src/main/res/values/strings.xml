@@ -41,4 +41,11 @@
     <string name="pref_summary_lock_screen">ロックスクリーン表示</string>
     <string name="pref_sub_title_lock_screen">ロックスクリーンより前の表示を設定</string>
 
+    <!--ReminderDialog-->
+    <string name="reminder_dialog_title">リマインダーを追加</string>
+    <string name="reminder_delete_button">削除</string>
+    <string name="reminder_cancel_button">キャンセル</string>
+    <string name="reminder_save_button">保存</string>
+
+
 </resources>

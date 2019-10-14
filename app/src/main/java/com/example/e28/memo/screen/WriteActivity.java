@@ -3,6 +3,9 @@ package com.example.e28.memo.screen;
 import java.lang.Number;
 import java.util.ArrayList;
 import java.util.Date;
+
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -45,7 +48,7 @@ public class WriteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_write);
-        memoInput = findViewById(R.id.memoInput);
+        memoInput = findViewById(R.id.edit_text_memo_Input);
 
         // Realmのインスタンスを生成
         realm = Realm.getDefaultInstance();
@@ -56,7 +59,7 @@ public class WriteActivity extends AppCompatActivity {
         saveRealmMemo(memo);
 
         // 保存ボタンでの保存と新規作成
-        Button btnSave = findViewById(R.id.buttonSave);
+        Button btnSave = findViewById(R.id.button_save);
         btnSave.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -72,7 +75,7 @@ public class WriteActivity extends AppCompatActivity {
         });
 
         // タグボタン押下でダイアログを表示
-        Button btnTag = findViewById(R.id.buttonTag);
+        Button btnTag = findViewById(R.id.button_tag);
         btnTag.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -87,8 +90,18 @@ public class WriteActivity extends AppCompatActivity {
             }
         });
 
+        // リマインダーボタン押下でダイアログを表示
+        Button reminderBtn = findViewById(R.id.button_reminder);
+        reminderBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(WriteActivity.this);
+                builder.setView(R.layout.dialog_fragment_reminder).setTitle(R.string.reminder_dialog_title).show();
+            }
+        });
+
         // ハイライトボタンでハイライトの設定
-        highlightBtn = findViewById(R.id.toggleButton);
+        highlightBtn = findViewById(R.id.toggle_button_highlight);
         highlightBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {

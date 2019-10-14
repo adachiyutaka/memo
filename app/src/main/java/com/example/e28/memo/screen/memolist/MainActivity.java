@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.action_reminder) {
             //new ReminderDialogFragment().show(getSupportFragmentManager(), "reminder");
-            Intent intent = new Intent(this, com.example.e28.memo.screen.reminder.ReminderDialogActivity.class);
+            Intent intent = new Intent(this, com.example.e28.memo.screen.reminder.ReminderDialogFragment.class);
             startActivity(intent);
             return true;
         }

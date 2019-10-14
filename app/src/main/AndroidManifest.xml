@@ -32,11 +32,6 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".screen.reminder.ReminderDialogActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.AppCompat.Dialog"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".screen.tagdialog.TagDialogActivity"
             android:theme="@style/Theme.AppCompat.Dialog"
             android:screenOrientation="portrait" />

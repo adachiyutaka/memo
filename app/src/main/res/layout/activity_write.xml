@@ -8,7 +8,7 @@
 
 
     <android.support.v7.widget.AppCompatButton
-        android:id="@+id/buttonTag"
+        android:id="@+id/button_tag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -19,17 +19,29 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/button_reminder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="リマインダー"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_tag" />
+
     <ToggleButton
-        android:id="@+id/toggleButton"
+        android:id="@+id/toggle_button_highlight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textOff="☆"
         android:textOn="★"
-        app:layout_constraintBottom_toBottomOf="@id/memoInput"
-        app:layout_constraintEnd_toStartOf="@+id/memoInput" />
+        app:layout_constraintBottom_toBottomOf="@id/edit_text_memo_Input"
+        app:layout_constraintEnd_toStartOf="@+id/edit_text_memo_Input" />
 
     <EditText
-        android:id="@+id/memoInput"
+        android:id="@+id/edit_text_memo_Input"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -38,10 +50,10 @@
         android:text="メモを入力"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonTag" />
+        app:layout_constraintTop_toBottomOf="@+id/button_reminder" />
 
     <Button
-        android:id="@+id/buttonSave"
+        android:id="@+id/button_save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -50,6 +62,6 @@
         android:text="保存"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/memoInput" />
+        app:layout_constraintTop_toBottomOf="@+id/edit_text_memo_Input" />
 
 </android.support.constraint.ConstraintLayout>

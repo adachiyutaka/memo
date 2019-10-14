@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <!--preference-->
     <string-array name="entries_lock_screen">
         <item>メモ入力画面のみ</item>
         <item>ハイライト、TODOも表示</item>
