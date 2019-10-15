@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -22,6 +23,7 @@ import com.example.e28.memo.R;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import static android.content.ContentValues.TAG;
 import static android.content.Context.MODE_PRIVATE;
 
 /**
@@ -64,9 +66,9 @@ public class ReminderDialogFragment extends DialogFragment {
         ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_item, date_array);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         dateSpinner.setAdapter(adapter);
-        dateSpinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        dateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position == 3){
                     final TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),
                             new TimePickerDialog.OnTimeSetListener() {
@@ -77,17 +79,22 @@ public class ReminderDialogFragment extends DialogFragment {
                                     editor.putInt("pref_key_reminder_morning_hour_of_day", hourOfDay);
                                     editor.putInt("pref_key_reminder_morning_minute", minute);
                                     editor.commit();
-                                    // サマリーに設定した時間をセット
                                 }
                             }, hour, minute, true);
                     timePickerDialog.show();
                 }
             }
-        });
 
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         Spinner timeSpinner = dialog.findViewById(R.id.spinner_time);
         Spinner repeatSpinner = dialog.findViewById(R.id.spinner_repeat);
+
+
         dialog.findViewById(R.id.button_delete).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -21,6 +21,7 @@ import android.widget.ToggleButton;
 import com.example.e28.memo.R;
 import com.example.e28.memo.model.Memo;
 import com.example.e28.memo.model.Tag;
+import com.example.e28.memo.screen.reminder.ReminderDialogFragment;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -95,8 +96,8 @@ public class WriteActivity extends AppCompatActivity {
         reminderBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(WriteActivity.this);
-                builder.setView(R.layout.dialog_fragment_reminder).setTitle(R.string.reminder_dialog_title).show();
+                ReminderDialogFragment reminderDialogFragment = new ReminderDialogFragment();
+                reminderDialogFragment.show(getSupportFragmentManager(), "dialog");
             }
         });
 
