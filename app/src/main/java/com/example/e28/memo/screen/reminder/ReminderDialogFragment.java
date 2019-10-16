@@ -1,8 +1,12 @@
 package com.example.e28.memo.screen.reminder;
 
 
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -19,6 +23,8 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 
 import com.example.e28.memo.R;
+import com.example.e28.memo.model.Todo;
+import com.example.e28.memo.screen.AlarmReceiver;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,8 +38,12 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class ReminderDialogFragment extends DialogFragment {
 
+    Todo todo;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        todo = new Todo();
 
         Dialog dialog = new Dialog(getActivity());
         // フルスクリーン
@@ -74,11 +84,15 @@ public class ReminderDialogFragment extends DialogFragment {
                             new TimePickerDialog.OnTimeSetListener() {
                                 @Override
                                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                    SharedPreferences pref = getActivity().getSharedPreferences("pref_key_reminder_morning", MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = pref.edit();
-                                    editor.putInt("pref_key_reminder_morning_hour_of_day", hourOfDay);
-                                    editor.putInt("pref_key_reminder_morning_minute", minute);
-                                    editor.commit();
+                                    // 現在の時間を表すCalendarの時間と分を0にリセット
+//                                    calendar.set(Calendar.HOUR_OF_DAY, 0);
+//                                    calendar.set(Calendar.MINUTE, 0);
+//                                    // タイムピッカーで指定した時間と分をセット
+//                                    calendar.add(Calendar.HOUR_OF_DAY, hourOfDay);
+//                                    calendar.add(Calendar.MINUTE, minute);
+                                    todo.setNotifyStartTime(calendar.getTime());
+                                    calendar.add(Calendar.SECOND, 10);
+                                    scheduleNotification("通知成功！", calendar);
                                 }
                             }, hour, minute, true);
                     timePickerDialog.show();
@@ -116,5 +130,14 @@ public class ReminderDialogFragment extends DialogFragment {
         });
 
         return dialog;
+    }
+
+    private void scheduleNotification(String content, Calendar calendar){
+        Intent notificationIntent = new Intent(getActivity(), AlarmReceiver.class);
+        notificationIntent.putExtra("alarm", content);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(calendar.getTimeInMillis(), null), pendingIntent);
     }
 }

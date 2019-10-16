@@ -20,6 +20,7 @@ import com.example.e28.memo.R;
 import com.example.e28.memo.model.Memo;
 
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity
@@ -38,7 +39,17 @@ public class MainActivity extends AppCompatActivity
     };
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {;
+    protected void onCreate(Bundle savedInstanceState) {
+
+        Realm.init(getApplicationContext());
+
+        // create your Realm configuration
+        RealmConfiguration config = new RealmConfiguration.
+                Builder().
+                deleteRealmIfMigrationNeeded().
+                build();
+        Realm.setDefaultConfiguration(config);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
