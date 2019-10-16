@@ -46,6 +46,7 @@
     <string name="reminder_delete_button">削除</string>
     <string name="reminder_cancel_button">キャンセル</string>
     <string name="reminder_save_button">保存</string>
-
+    <string name="notification_channel_name">リマインダーの通知</string>
+    <string name="notification_channel_discription">リマインダーによる通知を設定</string>
 
 </resources>

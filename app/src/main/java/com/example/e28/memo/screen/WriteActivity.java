@@ -2,10 +2,13 @@ package com.example.e28.memo.screen;
 
 import java.lang.Number;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.example.e28.memo.R;
@@ -33,6 +37,12 @@ import io.realm.RealmResults;
  */
 
 public class WriteActivity extends AppCompatActivity {
+
+    // 通知確認テスト
+    private AlarmManager am;
+    private PendingIntent pending;
+    private int requestCode = 1;
+    //
 
     Realm realm;
     Memo memo = new Memo();
@@ -112,7 +122,47 @@ public class WriteActivity extends AppCompatActivity {
                 }
             }
         });
+
+
+
+
+
+        // 通知確認テスト
+        Button notificationButton = findViewById(R.id.button_notification);
+        notificationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(System.currentTimeMillis());
+                // 10sec
+                calendar.add(Calendar.SECOND, 10);
+
+                Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
+                intent.putExtra("RequestCode",requestCode);
+
+                pending = PendingIntent.getBroadcast(
+                        getApplicationContext(),requestCode, intent, 0);
+
+                // アラームをセットする
+                am = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+                if (am != null) {
+                    am.setExact(AlarmManager.RTC_WAKEUP,
+                            calendar.getTimeInMillis(), pending);
+
+                    // トーストで設定されたことをを表示
+                    Toast.makeText(getApplicationContext(),
+                            "alarm start", Toast.LENGTH_SHORT).show();
+
+                    Log.d("debug", "start");
+                }
+            }
+        });
     }
+    //
+
+
+
 
     @Override
     protected void onPause() {

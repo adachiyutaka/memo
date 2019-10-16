@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.e28.memo">
 
+    <!-- if needed -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -42,9 +46,7 @@
             android:screenOrientation="portrait" />
         <receiver
             android:name=".screen.AlarmReceiver">
-            <intent-filter>
-                <action android:name="com.example.e28.memo"/>
-            </intent-filter>
+            <!--android:process=":remote">-->
         </receiver>
     </application>
 
