@@ -13,6 +13,8 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -67,6 +69,7 @@ public class ReminderDialogFragment extends DialogFragment {
         final int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
         final int hour = calendar.get(Calendar.HOUR_OF_DAY);
         final int minute = calendar.get(Calendar.MINUTE);
+        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         String[] week = new String[7];
         week[0] = "日";
@@ -80,36 +83,38 @@ public class ReminderDialogFragment extends DialogFragment {
         int week_int = calendar.get(calendar.DAY_OF_WEEK);//曜日を数値で取得
 
         Spinner dateSpinner = dialog.findViewById(R.id.spinner_date);
-        ArrayList<String> date_array = new ArrayList<>();
-        date_array.add("今日");
-        date_array.add("明日");
-        date_array.add("来週の" + week[week_int -1] + "曜日");
-        date_array.add("カレンダーから選ぶ");
-        ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_item, date_array);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        dateSpinner.setAdapter(adapter);
+        String[][] dateSpinnerItem = {{"今日", null},
+                                      {"明日", null},
+                                      {"来週の" + week[week_int -1] + "曜日", null},
+                                      {"カレンダーから選ぶ", null}};
+        ReminderSpinnerAdapter dateAdapter = new ReminderSpinnerAdapter(getActivity());
+        dateAdapter.setData(dateSpinnerItem, 0);
+        dateSpinner.setAdapter(dateAdapter);
         dateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position == 3){
-                    final DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
-                            new DatePickerDialog.OnDateSetListener() {
-                                @Override
-                                public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                                    // 現在の時間を表すCalendarの年と月と日を0にリセット
-                                    calendar.set(Calendar.YEAR, 0);
-                                    calendar.set(Calendar.MONTH, 0);
-                                    calendar.set(Calendar.DAY_OF_MONTH, 0);
-                                    // タイムピッカーで指定した年と月と日をセット
-                                    calendar.add(Calendar.YEAR, year);
-                                    calendar.add(Calendar.MONTH, month);
-                                    calendar.add(Calendar.DAY_OF_MONTH, dayOfMonth);
-                                    todo.setNotifyStartTime(calendar.getTime());
-                                    scheduleNotification("通知成功！", calendar);
-                                }
-                            }, year, month, dayOfMonth);
-                    datePickerDialog.getDatePicker().setMinDate(now.getTimeInMillis());
-                    datePickerDialog.show();
+                switch (position) {
+                    case 0:
+                        break;
+                    case 1:
+                        calendar.set(dayOfMonth, now.get(dayOfMonth) + 1);
+                        break;
+                    case 2:
+                        calendar.set(dayOfMonth, now.get(dayOfMonth) + 7);
+                        break;
+                    case 3:
+                        final DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
+                                new DatePickerDialog.OnDateSetListener() {
+                                    @Override
+                                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                                        // 現在の時間を表すCalendarの年と月と日を0にリセット
+                                        calendar.set(year, month, dayOfMonth);
+                                        todo.setNotifyStartTime(calendar.getTime());
+                                        scheduleNotification("通知成功！", calendar);
+                                    }
+                                }, year, month, dayOfMonth);
+                        datePickerDialog.getDatePicker().setMinDate(now.getTimeInMillis());
+                        datePickerDialog.show();
                 }
             }
 
@@ -118,7 +123,14 @@ public class ReminderDialogFragment extends DialogFragment {
         });
 
         Spinner timeSpinner = dialog.findViewById(R.id.spinner_time);
-        timeSpinner.setAdapter(adapter);
+        String[][] timeSpinnerItem = {{"午前", pref.getString("pref_key_reminder_morning_hour_of_day", "") + ":" + pref.getString("pref_key_reminder_morning_hour_of_day", "")},
+                                      {"午後", pref.getString("pref_key_reminder_morning_hour_of_day", "")},
+                                      {"夕方", pref.getString("pref_key_reminder_morning_hour_of_day", "")},
+                                      {"夜", pref.getString("pref_key_reminder_morning_hour_of_day", "")},
+                                      {"カレンダーから選ぶ", null}};
+        ReminderSpinnerAdapter timeAdapter = new ReminderSpinnerAdapter(getActivity());
+        dateAdapter.setData(timeSpinnerItem, 1);
+        timeSpinner.setAdapter(timeAdapter);
         timeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
               @Override
               public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -128,12 +140,7 @@ public class ReminderDialogFragment extends DialogFragment {
                                   @Override
                                   public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                                       // 現在の時間を表すCalendarの時間と分と秒を0にリセット
-                                      calendar.set(Calendar.HOUR_OF_DAY, 0);
-                                      calendar.set(Calendar.MINUTE, 0);
-                                      calendar.set(Calendar.SECOND, 0);
-                                      // タイムピッカーで指定した時間と分をセット
-                                      calendar.add(Calendar.HOUR_OF_DAY, hourOfDay);
-                                      calendar.add(Calendar.MINUTE, minute);
+                                      setCalenderDate(calendar, hourOfDay, minute);
                                       todo.setNotifyStartTime(calendar.getTime());
                                       scheduleNotification("通知成功！", calendar);
                                   }
@@ -188,5 +195,17 @@ public class ReminderDialogFragment extends DialogFragment {
             // トーストで設定されたことをを表示
             Toast.makeText(getActivity(),"リマインダーを設定しました", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private Calendar setCalenderDate(Calendar calendar, int hourOfDay, int minute){
+        Calendar mCalendar = calendar;
+        // 現在の時間を表すCalendarの時間と分と秒を0にリセット
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        // タイムピッカーで指定した時間と分をセット
+        calendar.add(Calendar.HOUR_OF_DAY, hourOfDay);
+        calendar.add(Calendar.MINUTE, minute);
+        return mCalendar;
     }
 }
