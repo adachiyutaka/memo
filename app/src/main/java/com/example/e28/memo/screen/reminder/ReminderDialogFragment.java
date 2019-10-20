@@ -123,10 +123,10 @@ public class ReminderDialogFragment extends DialogFragment {
         });
 
         Spinner timeSpinner = dialog.findViewById(R.id.spinner_time);
-        String[][] timeSpinnerItem = {{"午前", pref.getString("pref_key_reminder_morning_hour_of_day", "") + ":" + pref.getString("pref_key_reminder_morning_hour_of_day", "")},
-                                      {"午後", pref.getString("pref_key_reminder_morning_hour_of_day", "")},
-                                      {"夕方", pref.getString("pref_key_reminder_morning_hour_of_day", "")},
-                                      {"夜", pref.getString("pref_key_reminder_morning_hour_of_day", "")},
+        String[][] timeSpinnerItem = {{"午前", pref.getString("pref_key_reminder_morning_hour_of_day", "") + ":" + pref.getString("pref_key_reminder_morning_minute", "")},
+                                      {"午後", pref.getString("pref_key_reminder_ afternoon_hour_of_day", "") + ":" + pref.getString("pref_key_reminder_ afternoon_minute", "")},
+                                      {"夕方", pref.getString("pref_key_reminder_evening_hour_of_day", "") + ":" + pref.getString("pref_key_reminder_evening_minute", "")},
+                                      {"夜", pref.getString("pref_key_reminder_night_hour_of_day", "") + ":" + pref.getString("pref_key_reminder_night_minute", "")},
                                       {"カレンダーから選ぶ", null}};
         ReminderSpinnerAdapter timeAdapter = new ReminderSpinnerAdapter(getActivity());
         dateAdapter.setData(timeSpinnerItem, 1);

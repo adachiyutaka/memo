@@ -18,23 +18,24 @@
         android:entries="@array/entries_lock_screen"
         android:entryValues="@array/entries_lock_screen"/>
 
-    <PreferenceCategory android:title="@string/pref_title_reminder">
+    <PreferenceCategory android:title="@string/pref_title_reminder"
+        android:summary="@string/pref_summary_reminder">
         <Preference
             android:key="pref_key_reminder_morning"
             android:summary="@string/pref_summary_reminder_morning"
             android:title="@string/pref_sub_title_reminder_morning"
             android:defaultValue="8"/>
-        <EditTextPreference
+        <Preference
             android:key="pref_key_reminder_afternoon"
             android:summary="@string/pref_summary_reminder_afternoon"
             android:title="@string/pref_sub_title_reminder_afternoon"
             android:defaultValue="13"/>
-        <EditTextPreference
+        <Preference
             android:key="pref_key_reminder_evening"
             android:summary="@string/pref_summary_reminder_evening"
             android:title="@string/pref_sub_title_reminder_evening"
             android:defaultValue="18"/>
-        <EditTextPreference
+        <Preference
             android:key="pref_key_reminder_night"
             android:summary="@string/pref_summary_reminder_night"
             android:title="@string/pref_sub_title_reminder_night"

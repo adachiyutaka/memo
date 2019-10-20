@@ -53,15 +53,15 @@ public class ReminderSpinnerAdapter extends BaseAdapter {
         TextView textViewTimeName;
         TextView textViewTime;
 
-        if(convertView == null) {
+        if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(mContext);
             convertView = inflater.inflate(R.layout.reminder_spinner_selected_item, null);
             switch (mType) {
                 case 0: // Spinnerで日を指定
-                    textViewTimeName = convertView.findViewById(R.id);
-                    textViewTimeName.setText(mDataList(position).get(0));
-                    textViewTime = convertView.findViewById(R.id);
-                    textViewTime.setText(mDataList(position).get(1));
+//                    textViewTimeName = convertView.findViewById(R.id);
+//                    textViewTimeName.setText(mDataList(position).get(0));
+//                    textViewTime = convertView.findViewById(R.id);
+//                    textViewTime.setText(mDataList(position).get(1));
                     break;
                 case 1: // Spinnerで時間を指定
 
@@ -77,10 +77,10 @@ public class ReminderSpinnerAdapter extends BaseAdapter {
 
 
         }
-        String text = mDataList.get(position);
-        TextView tv = (TextView)convertView.
-                findViewById(R.id.sample_selected_text_id);
-        tv.setText(text);
+//        String text = mDataList.get(position);
+//        TextView tv = (TextView)convertView.
+//                findViewById(R.id.sample_selected_text_id);
+//        tv.setText(text);
 
         return convertView;
     }
@@ -90,15 +90,15 @@ public class ReminderSpinnerAdapter extends BaseAdapter {
         TextView textViewTimeName;
         TextView textViewTime;
 
-        if(convertView == null) {
+        if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(mContext);
             convertView = inflater.inflate(R.layout.reminder_spinner_selected_item, null);
             switch (mType) {
                 case 0: // Spinnerで日を指定
-                    textViewTimeName = convertView.findViewById(R.id);
-                    textViewTimeName.setText(mDataList(position).get(0));
-                    textViewTime = convertView.findViewById(R.id);
-                    textViewTime.setText(mDataList(position).get(1));
+//                    textViewTimeName = convertView.findViewById(R.id);
+//                    textViewTimeName.setText(mDataList(position).get(0));
+//                    textViewTime = convertView.findViewById(R.id);
+//                    textViewTime.setText(mDataList(position).get(1));
                     break;
                 case 1: // Spinnerで時間を指定
 
@@ -111,7 +111,8 @@ public class ReminderSpinnerAdapter extends BaseAdapter {
                     break;
 
             }
-
+        }
         return convertView;
     }
 }
+

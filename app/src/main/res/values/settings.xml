@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name = "pref_key_reminder_morning">8:00</string>
+    <integer name = "pref_key_reminder_morning_hour_of_day">8</integer>
+    <integer name = "pref_key_reminder_morning_minute">0</integer>
+    <string name = "pref_key_reminder_afternoon">12:00</string>
+    <integer name = "pref_key_reminder_afternoon_hour_of_day">12</integer>
+    <integer name = "pref_key_reminder_afternoon_minute">0</integer>
+    <string name = "pref_key_reminder_evening">18:00</string>
+    <integer name = "pref_key_reminder_evening_hour_of_day">18</integer>
+    <integer name = "pref_key_reminder_evening_minute">0</integer>
+    <string name = "pref_key_reminder_night">20:00</string>
+    <integer name = "pref_key_reminder_night_hour_of_day">20</integer>
+    <integer name = "pref_key_reminder_night_minute">0</integer>
+</resources>
