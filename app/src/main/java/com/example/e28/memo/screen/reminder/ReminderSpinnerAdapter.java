@@ -37,10 +37,10 @@ public class ReminderSpinnerAdapter extends BaseAdapter {
         mType = type;
     }
 
-    public void update(Calendar calendar) {
+    public void setTime(Calendar calendar) {
         this.calendar = calendar;
     }
-    public void update(Repeat repeat) {
+    public void setRepeat(Repeat repeat) {
         this.repeat = repeat;
     }
 

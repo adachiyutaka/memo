@@ -164,7 +164,7 @@ public class TagDialogActivity extends AppCompatActivity {
     public void onDestroy(){
         super.onDestroy();
 
-        adapter.deleteOnTagCheckListener();
+        adapter.removeOnTagCheckListener();
         // realmのインスタンスを閉じる
         realm.close();
     }

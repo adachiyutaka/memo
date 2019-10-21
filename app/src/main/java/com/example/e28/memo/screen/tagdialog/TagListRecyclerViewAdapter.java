@@ -78,7 +78,7 @@ public class TagListRecyclerViewAdapter extends RecyclerView.Adapter<TagListRecy
         this.listener = listener;
     }
 
-    public void deleteOnTagCheckListener() {
+    public void removeOnTagCheckListener() {
         this.listener = null;
     }
 

@@ -133,8 +133,7 @@ public class TagActivity extends AppCompatActivity {
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    final RealmResults<Tag> result = realm.where(Tag.class).equalTo("id", id).findAll();
-                    result.deleteFirstFromRealm();
+                    realm.where(Tag.class).equalTo("id", id).findFirst().deleteFromRealm();
                 }
             });
             adapter.notifyDataSetChanged();

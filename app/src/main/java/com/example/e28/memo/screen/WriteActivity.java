@@ -40,21 +40,18 @@ import io.realm.RealmResults;
 
 public class WriteActivity extends AppCompatActivity {
 
-    // 通知確認テスト
-    private AlarmManager am;
-    private PendingIntent pending;
-    private int requestCode = 1;
-    //
-
     Realm realm;
     Memo memo = new Memo();
     long memoId;
     long todoId;
     ArrayList<Long> tagIdList = new ArrayList<>();
+
     EditText memoInput;
     ToggleButton highlightBtn;
 
+    ReminderDialogFragment reminderDialogFragment;
     public static final String TAG_ID_LIST = "com.example.e28.memo.screen.TAG_LIST";
+    public static final String TODO_ID = "com.example.e28.memo.screen.TODO_ID";
     public static final int RESULT_TAG_LIST = 0;
 
     @Override
@@ -69,7 +66,6 @@ public class WriteActivity extends AppCompatActivity {
 
         // Memoに新しいIdをセットする
         memoId = getRealmNextId("Memo");
-        todoId = getRealmNextId("Todo");
         memo.setId(memoId);
         saveRealmMemo(memo);
 
@@ -110,13 +106,39 @@ public class WriteActivity extends AppCompatActivity {
         reminderBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ReminderDialogFragment reminderDialogFragment = new ReminderDialogFragment();
+                reminderDialogFragment = new ReminderDialogFragment();
                 reminderDialogFragment.setReminderDialogFragmentListener(new ReminderDialogFragment.ReminderDialogFragmentListener() {
                     @Override
-                    public void onReturnValue(long id) {
+                    public void onSaveClicked(long id) {
+                        // リマインダー保存
+                        memo.setTodo(true);
+                        RealmList<Todo> todoRealmList = new RealmList<>();
+                        todoRealmList.add(realm.where(Todo.class).equalTo("id", id).findFirst());
+                        memo.setTodoList(todoRealmList);
+                    }
 
+                    @Override
+                    public void onDeleteClicked() {
+                        // リマインダー削除
+                        memo.setTodo(false);
+                    }
+
+                    @Override
+                    public void onCancelClicked() {
+                        // リマインダー編集キャンセル
                     }
                 });
+
+                // TodoのIDをReminderDialogに渡す
+                Bundle bundle = new Bundle();
+                if (memo.isTodo) {
+                    // 既にTodoのIDが設定されている場合は、memoから読み取る
+                    bundle.putLong(TODO_ID, memo.getTodoList().get(0).getId());
+                } else {
+                    // まだTodoのIDが設定されていない場合は新規作成する
+                    bundle.putLong(TODO_ID, getRealmNextId("Todo"));
+                }
+                reminderDialogFragment.setArguments(bundle);
                 reminderDialogFragment.show(getSupportFragmentManager(), "dialog");
             }
         });
@@ -132,47 +154,7 @@ public class WriteActivity extends AppCompatActivity {
                 }
             }
         });
-
-
-
-
-
-        // 通知確認テスト
-        Button notificationButton = findViewById(R.id.button_notification);
-        notificationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(System.currentTimeMillis());
-                // 10sec
-                calendar.add(Calendar.SECOND, 10);
-
-                Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
-                intent.putExtra("RequestCode",requestCode);
-
-                pending = PendingIntent.getBroadcast(
-                        getApplicationContext(),requestCode, intent, 0);
-
-                // アラームをセットする
-                am = (AlarmManager) getSystemService(ALARM_SERVICE);
-
-                if (am != null) {
-                    am.setExact(AlarmManager.RTC_WAKEUP,
-                            calendar.getTimeInMillis(), pending);
-
-                    // トーストで設定されたことをを表示
-                    Toast.makeText(getApplicationContext(),
-                            "alarm start", Toast.LENGTH_SHORT).show();
-
-                    Log.d("debug", "start");
-                }
-            }
-        });
     }
-    //
-
-
-
 
     @Override
     protected void onPause() {
@@ -188,6 +170,8 @@ public class WriteActivity extends AppCompatActivity {
         super.onDestroy();
         // Activityが破棄される際にrealmのインスタンスを閉じる
         realm.close();
+        // 登録したリスナーを解除する
+        reminderDialogFragment.removeReminderDialogFragmentListener();
     }
 
     @Override
