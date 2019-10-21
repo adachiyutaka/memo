@@ -20,7 +20,7 @@ public class Memo extends RealmObject {
     public boolean isTagged;
     public RealmList<Tag> tagList;
     public boolean isTodo;
-    public RealmList<Todo> toDoList;
+    public RealmList<Todo> todoList;
     public boolean isHighlight;
     public boolean isChecked;
     public boolean isTrash;
@@ -40,7 +40,7 @@ public class Memo extends RealmObject {
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
-    
+
     public Date getUpdatedAt() {
         return updatedAt;
     }
@@ -56,13 +56,21 @@ public class Memo extends RealmObject {
     public void setText(String text) {
         this.text = text;
     }
-    
-    public boolean getIsTagged() {
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    public boolean isTagged() {
         return isTagged;
     }
 
-    public void setIsTagged(boolean isTagged) {
-        this.isTagged = isTagged;
+    public void setTagged(boolean tagged) {
+        isTagged = tagged;
     }
 
     public RealmList<Tag> getTagList() {
@@ -72,13 +80,44 @@ public class Memo extends RealmObject {
     public void setTagList(RealmList<Tag> tagList) {
         this.tagList = tagList;
     }
-    
-    public boolean getIsHighlight() {
+
+    public boolean isTodo() {
+        return isTodo;
+    }
+
+    public void setTodo(boolean todo) {
+        isTodo = todo;
+    }
+
+    public RealmList<Todo> getTodoList() {
+        return todoList;
+    }
+
+    public void setTodoList(RealmList<Todo> todoList) {
+        todoList = todoList;
+    }
+
+    public boolean isHighlight() {
         return isHighlight;
     }
 
-    public void setIsHighlight(boolean isHighlight) {
-        this.isHighlight = isHighlight;
+    public void setHighlight(boolean highlight) {
+        isHighlight = highlight;
     }
 
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
+    }
+
+    public boolean isTrash() {
+        return isTrash;
+    }
+
+    public void setTrash(boolean trash) {
+        isTrash = trash;
+    }
 }

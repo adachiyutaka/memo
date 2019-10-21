@@ -88,7 +88,6 @@ public class TagDialogActivity extends AppCompatActivity {
         adapter.setOnTagCheckListener(new TagListRecyclerViewAdapter.OnTagCheckListener() {
             @Override
             public void onChangeCheck(boolean isChecked, int position) {
-                Log.d("RECYCLERVIEW", "onClick: positionは" + position + "isChecked : " + isChecked);
                 long tagId = tagRealmResults.get(position).getId();
                 if(isChecked){
                     editedTagIdList.add(tagId);
@@ -186,31 +185,4 @@ public class TagDialogActivity extends AppCompatActivity {
         }
         return nextId;
     }
-
-    // 保存処理
-//    public void saveMemo(final Memo memo) {
-//        if (!Objects.equals(memo.gettagIdList(), tagIdList)) {
-//            // タグに変更がある場合は保存する
-//            memo.settagIdList(tagIdList);
-//            saveRealmMemo(memo);
-//        }else{
-//            // タグに変更がない場合は保存しない
-//        }
-//}
-//
-//    public void saveRealmMemo(final Memo memo) {
-//        try {
-//            realm.executeTransaction(new Realm.Transaction() {
-//                @Override
-//                public void execute(Realm realm) {
-//                    realm.copyToRealmOrUpdate(memo);
-//                }
-//            });
-//            // recyclerViewの更新を求めるintentを送る
-//            Intent intent = new Intent("LIST_UPDATE");
-//            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-//        } finally {
-//            Log.d("realm", "saveMemo:success");
-//        }
-//    }
 }

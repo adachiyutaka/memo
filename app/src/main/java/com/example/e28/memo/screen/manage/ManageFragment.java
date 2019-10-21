@@ -91,5 +91,4 @@ public class ManageFragment extends PreferenceFragmentCompat {
             }
         });
     }
-
 }

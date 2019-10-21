@@ -24,7 +24,9 @@ import android.widget.ToggleButton;
 
 import com.example.e28.memo.R;
 import com.example.e28.memo.model.Memo;
+import com.example.e28.memo.model.Repeat;
 import com.example.e28.memo.model.Tag;
+import com.example.e28.memo.model.Todo;
 import com.example.e28.memo.screen.reminder.ReminderDialogFragment;
 
 import io.realm.Realm;
@@ -47,6 +49,7 @@ public class WriteActivity extends AppCompatActivity {
     Realm realm;
     Memo memo = new Memo();
     long memoId;
+    long todoId;
     ArrayList<Long> tagIdList = new ArrayList<>();
     EditText memoInput;
     ToggleButton highlightBtn;
@@ -65,7 +68,8 @@ public class WriteActivity extends AppCompatActivity {
         realm = Realm.getDefaultInstance();
 
         // Memoに新しいIdをセットする
-        memoId = getRealmMemoNextId();
+        memoId = getRealmNextId("Memo");
+        todoId = getRealmNextId("Todo");
         memo.setId(memoId);
         saveRealmMemo(memo);
 
@@ -80,7 +84,7 @@ public class WriteActivity extends AppCompatActivity {
                 highlightBtn.setChecked(false);
 
                 // 新しいMemoモデルと新しいidをセット
-                memoId = getRealmMemoNextId();
+                memoId = getRealmNextId("Memo");
                 memo = new Memo();
             }
         });
@@ -107,6 +111,12 @@ public class WriteActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 ReminderDialogFragment reminderDialogFragment = new ReminderDialogFragment();
+                reminderDialogFragment.setReminderDialogFragmentListener(new ReminderDialogFragment.ReminderDialogFragmentListener() {
+                    @Override
+                    public void onReturnValue(long id) {
+
+                    }
+                });
                 reminderDialogFragment.show(getSupportFragmentManager(), "dialog");
             }
         });
@@ -116,9 +126,9 @@ public class WriteActivity extends AppCompatActivity {
         highlightBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    memo.setIsHighlight(true);
+                    memo.setHighlight(true);
                 } else {
-                    memo.setIsHighlight(false);
+                    memo.setHighlight(false);
                 }
             }
         });
@@ -196,7 +206,7 @@ public class WriteActivity extends AppCompatActivity {
         }
         // 1つでもタグがセットされている場合、IsTaggedをセットする
         if (!tagIdList.isEmpty()) {
-            memo.setIsTagged(true);
+            memo.setTagged(true);
         }
         saveMemo();
     }
@@ -206,7 +216,7 @@ public class WriteActivity extends AppCompatActivity {
         String memoInputStr = memoInput.getText().toString();
         // TODO: 2019/10/10 ハイライト、リマインダー、TODOが設定されている場合の処理を後で加える
         // memoInputに何も入力されおらず、い場合、保存しない
-        if (memoInputStr.isEmpty() && !memo.getIsTagged()) {
+        if (memoInputStr.isEmpty() && !memo.isTagged()) {
             return;
         } else {
             memo.setText(memoInputStr);
@@ -232,14 +242,33 @@ public class WriteActivity extends AppCompatActivity {
         }
     }
 
-    public long getRealmMemoNextId() {
+    public long getRealmNextId(String modelName) {
         // 初期化
         long nextId = 0;
+        Number maxId;
 
-        Number maxId = realm.where(Memo.class).max("id");
-        // 1度もデータが作成されていない場合はNULLが返ってくるため、NULLチェックをする
-        if(maxId != null) {
-            nextId = maxId.longValue() + 1;
+        switch (modelName) {
+            case "Memo":
+                maxId = realm.where(Memo.class).max("id");
+                // 1度もデータが作成されていない場合はNULLが返ってくるため、NULLチェックをする
+                if(maxId != null) {
+                    nextId = maxId.longValue() + 1;
+                }
+                break;
+            case "Todo":
+                maxId = realm.where(Todo.class).max("id");
+                // 1度もデータが作成されていない場合はNULLが返ってくるため、NULLチェックをする
+                if(maxId != null) {
+                    nextId = maxId.longValue() + 1;
+                }
+                break;
+            case "Repeat":
+                maxId = realm.where(Repeat.class).max("id");
+                // 1度もデータが作成されていない場合はNULLが返ってくるため、NULLチェックをする
+                if(maxId != null) {
+                    nextId = maxId.longValue() + 1;
+                }
+                break;
         }
         return nextId;
     }

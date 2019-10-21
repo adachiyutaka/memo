@@ -73,7 +73,7 @@ public class TaggedRecyclerViewAdapter extends RecyclerView.Adapter<TaggedRecycl
         } catch (NullPointerException e) {}
 
         // ハイライトがある場合は、★を表示
-        if(memo.getIsHighlight()){
+        if(memo.isHighlight()){
             viewHolder.memoHighLight.setText("★");
         }
 
@@ -81,7 +81,7 @@ public class TaggedRecyclerViewAdapter extends RecyclerView.Adapter<TaggedRecycl
         for (Tag tag : memo.getTagList()) {
             tagStr += ", " + tag.getName();
         }
-        if(memo.getIsTagged()){
+        if(memo.isTagged()){
             viewHolder.memoTag.setText(tagStr);
         }
     }

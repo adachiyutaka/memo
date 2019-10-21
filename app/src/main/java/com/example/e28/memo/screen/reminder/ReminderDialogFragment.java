@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
@@ -28,6 +29,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.e28.memo.R;
+import com.example.e28.memo.model.Repeat;
 import com.example.e28.memo.model.Todo;
 import com.example.e28.memo.screen.AlarmReceiver;
 
@@ -45,10 +47,14 @@ import static android.content.Context.MODE_PRIVATE;
 public class ReminderDialogFragment extends DialogFragment {
 
     Todo todo;
-
+    private ReminderDialogFragmentListener listener;
     private AlarmManager am;
     private PendingIntent pending;
     private int requestCode = 1;
+    Repeat repeat;
+    ReminderSpinnerAdapter dateAdapter;
+    ReminderSpinnerAdapter timeAdapter;
+    ReminderSpinnerAdapter repeatAdapter;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -87,8 +93,9 @@ public class ReminderDialogFragment extends DialogFragment {
                                       {"明日", null},
                                       {"来週の" + week[week_int -1] + "曜日", null},
                                       {"カレンダーから選ぶ", null}};
-        ReminderSpinnerAdapter dateAdapter = new ReminderSpinnerAdapter(getActivity());
-        dateAdapter.setData(dateSpinnerItem, 0);
+        dateAdapter = new ReminderSpinnerAdapter(getActivity());
+        dateAdapter.setList(dateSpinnerItem, 0);
+        dateAdapter.update(now);
         dateSpinner.setAdapter(dateAdapter);
         dateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -109,8 +116,8 @@ public class ReminderDialogFragment extends DialogFragment {
                                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                                         // 現在の時間を表すCalendarの年と月と日を0にリセット
                                         calendar.set(year, month, dayOfMonth);
-                                        todo.setNotifyStartTime(calendar.getTime());
-                                        scheduleNotification("通知成功！", calendar);
+                                        dateAdapter.update(calendar);
+                                        dateAdapter.notifyDataSetChanged();
                                     }
                                 }, year, month, dayOfMonth);
                         datePickerDialog.getDatePicker().setMinDate(now.getTimeInMillis());
@@ -123,26 +130,28 @@ public class ReminderDialogFragment extends DialogFragment {
         });
 
         Spinner timeSpinner = dialog.findViewById(R.id.spinner_time);
-        String[][] timeSpinnerItem = {{"午前", pref.getString("pref_key_reminder_morning_hour_of_day", "") + ":" + pref.getString("pref_key_reminder_morning_minute", "")},
-                                      {"午後", pref.getString("pref_key_reminder_ afternoon_hour_of_day", "") + ":" + pref.getString("pref_key_reminder_ afternoon_minute", "")},
-                                      {"夕方", pref.getString("pref_key_reminder_evening_hour_of_day", "") + ":" + pref.getString("pref_key_reminder_evening_minute", "")},
-                                      {"夜", pref.getString("pref_key_reminder_night_hour_of_day", "") + ":" + pref.getString("pref_key_reminder_night_minute", "")},
-                                      {"カレンダーから選ぶ", null}};
-        ReminderSpinnerAdapter timeAdapter = new ReminderSpinnerAdapter(getActivity());
-        dateAdapter.setData(timeSpinnerItem, 1);
+        String[][] timeSpinnerItem = {{"朝", pref.getInt("pref_key_reminder_morning_hour_of_day", -1) + ":" + pref.getInt("pref_key_reminder_morning_minute", -1)},
+                                      {"昼", pref.getInt("pref_key_reminder_afternoon_hour_of_day", -1) + ":" + pref.getInt("pref_key_reminder_afternoon_minute", -1)},
+                                      {"夕方", pref.getInt("pref_key_reminder_evening_hour_of_day", -1) + ":" + pref.getInt("pref_key_reminder_evening_minute", -1)},
+                                      {"夜", pref.getInt("pref_key_reminder_night_hour_of_day", -1) + ":" + pref.getInt("pref_key_reminder_night_minute", -1)},
+                                      {"時間を指定", null}};
+        timeAdapter = new ReminderSpinnerAdapter(getActivity());
+        timeAdapter.setList(timeSpinnerItem, 1);
         timeSpinner.setAdapter(timeAdapter);
+        timeAdapter.update(now);
         timeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
               @Override
               public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                  if (position == 3) {
+                  if (position == 4) {
                       final TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),
                               new TimePickerDialog.OnTimeSetListener() {
                                   @Override
                                   public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                                       // 現在の時間を表すCalendarの時間と分と秒を0にリセット
                                       setCalenderDate(calendar, hourOfDay, minute);
-                                      todo.setNotifyStartTime(calendar.getTime());
-                                      scheduleNotification("通知成功！", calendar);
+                                      // 表示を更新するために、Adapterに指定した時間を渡す
+                                      timeAdapter.update(calendar);
+                                      timeAdapter.notifyDataSetChanged();
                                   }
                               }, hour, minute, true);
                       timePickerDialog.show();
@@ -154,12 +163,43 @@ public class ReminderDialogFragment extends DialogFragment {
           });
 
         Spinner repeatSpinner = dialog.findViewById(R.id.spinner_repeat);
+        String[][] repeatSpinnerItem = {{"リピートなし", null},
+                                        {"毎日", null},
+                                        {"毎週", null},
+                                        {"毎月", null},
+                                        {"毎年", null},
+                                        {"詳細設定", null}};
+        repeatAdapter = new ReminderSpinnerAdapter(getActivity());
+        repeatAdapter.setList(repeatSpinnerItem, 3);
+        repeatSpinner.setAdapter(repeatAdapter);
+        repeatSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 3) {
+                    final TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),
+                            new TimePickerDialog.OnTimeSetListener() {
+                                @Override
+                                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                    // 現在の時間を表すCalendarの時間と分と秒を0にリセット
+                                    setCalenderDate(calendar, hourOfDay, minute);
+                                    todo.setNotifyStartTime(calendar.getTime());
+                                    scheduleNotification("通知成功！", calendar);
+                                    // 表示を更新するために、Adapterに指定した時間を渡す
+                                    repeatAdapter.update(calendar);
+                                }
+                            }, hour, minute, true);
+                    timePickerDialog.show();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
 
 
         dialog.findViewById(R.id.button_delete).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
             }
         });
 
@@ -167,6 +207,9 @@ public class ReminderDialogFragment extends DialogFragment {
         dialog.findViewById(R.id.button_save).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                todo.setNotifyStartTime(calendar.getTime());
+                listener.onReturnValue(todo.getId());
+                scheduleNotification("通知成功！", calendar);
             }
         });
         // Close ボタンのリスナ
@@ -207,5 +250,17 @@ public class ReminderDialogFragment extends DialogFragment {
         calendar.add(Calendar.HOUR_OF_DAY, hourOfDay);
         calendar.add(Calendar.MINUTE, minute);
         return mCalendar;
+    }
+
+    public interface ReminderDialogFragmentListener {
+        public void onReturnValue(long id);
+    }
+
+    public void setReminderDialogFragmentListener(ReminderDialogFragmentListener listener) {
+        this.listener = listener;
+    }
+
+    public void deleteReminderDialogFragmentListener() {
+        this.listener = null;
     }
 }

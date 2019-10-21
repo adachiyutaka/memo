@@ -19,8 +19,7 @@ public class Todo extends RealmObject {
     public Date updatedAt;
     public Date notifyStartTime;
     public boolean isRepeat;
-    public RealmList<Repeat> repeatList;
-    
+
     public long getId() {
         return id;
     }
@@ -53,20 +52,11 @@ public class Todo extends RealmObject {
         this.notifyStartTime = notifyStartTime;
     }
 
-    public boolean getIsRepeat() {
+    public boolean isRepeat() {
         return isRepeat;
     }
 
-    public void setIsRepeat(boolean isRepeat) {
-        this.isRepeat = isRepeat;
+    public void setRepeat(boolean repeat) {
+        isRepeat = repeat;
     }
-
-    public RealmList<Repeat> getRepeatList() {
-        return repeatList;
-    }
-
-    public void setRepeatList(RealmList<Repeat> repeatList) {
-        this.repeatList = repeatList;
-    }
-
 }
