@@ -56,8 +56,7 @@ public class ReminderDialogFragment extends DialogFragment {
     Realm realm;
     Todo todo;
     long todoId;
-    Repeat repeat;
-    long memoId;
+    // Repeat repeat;
     Calendar now;
     Calendar uneditedRemindTime;
     Calendar remindTime;
@@ -99,20 +98,24 @@ public class ReminderDialogFragment extends DialogFragment {
 
         int week_int = now.get(Calendar.DAY_OF_WEEK);//曜日を数値で取得
 
-        Dialog dialog = new Dialog(getActivity());
         // フルスクリーンでレイアウトを表示する
+        final Dialog dialog = new Dialog(getActivity());
         dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
         dialog.setContentView(R.layout.dialog_fragment_reminder);
 
+
         // TodoのIDを取得し、セットされた通知開始時間を取得する
         todoId = getArguments().getLong(WriteActivity.TODO_ID);
-        Date date = realm.where(Todo.class).equalTo("id", todoId).findFirst().getNotifyStartTime();
-        if (date == null) {
+        if (realm.where(Todo.class).equalTo("id", todoId).findFirst() == null) {
             // 新規作成されたTodoだった場合、現在の時間をセットする
             uneditedRemindTime = now;
         } else {
             // 既存のTodoだった場合、その時間を取得する
-            uneditedRemindTime.setTime(date);
+            try {
+                uneditedRemindTime.setTimeInMillis(realm.where(Todo.class).equalTo("id", todoId).findFirst().getNotifyStartTime());
+            }catch (NullPointerException e){
+                Log.d(TAG, "onCreateDialog: " + realm.where(Todo.class).equalTo("id", todoId).findFirst().getNotifyStartTime() +"|" + realm.where(Todo.class).equalTo("id", todoId).findFirst());
+            }
         }
         remindTime = uneditedRemindTime;
 
@@ -132,12 +135,16 @@ public class ReminderDialogFragment extends DialogFragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 switch (position) {
                     case 0:
+                        remindTime.set(Calendar.DAY_OF_MONTH, now.get(Calendar.DAY_OF_MONTH));
+                        Log.d(TAG, "onItemSelected: case 0 : now.get(Calendar.DAY_OF_MONTH" + now.get(Calendar.DAY_OF_MONTH));
                         break;
                     case 1:
-                        remindTime.set(dayOfMonth, now.get(dayOfMonth) + 1);
+                        remindTime.set(Calendar.DAY_OF_MONTH, now.get(Calendar.DAY_OF_MONTH) + 1);
+                        Log.d(TAG, "onItemSelected: case 1 : now.get(Calendar.DAY_OF_MONTH" + now.get(Calendar.DAY_OF_MONTH));
                         break;
                     case 2:
-                        remindTime.set(dayOfMonth, now.get(dayOfMonth) + 7);
+                        remindTime.set(Calendar.DAY_OF_MONTH, now.get(Calendar.DAY_OF_MONTH) + 7);
+                        Log.d(TAG, "onItemSelected: case 2 : now.get(Calendar.DAY_OF_MONTH" + now.get(Calendar.DAY_OF_MONTH));
                         break;
                     case 3:
                         final DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
@@ -152,6 +159,7 @@ public class ReminderDialogFragment extends DialogFragment {
                                 }, year, month, dayOfMonth);
                         datePickerDialog.getDatePicker().setMinDate(now.getTimeInMillis());
                         datePickerDialog.show();
+                        break;
                 }
             }
 
@@ -168,10 +176,22 @@ public class ReminderDialogFragment extends DialogFragment {
         timeAdapter = new ReminderSpinnerAdapter(getActivity());
         timeAdapter.setList(timeSpinnerItem, 1);
         timeSpinner.setAdapter(timeAdapter);
-        timeAdapter.setTime(now);
+        timeAdapter.setTime(remindTime);
         timeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
               @Override
               public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                  switch (position) {
+                      case 0:
+                          break;
+                      case 1:
+                          break;
+                      case 2:
+                          break;
+                      case 3:
+                          break;
+                      case 4:
+                          break;
+                  }
                   if (position == 4) {
                       final TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),
                               new TimePickerDialog.OnTimeSetListener() {
@@ -212,7 +232,7 @@ public class ReminderDialogFragment extends DialogFragment {
                                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                                     // 現在の時間を表すCalendarの時間と分と秒を0にリセット
                                     setCalenderDate(remindTime, hourOfDay, minute);
-                                    todo.setNotifyStartTime(remindTime.getTime());
+                                    todo.setNotifyStartTime(remindTime.getTimeInMillis());
                                     scheduleNotification("通知成功！", remindTime);
                                     // 表示を更新するために、Adapterに指定した時間を渡す
                                     repeatAdapter.setTime(remindTime);
@@ -232,6 +252,7 @@ public class ReminderDialogFragment extends DialogFragment {
             public void onClick(View v) {
                 realm.where(Todo.class).equalTo("id", todoId).findFirst().deleteFromRealm();
                 listener.onDeleteClicked();
+                dialog.dismiss();
             }
         });
 
@@ -241,15 +262,17 @@ public class ReminderDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 // Todoモデルの要素をセットし保存する
-                todo.setNotifyStartTime(remindTime.getTime());
-                if (todo.createdAt == null) {
-                    todo.setCreatedAt(now.getTime());
+                todo.setId(todoId);
+                todo.setNotifyStartTime(remindTime.getTimeInMillis());
+                if (todo.createdAt == 0) {
+                    todo.setCreatedAt(now.getTimeInMillis());
                 } else {
-                    todo.setUpdatedAt(now.getTime());
+                    todo.setUpdatedAt(now.getTimeInMillis());
                 }
                 saveRealmTodo(todo);
                 scheduleNotification("通知成功！", remindTime);
-                listener.onSaveClicked(todo.getId());
+                listener.onSaveClicked(todoId);
+                dialog.dismiss();
             }
         });
 
@@ -258,6 +281,7 @@ public class ReminderDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 listener.onCancelClicked();
+                dialog.dismiss();
             }
         });
 

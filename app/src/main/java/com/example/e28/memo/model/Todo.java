@@ -1,9 +1,5 @@
 package com.example.e28.memo.model;
 
-import java.util.Date;
-import java.util.Date;
-
-import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -15,9 +11,9 @@ import io.realm.annotations.PrimaryKey;
 public class Todo extends RealmObject {
     @PrimaryKey
     public long id;
-    public Date createdAt;
-    public Date updatedAt;
-    public Date notifyStartTime;
+    public long createdAt = 0;
+    public long updatedAt = 0;
+    public long notifyStartTime = 0;
     public boolean isRepeat;
     public long repeatId;
 
@@ -29,27 +25,27 @@ public class Todo extends RealmObject {
         this.id = id;
     }
 
-    public Date getCreatedAt() {
+    public long getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public long getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(long updatedAt) {
         this.updatedAt = updatedAt;
     }
 
-    public Date getNotifyStartTime() {
+    public long getNotifyStartTime() {
         return notifyStartTime;
     }
 
-    public void setNotifyStartTime(Date notifyStartTime) {
+    public void setNotifyStartTime(long notifyStartTime) {
         this.notifyStartTime = notifyStartTime;
     }
 

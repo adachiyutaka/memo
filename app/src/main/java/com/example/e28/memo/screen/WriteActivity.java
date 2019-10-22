@@ -45,11 +45,13 @@ public class WriteActivity extends AppCompatActivity {
     long memoId;
     long todoId;
     ArrayList<Long> tagIdList = new ArrayList<>();
+    RealmList<Todo> todoRealmList = new RealmList<>();
 
     EditText memoInput;
     ToggleButton highlightBtn;
 
     ReminderDialogFragment reminderDialogFragment;
+    public static final String MEMO_ID = "com.example.e28.memo.screen.MEMO_ID";
     public static final String TAG_ID_LIST = "com.example.e28.memo.screen.TAG_LIST";
     public static final String TODO_ID = "com.example.e28.memo.screen.TODO_ID";
     public static final int RESULT_TAG_LIST = 0;
@@ -107,13 +109,14 @@ public class WriteActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 reminderDialogFragment = new ReminderDialogFragment();
+                // リマインダーダイアログ上のボタンのクリック処理
                 reminderDialogFragment.setReminderDialogFragmentListener(new ReminderDialogFragment.ReminderDialogFragmentListener() {
                     @Override
-                    public void onSaveClicked(long id) {
+                    public void onSaveClicked(long todoId) {
                         // リマインダー保存
                         memo.setTodo(true);
-                        RealmList<Todo> todoRealmList = new RealmList<>();
-                        todoRealmList.add(realm.where(Todo.class).equalTo("id", id).findFirst());
+                        todoRealmList = new RealmList<>();
+                        todoRealmList.add(realm.where(Todo.class).equalTo("id", todoId).findFirst());
                         memo.setTodoList(todoRealmList);
                     }
 
@@ -129,11 +132,12 @@ public class WriteActivity extends AppCompatActivity {
                     }
                 });
 
-                // TodoのIDをReminderDialogに渡す
+                // MemoのID、TodoのIDをReminderDialogに渡す
                 Bundle bundle = new Bundle();
+                bundle.putLong(MEMO_ID, memo.getId());
                 if (memo.isTodo) {
                     // 既にTodoのIDが設定されている場合は、memoから読み取る
-                    bundle.putLong(TODO_ID, memo.getTodoList().get(0).getId());
+                    bundle.putLong(TODO_ID, todoRealmList.get(0).getId());
                 } else {
                     // まだTodoのIDが設定されていない場合は新規作成する
                     bundle.putLong(TODO_ID, getRealmNextId("Todo"));
