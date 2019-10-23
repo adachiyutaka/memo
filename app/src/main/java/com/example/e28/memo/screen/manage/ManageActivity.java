@@ -27,7 +27,7 @@ public class ManageActivity extends AppCompatActivity implements PreferenceFragm
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage);
 
-       //toolbar
+        //toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 

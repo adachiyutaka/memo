@@ -13,6 +13,8 @@ import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.TimePicker;
 import com.example.e28.memo.R;
+
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import static android.content.ContentValues.TAG;
@@ -27,7 +29,7 @@ public class ManageFragment extends PreferenceFragmentCompat {
     Context context;
     SharedPreferences pref = null;
     Resources res;
-    final String[] prefKeyList = {"pref_key_reminder_morning", "pref_key_reminder_afternoon", "pref_key_reminder_evening", "pref_key_reminder_night"};
+    String[] prefKeyList;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -36,6 +38,7 @@ public class ManageFragment extends PreferenceFragmentCompat {
         context = this.getActivity();
         pref = PreferenceManager.getDefaultSharedPreferences(context);
         res = getResources();
+        prefKeyList = getResources().getStringArray(R.array.pref_key_reminder_array);
 
         for (String key: prefKeyList){
             setTimePicker(key);
@@ -59,9 +62,9 @@ public class ManageFragment extends PreferenceFragmentCompat {
             new SharedPreferences.OnSharedPreferenceChangeListener() {
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String changedKey) {
                     for (String key: prefKeyList)
-                    if (changedKey.equals(key))
-                        // サマリーに変更された時間をセット
-                        findPreference(key).setSummary(sharedPreferences.getString(key, res.getString(getResources().getIdentifier(key,"string", context.getPackageName()))));
+                        if (changedKey.equals(key))
+                            // サマリーに変更された時間をセット
+                            findPreference(key).setSummary(sharedPreferences.getString(key, res.getString(getResources().getIdentifier(key,"string", context.getPackageName()))));
                 }
             };
 

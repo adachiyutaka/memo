@@ -109,28 +109,6 @@ public class WriteActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 reminderDialogFragment = new ReminderDialogFragment();
-                // リマインダーダイアログ上のボタンのクリック処理
-                reminderDialogFragment.setReminderDialogFragmentListener(new ReminderDialogFragment.ReminderDialogFragmentListener() {
-                    @Override
-                    public void onSaveClicked(long todoId) {
-                        // リマインダー保存
-                        memo.setTodo(true);
-                        todoRealmList = new RealmList<>();
-                        todoRealmList.add(realm.where(Todo.class).equalTo("id", todoId).findFirst());
-                        memo.setTodoList(todoRealmList);
-                    }
-
-                    @Override
-                    public void onDeleteClicked() {
-                        // リマインダー削除
-                        memo.setTodo(false);
-                    }
-
-                    @Override
-                    public void onCancelClicked() {
-                        // リマインダー編集キャンセル
-                    }
-                });
 
                 // MemoのID、TodoのIDをReminderDialogに渡す
                 Bundle bundle = new Bundle();
@@ -144,6 +122,29 @@ public class WriteActivity extends AppCompatActivity {
                 }
                 reminderDialogFragment.setArguments(bundle);
                 reminderDialogFragment.show(getSupportFragmentManager(), "dialog");
+
+                // リマインダーダイアログ上のボタンのクリック処理
+                reminderDialogFragment.setReminderDialogFragmentListener(new ReminderDialogFragment.ReminderDialogFragmentListener() {
+                    @Override
+                    public void onSaveClicked(long todoId) {
+                        // リマインダーの保存ボタン
+                        memo.setTodo(true);
+                        todoRealmList = new RealmList<>();
+                        todoRealmList.add(realm.where(Todo.class).equalTo("id", todoId).findFirst());
+                        memo.setTodoList(todoRealmList);
+                    }
+
+                    @Override
+                    public void onDeleteClicked() {
+                        // リマインダーの削除ボタン
+                        memo.setTodo(false);
+                    }
+
+                    @Override
+                    public void onCancelClicked() {
+                        // リマインダーのキャンセルボタン
+                    }
+                });
             }
         });
 

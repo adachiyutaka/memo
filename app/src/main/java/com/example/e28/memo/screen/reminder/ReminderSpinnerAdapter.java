@@ -76,30 +76,30 @@ public class ReminderSpinnerAdapter extends BaseAdapter {
                 textViewSelectedTime.setText(calendar.get(Calendar.YEAR) + "年" + (calendar.get(Calendar.MONTH) + 1) + "月" + calendar.get(Calendar.DAY_OF_MONTH) + "日");
                 break;
             case 1: // 時間を指定するSpinner
-                textViewSelectedTime.setText(calendar.get(Calendar.HOUR_OF_DAY) + "時" + calendar.get(Calendar.MINUTE) + "分");
+                textViewSelectedTime.setText(calendar.get(Calendar.HOUR_OF_DAY) + "時" + String.format("%02d", calendar.get(Calendar.MINUTE)) + "分");
                 break;
             case 2: // リピートを指定するSpinner
-                String textRepeat = null;
-                switch (repeat.getRepeatScale()){
-                    case 0:
-                        textRepeat = "リピートなし";
-                        break;
-                    case 1:
-                        textRepeat = "毎日";
-                        break;
-                    case 2:
-                        textRepeat = "毎週";
-                        break;
-                    case 3:
-                        textRepeat = "毎月";
-                        break;
-                    case 4:
-                        textRepeat = "毎年";
-                        break;
-                    default:
-                        textRepeat = "リピートなし";
-                        break;
-                }
+                String textRepeat = "リピートなし";
+//                switch (repeat.getRepeatScale()) {
+//                    case 0:
+//                        textRepeat = "リピートなし";
+//                        break;
+//                    case 1:
+//                        textRepeat = "毎日";
+//                        break;
+//                    case 2:
+//                        textRepeat = "毎週";
+//                        break;
+//                    case 3:
+//                        textRepeat = "毎月";
+//                        break;
+//                    case 4:
+//                        textRepeat = "毎年";
+//                        break;
+//                    default:
+//                        textRepeat = "リピートなし";
+//                        break;
+//                }
                 textViewSelectedTime.setText(textRepeat);
                 break;
         }

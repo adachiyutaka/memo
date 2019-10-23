@@ -11,5 +11,11 @@
         <item>mark</item>
         <item>all</item>
     </string-array>
+    <string-array name="pref_key_reminder_array">
+        <item>pref_key_reminder_morning</item>
+        <item>pref_key_reminder_afternoon</item>
+        <item>pref_key_reminder_evening</item>
+        <item>pref_key_reminder_night</item>
+    </string-array>
 
 </resources>
