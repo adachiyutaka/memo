@@ -36,8 +36,10 @@ import com.example.e28.memo.model.Repeat;
 import com.example.e28.memo.model.Todo;
 import com.example.e28.memo.screen.AlarmReceiver;
 import com.example.e28.memo.screen.WriteActivity;
-
+import com.example.e28.memo.screen.reminder.ReclickableSpinner;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -46,6 +48,7 @@ import io.realm.Realm;
 import static android.content.ContentValues.TAG;
 import static android.content.Context.ALARM_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
+import static com.example.e28.memo.screen.WriteActivity.TODO_ID;
 
 /**
  * Created by User on 2019/10/14.
@@ -66,9 +69,16 @@ public class ReminderDialogFragment extends DialogFragment {
     private PendingIntent pending;
     private int requestCode = 1;
     Repeat repeat;
+    String REPEAT_ID = "com.example.e28.memo.screen.REPEAT_ID";
     ReminderSpinnerAdapter dateAdapter;
     ReminderSpinnerAdapter timeAdapter;
     ReminderSpinnerAdapter repeatAdapter;
+    boolean isInitialDate;
+    boolean isInitialTime;
+    boolean isInitialRepeat;
+    boolean[] isInitialSetting = {isInitialDate, isInitialTime, isInitialRepeat};
+    DatePickerDialog datePickerDialog;
+    TimePickerDialog timePickerDialog;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -106,25 +116,37 @@ public class ReminderDialogFragment extends DialogFragment {
         dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
         dialog.setContentView(R.layout.dialog_fragment_reminder);
 
+        // 一度選択したアイテムを、再度クリックできるように拡張したスピナーを使用する
+        ReclickableSpinner dateSpinner = dialog.findViewById(R.id.spinner_date);
+        ReclickableSpinner timeSpinner = dialog.findViewById(R.id.spinner_time);
+        ReclickableSpinner repeatSpinner = dialog.findViewById(R.id.spinner_repeat);
 
         // TodoのIDを取得し、セットされた通知開始時間を取得する
-        todoId = getArguments().getLong(WriteActivity.TODO_ID);
+        todoId = getArguments().getLong(TODO_ID);
         remindTime = Calendar.getInstance();
+        SimpleDateFormat formatA = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
         if (realm.where(Todo.class).equalTo("id", todoId).findFirst() == null) {
             // 新規作成されたTodoだった場合、現在の時間をセットする
             remindTime.setTimeInMillis(now.getTimeInMillis());
+            // 時間選択スピナーの第1項目を初期設定にする
+            Arrays.fill(isInitialSetting, true);
+            String formatDate1 = formatA.format(remindTime.getTime());
+            Log.d(TAG, "onCreateDialog: new remindTime : " + formatDate1);
         } else {
             // 既存のTodoだった場合、その時間を取得する
             remindTime.setTimeInMillis(realm.where(Todo.class).equalTo("id", todoId).findFirst().getNotifyStartTime());
+            // 時間選択スピナーの第1項目をユーザーが選択した時間の表示にする
+            Arrays.fill(isInitialSetting, false);
+            String formatDate1 = formatA.format(remindTime.getTime());
+            Log.d(TAG, "onCreateDialog: load remindTime : " + formatDate1);
         }
 
         // TODO: 2019/10/14 スピナーの表示はカスタムアダプターで設定する必要あり（選択項目と確定項目の表示が違う、選択項目に日付を入れるなど）
 
-        Spinner dateSpinner = dialog.findViewById(R.id.spinner_date);
         String[][] dateSpinnerItem = {{"今日", null},
-                                      {"明日", null},
-                                      {"来週の" + week[week_int -1] + "曜日", null},
-                                      {"カレンダーから選ぶ", null}};
+                {"明日", null},
+                {"来週の" + week[week_int -1] + "曜日", null},
+                {"カレンダーから選ぶ", null}};
         dateAdapter = new ReminderSpinnerAdapter(getActivity());
         dateAdapter.setList(dateSpinnerItem, 0);
         dateAdapter.setTime(remindTime);
@@ -134,47 +156,63 @@ public class ReminderDialogFragment extends DialogFragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 switch (position) {
                     case 0:
-                        remindTime.set(Calendar.DAY_OF_MONTH, now.get(Calendar.DAY_OF_MONTH));
-                        dateAdapter.notifyDataSetChanged();
-                        break;
+                        if (isInitialDate){
+                            // 選択項目（現在の日付）を表示
+                            remindTime.setTime(now.getTime());
+                            break;
+                        } else {
+                            // 第1項目にユーザーが選択した日時を表示
+                            // ユーザーが第1項目を選択した場合は、初期設定の項目が表示されるように isInitialDate = true に変更
+                            isInitialDate = true;
+                            break;
+                        }
                     case 1:
-                        remindTime.set(Calendar.DAY_OF_MONTH, now.get(Calendar.DAY_OF_MONTH) + 1);
-                        dateAdapter.notifyDataSetChanged();
+                        now.add(Calendar.DAY_OF_MONTH, 1);
+                        remindTime.setTime(now.getTime());
+                        now.add(Calendar.DAY_OF_MONTH, -1);
                         break;
                     case 2:
-                        remindTime.set(Calendar.DAY_OF_MONTH, now.get(Calendar.DAY_OF_MONTH) + 7);
-                        dateAdapter.notifyDataSetChanged();
+                        now.add(Calendar.DAY_OF_MONTH, 7);
+                        remindTime.setTime(now.getTime());
+                        now.add(Calendar.DAY_OF_MONTH, -7);
                         break;
                     case 3:
-                        final DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
+                        if (datePickerDialog == null) {
+                            datePickerDialog = new DatePickerDialog(getActivity(),
                                 new DatePickerDialog.OnDateSetListener() {
                                     @Override
                                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                                        // 現在の時間を表すCalendarの年と月と日を0にリセット
                                         remindTime.set(year, month, dayOfMonth);
                                         dateAdapter.setTime(remindTime);
                                         dateAdapter.notifyDataSetChanged();
                                     }
                                 }, year, month, dayOfMonth);
-                        datePickerDialog.getDatePicker().setMinDate(now.getTimeInMillis());
+                            datePickerDialog.getDatePicker().setMinDate(now.getTimeInMillis());
+                        } else {
+                            datePickerDialog.updateDate(remindTime.get(Calendar.YEAR), remindTime.get(Calendar.MONTH), remindTime.get(Calendar.DAY_OF_MONTH));
+                        }
                         datePickerDialog.show();
                         break;
                 }
+                // 選択した時間をAdapterに渡し、表示の更新を行う
+                dateAdapter.setTime(remindTime);
+                dateAdapter.notifyDataSetChanged();
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        Spinner timeSpinner = dialog.findViewById(R.id.spinner_time);
-        // スピナー表示用のリスト　（例：朝, 8:05）
+        // スピナー表示用のプリファレンスの設定時間リスト　（例：8, 05）
         Resources res = getResources();
         final int[][] prefTime = new int[4][2];
         for (int i = 0 ; i < prefKeyList.length ; i++) {
             String prefHour = prefKeyList[i] + "_hour_of_day";
             String prefMinute = prefKeyList[i] + "_minute";
-            prefTime[i][0] = pref.getInt(prefHour, res.getInteger(res.getIdentifier(prefHour, "integer",  context.getPackageName())));
-            prefTime[i][1] = pref.getInt(prefMinute, res.getInteger(res.getIdentifier(prefMinute, "integer",  context.getPackageName())));
+            prefTime[i][0] = res.getInteger(res.getIdentifier(prefHour, "integer",  context.getPackageName()));
+            prefTime[i][1] = res.getInteger(res.getIdentifier(prefMinute, "integer",  context.getPackageName()));
+            String formatDate1 = formatA.format(remindTime.getTime());
+            Log.d(TAG, "prefTime : [" + i + "][0]" + prefTime[i][0]);
+            Log.d(TAG, "prefTime : [" + i + "][1]" + prefTime[i][1]);
         }
 
         // スピナー表示用のリスト　（例：朝, 8:05）
@@ -204,76 +242,125 @@ public class ReminderDialogFragment extends DialogFragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 switch (position) {
                     case 0:
+                        if (isInitialTime){
+                            // 選択項目（現在の時間）を表示
+                        } else {
+                            // 第1項目にユーザーが選択した日時を表示
+                            // ユーザーが第1項目を選択した場合は、初期設定の項目が表示されるように isInitialTime = true に変更
+                            isInitialTime = true;
+                            break;
+                        }
                     case 1:
                     case 2:
                     case 3:
                         remindTime.set(Calendar.HOUR_OF_DAY, prefTime[position][0]);
                         remindTime.set(Calendar.MINUTE, prefTime[position][1]);
-                        timeAdapter.notifyDataSetChanged();
                         break;
                     case 4:
-                        final TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),
-                                new TimePickerDialog.OnTimeSetListener() {
-                                    @Override
-                                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                        // 現在の時間を表すCalendarの時間と分と秒を0にリセット
-                                        setCalenderDate(remindTime, hourOfDay, minute);
-                                        // 表示を更新するために、Adapterに指定した時間を渡す
-                                        timeAdapter.setTime(remindTime);
-                                        timeAdapter.notifyDataSetChanged();
-                                    }
-                                }, hour, minute, true);
+                        if (timePickerDialog == null) {
+                            timePickerDialog = new TimePickerDialog(getActivity(),
+                                    new TimePickerDialog.OnTimeSetListener() {
+                                        @Override
+                                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                            // 現在の時間を表すCalendarの時間と分と秒を0にリセット
+                                            setCalenderDate(remindTime, hourOfDay, minute);
+                                            timeAdapter.setTime(remindTime);
+                                            timeAdapter.notifyDataSetChanged();
+                                        }
+                                    }, hour, minute, true);
+                        } else {
+                            timePickerDialog.updateTime(remindTime.get(Calendar.HOUR_OF_DAY), remindTime.get(Calendar.MINUTE));
+                        }
                         timePickerDialog.show();
                         break;
                 }
+                // 選択した時間をAdapterに渡し、表示の更新を行う
+                timeAdapter.setTime(remindTime);
+                timeAdapter.notifyDataSetChanged();
             }
-              @Override
-              public void onNothingSelected(AdapterView<?> parent) {}
-          });
-
-        Spinner repeatSpinner = dialog.findViewById(R.id.spinner_repeat);
-        String[][] repeatSpinnerItem = {{"リピートなし", null},
-                                        {"毎日", null},
-                                        {"毎週", null},
-                                        {"毎月", null},
-                                        {"毎年", null},
-                                        {"詳細設定", null}};
-        repeatAdapter = new ReminderSpinnerAdapter(getActivity());
-        repeatAdapter.setList(repeatSpinnerItem, 2);
-        repeatSpinner.setAdapter(repeatAdapter);
-        repeatSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position == 3) {
-                    final TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),
-                            new TimePickerDialog.OnTimeSetListener() {
-                                @Override
-                                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                    // 現在の時間を表すCalendarの時間と分と秒を0にリセット
-                                    setCalenderDate(remindTime, hourOfDay, minute);
-                                    todo.setNotifyStartTime(remindTime.getTimeInMillis());
-                                    scheduleNotification("通知成功！", remindTime);
-                                    // 表示を更新するために、Adapterに指定した時間を渡す
-                                    repeatAdapter.setTime(remindTime);
-                                }
-                            }, hour, minute, true);
-                    timePickerDialog.show();
-                }
-            }
-
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
+
+        String[][] repeatSpinnerItem = {{"リピートなし", null},
+                {"毎日", null},
+                {"毎週", null},
+                {"毎月", null},
+                {"毎年", null},
+                {"詳細設定", null}};
+        repeatAdapter = new ReminderSpinnerAdapter(getActivity());
+        repeatAdapter.setList(repeatSpinnerItem, 2);
+        repeatSpinner.setAdapter(repeatAdapter);
+//        repeatSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                switch (position) {
+//                    case 0:
+//                    case 1:
+//                    case 2:
+//                    case 3:
+//                    case 4:
+////                        repeat.setRepeatScale(position);
+//                        break;
+//                    case 5:
+//                        //   DialogFragment repeatDialogFragment = new RepeatDialogFragment();
+//
+//                        // MemoのID、TodoのIDをReminderDialogに渡す
+//                        Bundle bundle = new Bundle();
+//                        bundle.putLong(TODO_ID, todoId);
+//                        if (todo.isRepeat) {
+//                            // 既にTodoのIDが設定されている場合は、memoから読み取る
+//                            bundle.putLong(REPEAT_ID, repeat.getId());
+//                        } else {
+//                            // まだTodoのIDが設定されていない場合は新規作成する
+//                            bundle.putLong(TODO_ID, repeat.getId());
+//                        }
+//                        //   repeatDialogFragment.setArguments(bundle);
+//                        //   repeatDialogFragment.show(getSupportFragmentManager(), "dialog");
+//
+//                        // リマインダーダイアログ上のボタンのクリック処理
+//                        reminderDialogFragment.setReminderDialogFragmentListener(new ReminderDialogFragment.ReminderDialogFragmentListener() {
+//                            @Override
+//                            public void onSaveClicked(long todoId) {
+//                                // リマインダーの保存ボタン
+//                                memo.setTodo(true);
+//                                todoRealmList = new RealmList<>();
+//                                todoRealmList.add(realm.where(Todo.class).equalTo("id", todoId).findFirst());
+//                                memo.setTodoList(todoRealmList);
+//                            }
+//
+//                            @Override
+//                            public void onDeleteClicked() {
+//                                // リマインダーの削除ボタン
+//                                memo.setTodo(false);
+//                            }
+//
+//                            @Override
+//                            public void onCancelClicked() {
+//                                // リマインダーのキャンセルボタン
+//                            }
+//                        });
+//                }
+//            }
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {}
+//        });
 
         // 削除ボタンの処理
         dialog.findViewById(R.id.button_delete).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                realm.where(Todo.class).equalTo("id", todoId).findFirst().deleteFromRealm();
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        realm.where(Todo.class).equalTo("id", todoId).findFirst().deleteFromRealm();
+                    }
+                });
                 listener.onDeleteClicked();
                 dialog.dismiss();
             }
         });
+
 
         // 保存ボタンの処理
         // ここで通知時間を確定する
@@ -373,5 +460,36 @@ public class ReminderDialogFragment extends DialogFragment {
         } finally {
             Log.d("realm","saveTodo:success");
         }
+    }
+
+    public long getRealmNextId(String modelName) {
+        // 初期化
+        long nextId = 0;
+        Number maxId;
+
+        switch (modelName) {
+            case "Memo":
+                maxId = realm.where(Memo.class).max("id");
+                // 1度もデータが作成されていない場合はNULLが返ってくるため、NULLチェックをする
+                if(maxId != null) {
+                    nextId = maxId.longValue() + 1;
+                }
+                break;
+            case "Todo":
+                maxId = realm.where(Todo.class).max("id");
+                // 1度もデータが作成されていない場合はNULLが返ってくるため、NULLチェックをする
+                if(maxId != null) {
+                    nextId = maxId.longValue() + 1;
+                }
+                break;
+            case "Repeat":
+                maxId = realm.where(Repeat.class).max("id");
+                // 1度もデータが作成されていない場合はNULLが返ってくるため、NULLチェックをする
+                if(maxId != null) {
+                    nextId = maxId.longValue() + 1;
+                }
+                break;
+        }
+        return nextId;
     }
 }

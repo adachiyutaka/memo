@@ -1,6 +1,7 @@
 package com.example.e28.memo.screen.reminder;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +11,11 @@ import android.widget.TextView;
 import com.example.e28.memo.R;
 import com.example.e28.memo.model.Repeat;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by User on 2019/10/18.
@@ -39,6 +43,9 @@ public class ReminderSpinnerAdapter extends BaseAdapter {
 
     public void setTime(Calendar calendar) {
         this.calendar = calendar;
+        SimpleDateFormat formatA = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+        String formatDate1 = formatA.format(calendar.getTime());
+        Log.d(TAG, "onCreateDialog: set adapter remindTime : " + formatDate1);
     }
     public void setRepeat(Repeat repeat) {
         this.repeat = repeat;
