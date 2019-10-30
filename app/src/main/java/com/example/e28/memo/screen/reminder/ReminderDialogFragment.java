@@ -44,6 +44,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 
 import static android.content.ContentValues.TAG;
 import static android.content.Context.ALARM_SERVICE;
@@ -54,7 +55,7 @@ import static com.example.e28.memo.screen.WriteActivity.TODO_ID;
  * Created by User on 2019/10/14.
  */
 
-public class ReminderDialogFragment extends DialogFragment {
+public class ReminderDialogFragment extends DialogFragment{
 
     Context context;
     Realm realm;
@@ -88,8 +89,6 @@ public class ReminderDialogFragment extends DialogFragment {
         // Realmのインスタンスを生成
         realm = Realm.getDefaultInstance();
 
-        todo = new Todo();
-
         final String[] prefKeyList = getResources().getStringArray(R.array.pref_key_reminder_array);
 
         now = Calendar.getInstance();
@@ -121,25 +120,25 @@ public class ReminderDialogFragment extends DialogFragment {
         ReclickableSpinner timeSpinner = dialog.findViewById(R.id.spinner_time);
         ReclickableSpinner repeatSpinner = dialog.findViewById(R.id.spinner_repeat);
 
-        // TodoのIDを取得し、セットされた通知開始時間を取得する
+        // TodoのIDを取得し、セットされた通知開始時間、リピート情報を取得する
         todoId = getArguments().getLong(TODO_ID);
         remindTime = Calendar.getInstance();
-        SimpleDateFormat formatA = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
         if (realm.where(Todo.class).equalTo("id", todoId).findFirst() == null) {
-            // 新規作成されたTodoだった場合、現在の時間をセットする
+            // 新規作成されたTodoだった場合、新規作成する
+
+            // ID、現在の時間をセットする
             remindTime.setTimeInMillis(now.getTimeInMillis());
             // 時間選択スピナーの第1項目を初期設定にする
             Arrays.fill(isInitialSetting, true);
-            String formatDate1 = formatA.format(remindTime.getTime());
-            Log.d(TAG, "onCreateDialog: new remindTime : " + formatDate1);
         } else {
             // 既存のTodoだった場合、その時間を取得する
             remindTime.setTimeInMillis(realm.where(Todo.class).equalTo("id", todoId).findFirst().getNotifyStartTime());
             // 時間選択スピナーの第1項目をユーザーが選択した時間の表示にする
             Arrays.fill(isInitialSetting, false);
-            String formatDate1 = formatA.format(remindTime.getTime());
-            Log.d(TAG, "onCreateDialog: load remindTime : " + formatDate1);
         }
+
+        // 同じく、TodoのIDからセットされたRepeatを取得する
+
 
         // TODO: 2019/10/14 スピナーの表示はカスタムアダプターで設定する必要あり（選択項目と確定項目の表示が違う、選択項目に日付を入れるなど）
 
@@ -210,9 +209,6 @@ public class ReminderDialogFragment extends DialogFragment {
             String prefMinute = prefKeyList[i] + "_minute";
             prefTime[i][0] = res.getInteger(res.getIdentifier(prefHour, "integer",  context.getPackageName()));
             prefTime[i][1] = res.getInteger(res.getIdentifier(prefMinute, "integer",  context.getPackageName()));
-            String formatDate1 = formatA.format(remindTime.getTime());
-            Log.d(TAG, "prefTime : [" + i + "][0]" + prefTime[i][0]);
-            Log.d(TAG, "prefTime : [" + i + "][1]" + prefTime[i][1]);
         }
 
         // スピナー表示用のリスト　（例：朝, 8:05）
@@ -282,69 +278,65 @@ public class ReminderDialogFragment extends DialogFragment {
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
+        // RepeatSpinner表示用リスト
         String[][] repeatSpinnerItem = {{"リピートなし", null},
                 {"毎日", null},
                 {"毎週", null},
                 {"毎月", null},
                 {"毎年", null},
                 {"詳細設定", null}};
+
+        // RepeatSpinnerの設定
         repeatAdapter = new ReminderSpinnerAdapter(getActivity());
         repeatAdapter.setList(repeatSpinnerItem, 2);
         repeatSpinner.setAdapter(repeatAdapter);
-//        repeatSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                switch (position) {
-//                    case 0:
-//                    case 1:
-//                    case 2:
-//                    case 3:
-//                    case 4:
-////                        repeat.setRepeatScale(position);
-//                        break;
-//                    case 5:
-//                        //   DialogFragment repeatDialogFragment = new RepeatDialogFragment();
-//
-//                        // MemoのID、TodoのIDをReminderDialogに渡す
-//                        Bundle bundle = new Bundle();
-//                        bundle.putLong(TODO_ID, todoId);
-//                        if (todo.isRepeat) {
-//                            // 既にTodoのIDが設定されている場合は、memoから読み取る
-//                            bundle.putLong(REPEAT_ID, repeat.getId());
-//                        } else {
-//                            // まだTodoのIDが設定されていない場合は新規作成する
-//                            bundle.putLong(TODO_ID, repeat.getId());
-//                        }
-//                        //   repeatDialogFragment.setArguments(bundle);
-//                        //   repeatDialogFragment.show(getSupportFragmentManager(), "dialog");
-//
-//                        // リマインダーダイアログ上のボタンのクリック処理
-//                        reminderDialogFragment.setReminderDialogFragmentListener(new ReminderDialogFragment.ReminderDialogFragmentListener() {
+        repeatSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                Bundle bundle = new Bundle();
+//                if (todo.isRepeat) {
+//                    // 既にTodoのIDが設定されている場合は、memoから読み取る
+//                    bundle.putLong(REPEAT_ID, repeat.getId());
+//                } else {
+//                    // まだTodoのIDが設定されていない場合は新規作成する
+//                    bundle.putLong(TODO_ID, repeat.getId());
+//                }
+                repeat = new Repeat();
+                long repeatId = getRealmNextId("Repeat");
+                repeat.setId(repeatId);
+                switch (position) {
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                        repeat.setRepeatScale(position);
+                        break;
+                    case 5:
+                        DialogFragment repeatDialogFragment = new RepeatDialogFragment();
+
+                        // MemoのID、TodoのIDをReminderDialogに渡す
+                        Bundle bundle = new Bundle();
+                        bundle.putLong(REPEAT_ID, repeatId);
+
+                        //   repeatDialogFragment.setArguments(bundle);
+                        listener.onShowDialog(repeatDialogFragment);
+
+                        // リマインダーダイアログ上のボタンのクリック処理
+//                        repeatDialogFragment.setRepeatDialogFragmentListener(new RepeatDialogFragment.RepeatDialogFragmentListener() {
 //                            @Override
 //                            public void onSaveClicked(long todoId) {
 //                                // リマインダーの保存ボタン
-//                                memo.setTodo(true);
-//                                todoRealmList = new RealmList<>();
-//                                todoRealmList.add(realm.where(Todo.class).equalTo("id", todoId).findFirst());
-//                                memo.setTodoList(todoRealmList);
-//                            }
-//
-//                            @Override
-//                            public void onDeleteClicked() {
-//                                // リマインダーの削除ボタン
-//                                memo.setTodo(false);
-//                            }
-//
-//                            @Override
-//                            public void onCancelClicked() {
-//                                // リマインダーのキャンセルボタン
+//                                todo.setRepeat(true);
+//                                todo.setRepeatId(repeatId);
 //                            }
 //                        });
-//                }
-//            }
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {}
-//        });
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
 
         // 削除ボタンの処理
         dialog.findViewById(R.id.button_delete).setOnClickListener(new OnClickListener() {
@@ -435,6 +427,7 @@ public class ReminderDialogFragment extends DialogFragment {
         void onSaveClicked(long id);
         void onDeleteClicked();
         void onCancelClicked();
+        void onShowDialog(DialogFragment dialogFragment);
     }
 
     public void setReminderDialogFragmentListener(ReminderDialogFragmentListener listener) {

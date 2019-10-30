@@ -12,10 +12,15 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -28,6 +33,7 @@ import com.example.e28.memo.model.Repeat;
 import com.example.e28.memo.model.Tag;
 import com.example.e28.memo.model.Todo;
 import com.example.e28.memo.screen.reminder.ReminderDialogFragment;
+import com.example.e28.memo.screen.reminder.RepeatDialogFragment;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -63,6 +69,21 @@ public class WriteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_write);
         memoInput = findViewById(R.id.edit_text_memo_Input);
 
+
+        // TestDialog
+
+        Button dialogTextButton = findViewById(R.id.button_dialog_test);
+        dialogTextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogFragment firstDialogFragment = new FirstDialogFragment();
+                firstDialogFragment.show(getSupportFragmentManager(), "FirstDialog");
+            }
+        });
+
+        // TestDialog
+
+
         // Realmのインスタンスを生成
         realm = Realm.getDefaultInstance();
 
@@ -73,9 +94,9 @@ public class WriteActivity extends AppCompatActivity {
 
         // 保存ボタンでの保存と新規作成
         Button btnSave = findViewById(R.id.button_save);
-        btnSave.setOnClickListener(new View.OnClickListener(){
+        btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 saveMemo();
                 // メモ入力エリアの表示をクリア
                 memoInput.getEditableText().clear();
@@ -89,16 +110,17 @@ public class WriteActivity extends AppCompatActivity {
 
         // タグボタン押下でダイアログを表示
         Button btnTag = findViewById(R.id.button_tag);
-        btnTag.setOnClickListener(new View.OnClickListener(){
+        btnTag.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Intent intent = new Intent(WriteActivity.this, com.example.e28.memo.screen.tagdialog.TagDialogActivity.class);
                 // Memoが持つタグのidリストを生成し、中身が0でない場合はintentで渡す
                 if (memo.getTagList() != null) {
                     for (Tag tag : memo.getTagList()) {
                         tagIdList.add(tag.getId());
                     }
-                intent.putExtra(TAG_ID_LIST, tagIdList);}
+                    intent.putExtra(TAG_ID_LIST, tagIdList);
+                }
                 startActivityForResult(intent, RESULT_TAG_LIST);
             }
         });
@@ -144,6 +166,12 @@ public class WriteActivity extends AppCompatActivity {
                     public void onCancelClicked() {
                         // リマインダーのキャンセルボタン
                     }
+
+                    @Override
+                    public void onShowDialog(DialogFragment dialogFragment) {
+                        DialogFragment repeatDialogFragment = new RepeatDialogFragment();
+                        repeatDialogFragment.show(getSupportFragmentManager(), "dialog");
+                    }
                 });
             }
         });
@@ -171,7 +199,7 @@ public class WriteActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         // Activityが破棄される際にrealmのインスタンスを閉じる
         realm.close();
@@ -201,7 +229,7 @@ public class WriteActivity extends AppCompatActivity {
     }
 
 
-    public void saveMemo(){
+    public void saveMemo() {
         String memoInputStr = memoInput.getText().toString();
         // TODO: 2019/10/10 ハイライト、リマインダー、TODOが設定されている場合の処理を後で加える
         // memoInputに何も入力されおらず、い場合、保存しない
@@ -214,7 +242,7 @@ public class WriteActivity extends AppCompatActivity {
         }
     }
 
-    public void saveRealmMemo(final Memo memo){
+    public void saveRealmMemo(final Memo memo) {
         try {
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
@@ -227,7 +255,7 @@ public class WriteActivity extends AppCompatActivity {
             Intent intent = new Intent("LIST_UPDATE");
             LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         } finally {
-            Log.d("realm","saveMemo:success");
+            Log.d("realm", "saveMemo:success");
         }
     }
 
@@ -240,25 +268,79 @@ public class WriteActivity extends AppCompatActivity {
             case "Memo":
                 maxId = realm.where(Memo.class).max("id");
                 // 1度もデータが作成されていない場合はNULLが返ってくるため、NULLチェックをする
-                if(maxId != null) {
+                if (maxId != null) {
                     nextId = maxId.longValue() + 1;
                 }
                 break;
             case "Todo":
                 maxId = realm.where(Todo.class).max("id");
                 // 1度もデータが作成されていない場合はNULLが返ってくるため、NULLチェックをする
-                if(maxId != null) {
+                if (maxId != null) {
                     nextId = maxId.longValue() + 1;
                 }
                 break;
             case "Repeat":
                 maxId = realm.where(Repeat.class).max("id");
                 // 1度もデータが作成されていない場合はNULLが返ってくるため、NULLチェックをする
-                if(maxId != null) {
+                if (maxId != null) {
                     nextId = maxId.longValue() + 1;
                 }
                 break;
         }
         return nextId;
+    }
+
+    interface If {
+        public void ifMethod();
+    }
+
+
+    // TestDialog
+
+
+
+
+
+    public static class FirstDialogFragment extends DialogFragment {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+            final Dialog dialog = new Dialog(getActivity());
+            dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+            dialog.setContentView(R.layout.first_dialog);
+
+
+            Button nextButton = (Button) dialog.findViewById(R.id.button_next);
+            nextButton.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    DialogFragment nextDialogFragment = new NextDialogFragment();
+                    nextDialogFragment.show(getFragmentManager(), "nextFragment");
+                }
+            });
+
+            Button cancelButton = (Button) dialog.findViewById(R.id.button_cancel);
+            cancelButton.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    dismiss();
+                }
+            });
+            return dialog;
+        }
+
+        public static class NextDialogFragment extends DialogFragment {
+
+            @Override
+            public Dialog onCreateDialog(Bundle savedInstanceState) {
+                return new AlertDialog.Builder(getActivity())
+                        .setMessage("Next Dialog").setPositiveButton("Ok", null).create();
+            }
+        }
+
+        // TestDialog
     }
 }
