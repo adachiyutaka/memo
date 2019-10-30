@@ -166,12 +166,6 @@ public class WriteActivity extends AppCompatActivity {
                     public void onCancelClicked() {
                         // リマインダーのキャンセルボタン
                     }
-
-                    @Override
-                    public void onShowDialog(DialogFragment dialogFragment) {
-                        DialogFragment repeatDialogFragment = new RepeatDialogFragment();
-                        repeatDialogFragment.show(getSupportFragmentManager(), "dialog");
-                    }
                 });
             }
         });

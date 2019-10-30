@@ -2,6 +2,7 @@ package com.example.e28.memo.screen.reminder;
 
 
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
@@ -13,6 +14,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.preference.PreferenceFragmentCompat;
@@ -25,6 +27,7 @@ import android.view.WindowManager;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.Spinner;
 import android.widget.TimePicker;
@@ -138,6 +141,31 @@ public class ReminderDialogFragment extends DialogFragment{
         }
 
         // 同じく、TodoのIDからセットされたRepeatを取得する
+
+
+
+
+
+
+        //TEST DIALOG
+
+
+        Button nextButton = (Button) dialog.findViewById(R.id.button_dialog_test);
+        nextButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                DialogFragment nextDialogFragment = new WriteActivity.FirstDialogFragment.NextDialogFragment();
+                nextDialogFragment.show(getFragmentManager(), "nextFragment");
+            }
+        });
+
+
+        //TEST DIALOG
+
+
+
+
 
 
         // TODO: 2019/10/14 スピナーの表示はカスタムアダプターで設定する必要あり（選択項目と確定項目の表示が違う、選択項目に日付を入れるなど）
@@ -318,19 +346,19 @@ public class ReminderDialogFragment extends DialogFragment{
                         // MemoのID、TodoのIDをReminderDialogに渡す
                         Bundle bundle = new Bundle();
                         bundle.putLong(REPEAT_ID, repeatId);
+                        repeatDialogFragment.setArguments(bundle);
 
-                        //   repeatDialogFragment.setArguments(bundle);
-                        listener.onShowDialog(repeatDialogFragment);
+                        repeatDialogFragment.show(getFragmentManager(), "RepeatFragment");
 
                         // リマインダーダイアログ上のボタンのクリック処理
-//                        repeatDialogFragment.setRepeatDialogFragmentListener(new RepeatDialogFragment.RepeatDialogFragmentListener() {
-//                            @Override
-//                            public void onSaveClicked(long todoId) {
-//                                // リマインダーの保存ボタン
-//                                todo.setRepeat(true);
-//                                todo.setRepeatId(repeatId);
-//                            }
-//                        });
+                        repeatDialogFragment.setRepeatDialogFragmentListener(new RepeatDialogFragment.RepeatDialogFragmentListener() {
+                            @Override
+                            public void onSaveClicked(long repeatId) {
+                                // リマインダーの保存ボタン
+                                todo.setRepeat(true);
+                                todo.setRepeatId(repeatId);
+                            }
+                        });
                 }
             }
 
@@ -427,7 +455,6 @@ public class ReminderDialogFragment extends DialogFragment{
         void onSaveClicked(long id);
         void onDeleteClicked();
         void onCancelClicked();
-        void onShowDialog(DialogFragment dialogFragment);
     }
 
     public void setReminderDialogFragmentListener(ReminderDialogFragmentListener listener) {
