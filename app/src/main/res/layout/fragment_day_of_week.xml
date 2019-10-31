@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RadioButton
+        android:id="@+id/radio_button_monday"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/monday"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RadioButton
+        android:id="@+id/radio_button_tuesday"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/tuesday"
+        app:layout_constraintStart_toEndOf="@+id/radio_button_monday" />
+
+    <RadioButton
+        android:id="@+id/radio_button_wednesday"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/wednesday"
+        app:layout_constraintStart_toEndOf="@+id/radio_button_tuesday" />
+
+    <RadioButton
+        android:id="@+id/radio_button_thursday"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/thursday"
+        app:layout_constraintStart_toEndOf="@+id/radio_button_wednesday" />
+
+    <RadioButton
+        android:id="@+id/radio_button_friday"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/friday"
+        app:layout_constraintStart_toEndOf="@+id/radio_button_thursday" />
+
+    <RadioButton
+        android:id="@+id/radio_button_saturday"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/saturday"
+        app:layout_constraintStart_toEndOf="@+id/radio_button_friday" />
+
+    <RadioButton
+        android:id="@+id/radio_button_sunday"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/sunday"
+        app:layout_constraintStart_toEndOf="@+id/radio_button_saturday" />
+
+</android.support.constraint.ConstraintLayout>

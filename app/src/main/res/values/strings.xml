@@ -50,4 +50,24 @@
     <string name="notification_channel_name">リマインダーの通知</string>
     <string name="notification_channel_discription">リマインダーによる通知を設定</string>
 
+
+    <!--RepeatDialog-->
+    <string name="monday">月</string>
+    <string name="tuesday">火</string>
+    <string name="wednesday">水</string>
+    <string name="thursday">木</string>
+    <string name="friday">金</string>
+    <string name="saturday">土</string>
+    <string name="sunday">日</string>
+
+    <string name="time_scale_every_day">毎日</string>
+    <string name="time_scale_day">日ごと</string>
+    <string name="time_scale_every_week">毎週</string>
+    <string name="time_scale_week">週ごと</string>
+    <string name="time_scale_every_month">毎月</string>
+    <string name="time_scale_month">か月ごと</string>
+    <string name="time_scale_every_year">毎年</string>
+    <string name="time_scale_year">年ごと</string>
+
+
 </resources>

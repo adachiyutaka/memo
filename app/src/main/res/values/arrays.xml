@@ -6,16 +6,32 @@
         <item>ハイライト、TODOも表示</item>
         <item>すべて表示</item>
     </string-array>
+
     <string-array name="entry_values_preference_theme">
         <item>write</item>
         <item>mark</item>
         <item>all</item>
     </string-array>
+
     <string-array name="pref_key_reminder_array">
         <item>pref_key_reminder_morning</item>
         <item>pref_key_reminder_afternoon</item>
         <item>pref_key_reminder_evening</item>
         <item>pref_key_reminder_night</item>
+    </string-array>
+
+    <string-array name="time_scale">
+        <item>@string/time_scale_day</item>
+        <item>@string/time_scale_week</item>
+        <item>@string/time_scale_month</item>
+        <item>@string/time_scale_year</item>
+    </string-array>
+
+    <string-array name="time_scale_every">
+        <item>@string/time_scale_every_day</item>
+        <item>@string/time_scale_every_week</item>
+        <item>@string/time_scale_every_month</item>
+        <item>@string/time_scale_every_year</item>
     </string-array>
 
 </resources>

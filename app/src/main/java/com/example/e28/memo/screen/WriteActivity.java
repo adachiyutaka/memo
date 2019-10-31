@@ -69,21 +69,6 @@ public class WriteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_write);
         memoInput = findViewById(R.id.edit_text_memo_Input);
 
-
-        // TestDialog
-
-        Button dialogTextButton = findViewById(R.id.button_dialog_test);
-        dialogTextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DialogFragment firstDialogFragment = new FirstDialogFragment();
-                firstDialogFragment.show(getSupportFragmentManager(), "FirstDialog");
-            }
-        });
-
-        // TestDialog
-
-
         // Realmのインスタンスを生成
         realm = Realm.getDefaultInstance();
 
@@ -282,59 +267,5 @@ public class WriteActivity extends AppCompatActivity {
                 break;
         }
         return nextId;
-    }
-
-    interface If {
-        public void ifMethod();
-    }
-
-
-    // TestDialog
-
-
-
-
-
-    public static class FirstDialogFragment extends DialogFragment {
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-
-            final Dialog dialog = new Dialog(getActivity());
-            dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
-            dialog.setContentView(R.layout.first_dialog);
-
-
-            Button nextButton = (Button) dialog.findViewById(R.id.button_next);
-            nextButton.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    DialogFragment nextDialogFragment = new NextDialogFragment();
-                    nextDialogFragment.show(getFragmentManager(), "nextFragment");
-                }
-            });
-
-            Button cancelButton = (Button) dialog.findViewById(R.id.button_cancel);
-            cancelButton.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    dismiss();
-                }
-            });
-            return dialog;
-        }
-
-        public static class NextDialogFragment extends DialogFragment {
-
-            @Override
-            public Dialog onCreateDialog(Bundle savedInstanceState) {
-                return new AlertDialog.Builder(getActivity())
-                        .setMessage("Next Dialog").setPositiveButton("Ok", null).create();
-            }
-        }
-
-        // TestDialog
     }
 }

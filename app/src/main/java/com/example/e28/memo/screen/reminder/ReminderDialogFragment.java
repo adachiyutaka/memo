@@ -69,6 +69,8 @@ public class ReminderDialogFragment extends DialogFragment{
     Calendar uneditedRemindTime;
     Calendar remindTime;
     private ReminderDialogFragmentListener listener;
+    RepeatDialogFragment repeatDialogFragment;
+    private ReminderDialogFragmentListener repeatListener;
     private AlarmManager am;
     private PendingIntent pending;
     private int requestCode = 1;
@@ -141,29 +143,6 @@ public class ReminderDialogFragment extends DialogFragment{
         }
 
         // 同じく、TodoのIDからセットされたRepeatを取得する
-
-
-
-
-
-
-        //TEST DIALOG
-
-
-        Button nextButton = (Button) dialog.findViewById(R.id.button_dialog_test);
-        nextButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                DialogFragment nextDialogFragment = new WriteActivity.FirstDialogFragment.NextDialogFragment();
-                nextDialogFragment.show(getFragmentManager(), "nextFragment");
-            }
-        });
-
-
-        //TEST DIALOG
-
-
 
 
 
@@ -341,7 +320,9 @@ public class ReminderDialogFragment extends DialogFragment{
                         repeat.setRepeatScale(position);
                         break;
                     case 5:
-                        DialogFragment repeatDialogFragment = new RepeatDialogFragment();
+                        // ↓が　
+                        // RepeatDialog repeatDialogFragment = new RepeatDialogFragment();　//だとうごかなかった
+                        repeatDialogFragment = new RepeatDialogFragment();
 
                         // MemoのID、TodoのIDをReminderDialogに渡す
                         Bundle bundle = new Bundle();
