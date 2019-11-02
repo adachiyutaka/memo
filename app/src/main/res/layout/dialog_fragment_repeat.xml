@@ -39,7 +39,8 @@
     <FrameLayout
         android:id="@+id/day_of_week_choice_fragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="10dp"
+        android:background="@android:color/black"
         android:layout_below="@+id/text_view_frequency" />
 
     <View
@@ -112,8 +113,8 @@
         android:layout_weight="1"
         android:text="RadioButton" />
 
-    <EditText
-        android:id="@+id/edit_text_end_date"
+    <TextView
+        android:id="@+id/text_view_end_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/radio_button_end_date"

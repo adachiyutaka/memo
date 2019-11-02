@@ -8,11 +8,13 @@ import java.util.Date;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.support.v4.app.FragmentTransaction;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -32,6 +34,7 @@ import com.example.e28.memo.model.Memo;
 import com.example.e28.memo.model.Repeat;
 import com.example.e28.memo.model.Tag;
 import com.example.e28.memo.model.Todo;
+import com.example.e28.memo.screen.reminder.FragmentClass;
 import com.example.e28.memo.screen.reminder.ReminderDialogFragment;
 import com.example.e28.memo.screen.reminder.RepeatDialogFragment;
 
@@ -55,6 +58,7 @@ public class WriteActivity extends AppCompatActivity {
 
     EditText memoInput;
     ToggleButton highlightBtn;
+    Button fragmentBtn;
 
     ReminderDialogFragment reminderDialogFragment;
     public static final String MEMO_ID = "com.example.e28.memo.screen.MEMO_ID";
@@ -166,6 +170,22 @@ public class WriteActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // フラグメントテスト
+
+        fragmentBtn = findViewById(R.id.button_fragment);
+        fragmentBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentClass myFragment = new FragmentClass();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragmentContainer, myFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
+
+        // フラグメントテスト
     }
 
     @Override
