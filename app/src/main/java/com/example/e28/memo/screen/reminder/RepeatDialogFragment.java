@@ -43,7 +43,7 @@ public class RepeatDialogFragment extends DialogFragment {
     Repeat repeat;
     android.support.v4.app.FragmentManager fragmentManager;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
-    android.support.v4.app.Fragment dayOfWeekFragment;
+    DayOfWeekFragment dayOfWeekFragment;
     Spinner scaleSpinner;
     Calendar now;
     DatePickerDialog datePickerDialog;
@@ -55,9 +55,7 @@ public class RepeatDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         context = getActivity();
-        fragmentManager = getFragmentManager();
-        fragmentTransaction = fragmentManager.beginTransaction();
-        dayOfWeekFragment = new DayOfWeekFragment();
+
 
 
         now = Calendar.getInstance();
@@ -85,17 +83,21 @@ public class RepeatDialogFragment extends DialogFragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 switch (position) {
                     case 0:
-                        //  fragmentTransaction.hide(dayOfWeekFragment);
+                        //fragmentTransaction.hide(dayOfWeekFragment);
                         break;
                     case 1:
-                        //  fragmentTransaction.replace(R.id.day_of_week_choice_fragment, dayOfWeekFragment);
-                        //  fragmentTransaction.commit();
+//                        fragmentManager = getFragmentManager();
+//                        fragmentTransaction = fragmentManager.beginTransaction();
+//                        dayOfWeekFragment = new DayOfWeekFragment();
+//                        fragmentTransaction.replace(R.id.day_of_week_choice_fragment, dayOfWeekFragment);
+//                        fragmentTransaction.commit();
+
                         break;
                     case 2:
-                        fragmentTransaction.hide(dayOfWeekFragment);
+                        //fragmentTransaction.hide(dayOfWeekFragment);
                         break;
                     case 3:
-                        fragmentTransaction.hide(dayOfWeekFragment);
+                        //fragmentTransaction.hide(dayOfWeekFragment);
                         break;
                 }
             }

@@ -1,63 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<om.google.android.flexbox.FlexboxLayout
+<LinearLayout
     android:id="@+id/fragment_day_of_week"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:flexDirection="row"
-    app:flexWrap="wrap"
-    app:alignItems="flex_start"
-    app:justifyContent="flex_start">
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <RadioButton
         android:id="@+id/radio_button_monday"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/monday"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:text="@string/monday" />
 
     <RadioButton
         android:id="@+id/radio_button_tuesday"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/tuesday"
-        app:layout_constraintStart_toEndOf="@+id/radio_button_monday" />
+        android:text="@string/tuesday" />
 
     <RadioButton
         android:id="@+id/radio_button_wednesday"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/wednesday"
-        app:layout_constraintStart_toEndOf="@+id/radio_button_tuesday" />
+        android:text="@string/wednesday" />
 
     <RadioButton
         android:id="@+id/radio_button_thursday"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/thursday"
-        app:layout_constraintStart_toEndOf="@+id/radio_button_wednesday" />
+        android:text="@string/thursday"/>
 
     <RadioButton
         android:id="@+id/radio_button_friday"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/friday"
-        app:layout_constraintStart_toEndOf="@+id/radio_button_thursday" />
+        android:text="@string/friday" />
 
     <RadioButton
         android:id="@+id/radio_button_saturday"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/saturday"
-        app:layout_constraintStart_toEndOf="@+id/radio_button_friday" />
+        android:text="@string/saturday" />
 
     <RadioButton
         android:id="@+id/radio_button_sunday"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/sunday"
-        app:layout_constraintStart_toEndOf="@+id/radio_button_saturday" />
+        android:text="@string/sunday" />
 
-</om.google.android.flexbox.FlexboxLayout>
+</LinearLayout>

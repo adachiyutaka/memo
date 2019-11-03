@@ -13,7 +13,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_margin="8dp"
-        android:text="TextView" />
+        android:text="@string/text_view_frequency_title" />
 
     <EditText
         android:id="@+id/text_view_interval"
@@ -21,11 +21,11 @@
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/text_view_frequency"
         android:layout_alignBottom="@+id/text_view_frequency"
-        android:layout_toEndOf="@+id/text_view_frequency"
         android:layout_margin="8dp"
+        android:layout_toEndOf="@+id/text_view_frequency"
         android:inputType="number"
         android:maxLength="2"
-        android:text="TextView" />
+        android:text="0" />
 
     <android.support.v7.widget.AppCompatSpinner
         android:id="@+id/spinner_scale"
@@ -36,12 +36,12 @@
         android:layout_margin="8dp"
         android:layout_toEndOf="@+id/text_view_interval" />
 
-    <FrameLayout
+    <include
         android:id="@+id/day_of_week_choice_fragment"
         android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:background="@android:color/black"
-        android:layout_below="@+id/text_view_frequency" />
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_view_frequency"
+        layout="@layout/fragment_day_of_week"/>
 
     <View
         android:id="@+id/line"
@@ -59,7 +59,7 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/line"
         android:layout_margin="8dp"
-        android:text="TextView" />
+        android:text="@string/text_view_scale" />
 
     <RadioButton
         android:id="@+id/radio_button_no_end"
@@ -69,17 +69,7 @@
         android:layout_alignBottom="@+id/text_view_time_end"
         android:layout_toEndOf="@+id/text_view_time_end"
         android:layout_weight="1"
-        android:text="RadioButton" />
-
-    <TextView
-        android:id="@+id/text_view_no_repeat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/radio_button_no_end"
-        android:layout_alignBottom="@+id/radio_button_no_end"
-        android:layout_toEndOf="@+id/radio_button_no_end"
-        android:layout_margin="8dp"
-        android:text="TextView" />
+        android:text="@string/radio_button_no_end" />
 
     <RadioButton
         android:id="@+id/radio_button_repeat_count"
@@ -89,7 +79,7 @@
         android:layout_below="@+id/radio_button_no_end"
         android:layout_marginStart="0dp"
         android:layout_weight="1"
-        android:text="RadioButton" />
+        android:text="@string/radio_button_count" />
 
     <EditText
         android:id="@+id/edit_text_repeat_count"
@@ -97,11 +87,22 @@
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/radio_button_repeat_count"
         android:layout_alignBottom="@+id/radio_button_repeat_count"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:layout_toEndOf="@+id/radio_button_repeat_count"
-        android:layout_margin="8dp"
         android:inputType="date"
         android:maxLength="3"
-        android:text="TextView" />
+        android:text="0" />
+
+    <TextView
+        android:id="@+id/text_view_repeat_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/radio_button_repeat_count"
+        android:layout_alignBottom="@+id/radio_button_repeat_count"
+        android:layout_toEndOf="@+id/edit_text_repeat_count"
+        android:text="@string/text_view_repeat_time" />
 
     <RadioButton
         android:id="@+id/radio_button_end_date"
@@ -111,7 +112,7 @@
         android:layout_below="@+id/radio_button_repeat_count"
         android:layout_margin="0dp"
         android:layout_weight="1"
-        android:text="RadioButton" />
+        android:text="@string/radio_button_date" />
 
     <TextView
         android:id="@+id/text_view_end_date"
@@ -119,9 +120,9 @@
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/radio_button_end_date"
         android:layout_alignBottom="@+id/radio_button_end_date"
-        android:layout_toEndOf="@+id/radio_button_end_date"
         android:layout_margin="8dp"
-        android:text="TextView" />
+        android:layout_toEndOf="@+id/radio_button_end_date"
+        android:text="1/1" />
 
     <Button
         android:id="@+id/button_save"
@@ -130,7 +131,7 @@
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/radio_button_end_date"
         android:layout_margin="8dp"
-        android:text="Button" />
+        android:text="@string/button_finish" />
 
     <TextView
         android:id="@+id/text_view_repeat_summary"
@@ -140,7 +141,6 @@
         android:layout_below="@+id/radio_button_end_date"
         android:layout_margin="8dp"
         android:layout_toStartOf="@+id/button_save"
-        android:layout_weight="1"
-        android:text="TextView" />
+        android:layout_weight="1" />
 
 </RelativeLayout>
