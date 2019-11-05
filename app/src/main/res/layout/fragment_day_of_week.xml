@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<om.google.android.flexbox.FlexboxLayout
+<com.google.android.flexbox.FlexboxLayout
     android:id="@+id/fragment_day_of_week"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -10,54 +10,54 @@
     app:alignItems="flex_start"
     app:justifyContent="flex_start">
 
-    <RadioButton
-        android:id="@+id/radio_button_monday"
+    <CheckBox
+        android:id="@+id/check_box_monday"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/monday"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <RadioButton
-        android:id="@+id/radio_button_tuesday"
+    <CheckBox
+        android:id="@+id/check_box_tuesday"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/tuesday"
-        app:layout_constraintStart_toEndOf="@+id/radio_button_monday" />
+        app:layout_constraintStart_toEndOf="@+id/check_box_monday" />
 
-    <RadioButton
-        android:id="@+id/radio_button_wednesday"
+    <CheckBox
+        android:id="@+id/check_box_wednesday"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/wednesday"
-        app:layout_constraintStart_toEndOf="@+id/radio_button_tuesday" />
+        app:layout_constraintStart_toEndOf="@+id/check_box_tuesday" />
 
-    <RadioButton
-        android:id="@+id/radio_button_thursday"
+    <CheckBox
+        android:id="@+id/check_box_thursday"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/thursday"
-        app:layout_constraintStart_toEndOf="@+id/radio_button_wednesday" />
+        app:layout_constraintStart_toEndOf="@+id/check_box_wednesday" />
 
-    <RadioButton
-        android:id="@+id/radio_button_friday"
+    <CheckBox
+        android:id="@+id/check_box_friday"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/friday"
-        app:layout_constraintStart_toEndOf="@+id/radio_button_thursday" />
+        app:layout_constraintStart_toEndOf="@+id/check_box_thursday" />
 
-    <RadioButton
-        android:id="@+id/radio_button_saturday"
+    <CheckBox
+        android:id="@+id/check_box_saturday"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/saturday"
-        app:layout_constraintStart_toEndOf="@+id/radio_button_friday" />
+        app:layout_constraintStart_toEndOf="@+id/check_box_friday" />
 
-    <RadioButton
-        android:id="@+id/radio_button_sunday"
+    <CheckBox
+        android:id="@+id/check_box_sunday"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/sunday"
-        app:layout_constraintStart_toEndOf="@+id/radio_button_saturday" />
+        app:layout_constraintStart_toEndOf="@+id/check_box_saturday" />
 
-</om.google.android.flexbox.FlexboxLayout>
+</com.google.android.flexbox.FlexboxLayout>

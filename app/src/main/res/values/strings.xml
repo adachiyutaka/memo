@@ -75,6 +75,8 @@
     <string name="radio_button_date">指定した日付まで</string>
     <string name="button_finish">完了</string>
     <string name="text_view_repeat_time">回</string>
+    <string name="radio_button_same_day">その月の同じ日</string>
+    <string name="radio_button_same_last">その月の末日</string>
 
 
 </resources>

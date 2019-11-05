@@ -20,14 +20,17 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.e28.memo.R;
 import com.example.e28.memo.model.Repeat;
+import com.google.android.flexbox.FlexboxLayout;
 
 import java.util.Calendar;
 
@@ -43,7 +46,6 @@ public class RepeatDialogFragment extends DialogFragment {
     Repeat repeat;
     android.support.v4.app.FragmentManager fragmentManager;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
-    DayOfWeekFragment dayOfWeekFragment;
     Spinner scaleSpinner;
     Calendar now;
     DatePickerDialog datePickerDialog;
@@ -62,6 +64,7 @@ public class RepeatDialogFragment extends DialogFragment {
         final int year = now.get(Calendar.YEAR);
         final int month = now.get(Calendar.MONTH);
         final int dayOfMonth = now.get(Calendar.DAY_OF_MONTH);
+        final int lastDayOfMonth = now.getActualMaximum(Calendar.DATE);
 
         // フルスクリーンでレイアウトを表示する
         final Dialog dialog = new Dialog(context);
@@ -74,6 +77,29 @@ public class RepeatDialogFragment extends DialogFragment {
         repeat = new Repeat();
         repeat.setNotifyEndDate(now.getTime());
 
+        // 週ごと、月ごとにリピートする場合の詳細を指定するView郡
+        final FlexboxLayout dayOfWeekFragment = dialog.findViewById(R.id.fragment_day_of_week);
+        String[] dayOfWeekStrings = {"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"};
+        final CheckBox checkBoxes[] = new CheckBox[7];
+        for (int i = 0 ; i < dayOfWeekStrings.length ; i++) {
+            final CheckBox dOWCheckBox = dialog.findViewById(getResources().getIdentifier("check_box_" + dayOfWeekStrings[i], "id", context.getPackageName()));
+            dOWCheckBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+
+        }
+        final RadioButton sameDayRadioButton = dialog.findViewById(R.id.radio_button_same_day);
+        final RadioButton sameDOWRadioButton = dialog.findViewById(R.id.radio_button_same_dow);
+        final RadioButton sameLastRadioButton = dialog.findViewById(R.id.radio_button_same_last);
+        // 最初はすべて非表示状態
+        dayOfWeekFragment.setVisibility(View.GONE);
+        sameDayRadioButton.setVisibility(View.GONE);
+        sameDOWRadioButton.setVisibility(View.GONE);
+        sameLastRadioButton.setVisibility(View.GONE);
+
         scaleSpinner = dialog.findViewById(R.id.spinner_scale);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context, R.array.time_scale, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -81,23 +107,35 @@ public class RepeatDialogFragment extends DialogFragment {
         scaleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // 週ごと、月ごとの場合は詳細を指定するViewを可視化する
                 switch (position) {
                     case 0:
-                        //fragmentTransaction.hide(dayOfWeekFragment);
+                        dayOfWeekFragment.setVisibility(View.GONE);
+                        sameDayRadioButton.setVisibility(View.GONE);
+                        sameDOWRadioButton.setVisibility(View.GONE);
+                        sameLastRadioButton.setVisibility(View.GONE);
                         break;
                     case 1:
-//                        fragmentManager = getFragmentManager();
-//                        fragmentTransaction = fragmentManager.beginTransaction();
-//                        dayOfWeekFragment = new DayOfWeekFragment();
-//                        fragmentTransaction.replace(R.id.day_of_week_choice_fragment, dayOfWeekFragment);
-//                        fragmentTransaction.commit();
-
+                        dayOfWeekFragment.setVisibility(View.VISIBLE);
+                        sameDayRadioButton.setVisibility(View.GONE);
+                        sameDOWRadioButton.setVisibility(View.GONE);
+                        sameLastRadioButton.setVisibility(View.GONE);
                         break;
                     case 2:
-                        //fragmentTransaction.hide(dayOfWeekFragment);
+                        dayOfWeekFragment.setVisibility(View.GONE);
+                        sameDayRadioButton.setVisibility(View.VISIBLE);
+                        sameDOWRadioButton.setVisibility(View.VISIBLE);
+                        if (dayOfMonth == lastDayOfMonth) {
+                            sameLastRadioButton.setVisibility(View.VISIBLE);
+                        } else {
+                            sameLastRadioButton.setVisibility(View.GONE);
+                        }
                         break;
                     case 3:
-                        //fragmentTransaction.hide(dayOfWeekFragment);
+                        dayOfWeekFragment.setVisibility(View.GONE);
+                        sameDayRadioButton.setVisibility(View.GONE);
+                        sameDOWRadioButton.setVisibility(View.GONE);
+                        sameLastRadioButton.setVisibility(View.GONE);
                         break;
                 }
             }
