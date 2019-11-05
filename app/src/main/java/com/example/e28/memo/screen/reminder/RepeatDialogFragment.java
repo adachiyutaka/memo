@@ -32,6 +32,7 @@ import com.example.e28.memo.R;
 import com.example.e28.memo.model.Repeat;
 import com.google.android.flexbox.FlexboxLayout;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
@@ -46,7 +47,10 @@ public class RepeatDialogFragment extends DialogFragment {
     Repeat repeat;
     android.support.v4.app.FragmentManager fragmentManager;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
+    EditText intervalEditText;
     Spinner scaleSpinner;
+    ArrayAdapter<CharSequence> everyAdapter;
+    ArrayAdapter<CharSequence> intervalAdapter;
     Calendar now;
     DatePickerDialog datePickerDialog;
 
@@ -58,7 +62,10 @@ public class RepeatDialogFragment extends DialogFragment {
 
         context = getActivity();
 
-
+        // 年月日表示フォーマット
+        final SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日");
+        // 通知終了日
+        final Calendar notifyEndDate = Calendar.getInstance();
 
         now = Calendar.getInstance();
         final int year = now.get(Calendar.YEAR);
@@ -72,7 +79,6 @@ public class RepeatDialogFragment extends DialogFragment {
 
         dialog.setContentView(R.layout.dialog_fragment_repeat);
 
-        EditText intervalEditText = dialog.findViewById(R.id.text_view_interval);
 
         repeat = new Repeat();
         repeat.setNotifyEndDate(now.getTime());
@@ -89,8 +95,17 @@ public class RepeatDialogFragment extends DialogFragment {
 
                 }
             });
-
         }
+
+        intervalEditText = dialog.findViewById(R.id.text_view_interval);
+        intervalEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateIntervalSpinner();
+            }
+        });
+
+        //
         final RadioButton sameDayRadioButton = dialog.findViewById(R.id.radio_button_same_day);
         final RadioButton sameDOWRadioButton = dialog.findViewById(R.id.radio_button_same_dow);
         final RadioButton sameLastRadioButton = dialog.findViewById(R.id.radio_button_same_last);
@@ -101,9 +116,11 @@ public class RepeatDialogFragment extends DialogFragment {
         sameLastRadioButton.setVisibility(View.GONE);
 
         scaleSpinner = dialog.findViewById(R.id.spinner_scale);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context, R.array.time_scale, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        scaleSpinner.setAdapter(adapter);
+        everyAdapter = ArrayAdapter.createFromResource(context, R.array.time_scale_every, android.R.layout.simple_spinner_item);
+        everyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        intervalAdapter = ArrayAdapter.createFromResource(context, R.array.time_scale, android.R.layout.simple_spinner_item);
+        intervalAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        updateIntervalSpinner();
         scaleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -163,29 +180,31 @@ public class RepeatDialogFragment extends DialogFragment {
             });
         }
 
+
         EditText countEditText = dialog.findViewById(R.id.edit_text_repeat_count);
+
+
         final TextView dateTextView = dialog.findViewById(R.id.text_view_end_date);
-        dateTextView.setText(now.get(Calendar.YEAR) + "年" + (now.get(Calendar.MONTH) + 1) + "月" + now.get(Calendar.DAY_OF_MONTH) + "日");
+        now.add(Calendar.MONTH, 1);
+        dateTextView.setText(format.format(now.getTime()));
+        now.add(Calendar.MONTH, -1);
+
         dateTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar notifyEndDateCalendar =  Calendar.getInstance();
-                notifyEndDateCalendar.setTime(repeat.getNotifyEndDate());
-
                 if (datePickerDialog == null) {
                     datePickerDialog = new DatePickerDialog(getActivity(),
                             new DatePickerDialog.OnDateSetListener() {
                                 @Override
                                 public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                                    Calendar endDateCalendar = Calendar.getInstance();
-                                    endDateCalendar.set(year, month, dayOfMonth);
-                                    repeat.setNotifyEndDate(endDateCalendar.getTime());
-                                    dateTextView.setText(endDateCalendar.get(Calendar.YEAR) + "年" + (endDateCalendar.get(Calendar.MONTH) + 1) + "月" + endDateCalendar.get(Calendar.DAY_OF_MONTH) + "日");
+                                    // TODO:終了日の日時は設定すべき？
+                                    notifyEndDate.set(year, month, dayOfMonth);
+                                    dateTextView.setText(format.format(notifyEndDate.getTime()));
                                 }
-                            }, year, month + 2, dayOfMonth);
+                            }, year, month + 1, dayOfMonth);
                     datePickerDialog.getDatePicker().setMinDate(now.getTimeInMillis());
                 } else {
-                    datePickerDialog.updateDate(notifyEndDateCalendar.get(Calendar.YEAR), notifyEndDateCalendar.get(Calendar.MONTH), notifyEndDateCalendar.get(Calendar.DAY_OF_MONTH));
+                    datePickerDialog.updateDate(notifyEndDate.get(Calendar.YEAR), notifyEndDate.get(Calendar.MONTH), notifyEndDate.get(Calendar.DAY_OF_MONTH));
                 }
                 datePickerDialog.show();
             }
@@ -212,4 +231,43 @@ public class RepeatDialogFragment extends DialogFragment {
     public void removeRepeatDialogFragmentListener() {
         this.listener = null;
     }
+
+
+    // 通知間隔のSpinnerを設定された値によって更新する
+    public void updateIntervalSpinner() {
+        if (Integer.parseInt(intervalEditText.getText().toString()) == 1) {
+            scaleSpinner.setAdapter(everyAdapter);
+        } else {
+            scaleSpinner.setAdapter(intervalAdapter);
+        }
+    }
+
+//    public void updateSummry() {
+//
+//        // ※リピート間隔の表示
+//        // ｛毎（頻度）/（間隔）（頻度）ごとに｝
+//        // ｛○曜日　/　同じ日　/　第N○曜日　/　末日｝
+//        // にリピート
+//        // （｛残りN回　/　YYYY/MM/DDまで｝）
+//
+//        TextView summryTextView;
+//        String summryFrequency;
+//        String summryEnd;
+//
+//        for () {
+//            // 設定された通知間隔を元にsummryFrequencyに設定
+//            switch (scaleSpinner.getSelectedItemPosition) {
+//                case 0: // 通知間隔が日単位
+//                    (intervalEditText.getInt
+//                    summryFrequency = 日　ごとに
+//                    break;
+//                case 1: // 通知間隔が週単位
+//                    break;
+//                case 2: // 通知間隔が月単位
+//                    break;
+//                case 3: // 通知間隔が年単位
+//                    break;
+//            }
+//        }
+//    }
 }
