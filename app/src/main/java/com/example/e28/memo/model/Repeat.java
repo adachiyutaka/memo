@@ -15,7 +15,7 @@ public class Repeat extends RealmObject {
     public Date createdAt;
     public Date updatedAt;
     public Integer repeatScale; //リピートなし=0、日=1、週=2、月=3、年=4
-    public long repeatInterval;
+    public int repeatInterval;
     public boolean isNotifyMonday;
     public boolean isNotifyTuesday;
     public boolean isNotifyWednesday;
@@ -23,8 +23,8 @@ public class Repeat extends RealmObject {
     public boolean isNotifyFriday;
     public boolean isNotifySaturday;
     public boolean isNotifySunday;
-    public long notifyRemainCount; //設定回数
-    public long notifyEndCount; //残り回数
+    public int notifyRemainCount; //設定回数
+    public int notifyEndCount; //残り回数
     public Date notifyEndDate;
 
     public long getId() {
@@ -59,11 +59,11 @@ public class Repeat extends RealmObject {
         this.repeatScale = repeatScale;
     }
 
-    public long getRepeatInterval() {
+    public int getRepeatInterval() {
         return repeatInterval;
     }
 
-    public void setRepeatInterval(long repeatInterval) {
+    public void setRepeatInterval(int repeatInterval) {
         this.repeatInterval = repeatInterval;
     }
 
@@ -123,19 +123,19 @@ public class Repeat extends RealmObject {
         isNotifySunday = notifySunday;
     }
 
-    public long getNotifyRemainCount() {
+    public int getNotifyRemainCount() {
         return notifyRemainCount;
     }
 
-    public void setNotifyRemainCount(long notifyRemainCount) {
+    public void setNotifyRemainCount(int notifyRemainCount) {
         this.notifyRemainCount = notifyRemainCount;
     }
 
-    public long getNotifyEndCount() {
+    public int getNotifyEndCount() {
         return notifyEndCount;
     }
 
-    public void setNotifyEndCount(long notifyEndCount) {
+    public void setNotifyEndCount(int notifyEndCount) {
         this.notifyEndCount = notifyEndCount;
     }
 

@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +36,7 @@ import com.google.android.flexbox.FlexboxLayout;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Objects;
 
 /**
  * Created by User on 2019/10/25.
@@ -52,7 +55,9 @@ public class RepeatDialogFragment extends DialogFragment {
     ArrayAdapter<CharSequence> everyAdapter;
     ArrayAdapter<CharSequence> intervalAdapter;
     Calendar now;
+    String week[];
     DatePickerDialog datePickerDialog;
+    EditText countEditText;
 
     String TAG = "mytext";
 
@@ -66,6 +71,14 @@ public class RepeatDialogFragment extends DialogFragment {
         final SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日");
         // 通知終了日
         final Calendar notifyEndDate = Calendar.getInstance();
+        week = new String[7];
+        week[0] = "日";
+        week[1] = "月";
+        week[2] = "火";
+        week[3] = "水";
+        week[4] = "木";
+        week[5] = "金";
+        week[6] = "土";
 
         now = Calendar.getInstance();
         final int year = now.get(Calendar.YEAR);
@@ -82,8 +95,9 @@ public class RepeatDialogFragment extends DialogFragment {
 
         repeat = new Repeat();
         repeat.setNotifyEndDate(now.getTime());
+        repeat.setNotifyRemainCount(22);
 
-        // 週ごと、月ごとにリピートする場合の詳細を指定するView郡
+        // 週ごとにリピートする場合の詳細を指定するViewを作成
         final FlexboxLayout dayOfWeekFragment = dialog.findViewById(R.id.fragment_day_of_week);
         String[] dayOfWeekStrings = {"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"};
         final CheckBox checkBoxes[] = new CheckBox[7];
@@ -97,7 +111,11 @@ public class RepeatDialogFragment extends DialogFragment {
             });
         }
 
+        // TODO:初期値の設定
         intervalEditText = dialog.findViewById(R.id.text_view_interval);
+        int interval = (Objects.nonNull(repeat.getRepeatInterval()) && repeat.getRepeatInterval() != 0)? repeat.getRepeatInterval() : 1; // repeatに設定がない場合、初期値を1とする
+        intervalEditText.setText(String.valueOf(interval), TextView.BufferType.NORMAL);
+        intervalEditText.setFilters(new InputFilter[]{ new InputFilterMinMax("1", "99", intervalEditText)});
         intervalEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,16 +123,19 @@ public class RepeatDialogFragment extends DialogFragment {
             }
         });
 
-        //
+        // 月ごとにリピートする場合の詳細を指定するViewを作成
         final RadioButton sameDayRadioButton = dialog.findViewById(R.id.radio_button_same_day);
         final RadioButton sameDOWRadioButton = dialog.findViewById(R.id.radio_button_same_dow);
         final RadioButton sameLastRadioButton = dialog.findViewById(R.id.radio_button_same_last);
-        // 最初はすべて非表示状態
+        sameDOWRadioButton.setText("その月の第" + now.get(Calendar.DAY_OF_WEEK_IN_MONTH) + week[now.get(Calendar.DAY_OF_WEEK)] + "曜日");
+
+        // 月ごと、週ごとのViewは、初期状態ではすべて非表示
         dayOfWeekFragment.setVisibility(View.GONE);
         sameDayRadioButton.setVisibility(View.GONE);
         sameDOWRadioButton.setVisibility(View.GONE);
         sameLastRadioButton.setVisibility(View.GONE);
 
+        //
         scaleSpinner = dialog.findViewById(R.id.spinner_scale);
         everyAdapter = ArrayAdapter.createFromResource(context, R.array.time_scale_every, android.R.layout.simple_spinner_item);
         everyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -181,8 +202,10 @@ public class RepeatDialogFragment extends DialogFragment {
         }
 
 
-        EditText countEditText = dialog.findViewById(R.id.edit_text_repeat_count);
-
+        countEditText = dialog.findViewById(R.id.edit_text_repeat_count);
+        countEditText.setFilters(new InputFilter[]{ new InputFilterMinMax("1", "999", countEditText)});
+        int count = (Objects.nonNull(repeat.getNotifyRemainCount()))? repeat.getNotifyRemainCount() : 1; // repeatに設定がない場合、初期値を1とする
+        countEditText.setText(String.valueOf(count), TextView.BufferType.NORMAL);
 
         final TextView dateTextView = dialog.findViewById(R.id.text_view_end_date);
         now.add(Calendar.MONTH, 1);
@@ -235,11 +258,17 @@ public class RepeatDialogFragment extends DialogFragment {
 
     // 通知間隔のSpinnerを設定された値によって更新する
     public void updateIntervalSpinner() {
-        if (Integer.parseInt(intervalEditText.getText().toString()) == 1) {
+
+        // Adapterの変更で選択された場所が変わらないように、現在のポジションを再設定する
+        int position = scaleSpinner.getSelectedItemPosition();
+
+        if (Integer.parseInt(intervalEditText.getText().toString()) == 1 || Objects.isNull(intervalEditText.getText())) {
             scaleSpinner.setAdapter(everyAdapter);
         } else {
             scaleSpinner.setAdapter(intervalAdapter);
         }
+
+        scaleSpinner.setSelection(position);
     }
 
 //    public void updateSummry() {
@@ -270,4 +299,44 @@ public class RepeatDialogFragment extends DialogFragment {
 //            }
 //        }
 //    }
+
+    public class InputFilterMinMax implements InputFilter {
+
+        private int min, max;
+        private EditText editText;
+
+        public InputFilterMinMax(int min, int max, EditText editText) {
+            this.min = min;
+            this.max = max;
+            this.editText = editText;
+        }
+
+        public InputFilterMinMax(String min, String max, EditText editText) {
+            this.min = Integer.parseInt(min);
+            this.max = Integer.parseInt(max);
+            this.editText = editText;
+        }
+
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+            try {
+                int input = Integer.parseInt(source.toString());
+                if (isInRange(min, max, input)) { // 最大値と最小値の間に収まる場合
+                    return null;
+                } else if (input < min || Objects.isNull(input)) { // 最小値以下、または、空欄（null）の場合、強制的に最小値を表示
+                    editText.setText(String.valueOf(min));
+                } else if (max < input) { // 最大値以上の場合、強制的に最大値を表示
+                    editText.setText(String.valueOf(max));
+                }
+                    return null;
+            } catch (NumberFormatException nfe) { }
+            return "";
+        }
+
+        // minとmaxが逆だった場合に入れ替える処理
+        private boolean isInRange(int min, int max, int input) {
+            return max > min ? input >= min && input <= max : input >= max && input <= min;
+        }
+    }
+
 }
