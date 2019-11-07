@@ -129,7 +129,9 @@
         android:layout_alignBottom="@+id/radio_button_end_date"
         android:layout_margin="8dp"
         android:layout_toEndOf="@+id/radio_button_end_date"
-        android:text="1/1" />
+        android:text="1/1"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="18sp" />
 
     <Button
         android:id="@+id/button_save"
