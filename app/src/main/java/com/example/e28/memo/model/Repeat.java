@@ -23,6 +23,14 @@ public class Repeat extends RealmObject {
     public boolean isNotifyFriday;
     public boolean isNotifySaturday;
     public boolean isNotifySunday;
+    public boolean isNotifySameDay;
+    public boolean isNotifySameDOW;
+    public int notifySameDOW; //月 = 0, 火 = 1, 水 = 2, 木 = 3, 金 = 4, 土 = 5, 日 =6
+    public int notifySameDOWOrdinal;
+    public boolean isNotifySameLastDay;
+    public boolean isNoEnd;
+    public boolean isEndCount;
+    public boolean isEndDate;
     public int notifyRemainCount; //設定回数
     public int notifyEndCount; //残り回数
     public Date notifyEndDate;
@@ -121,6 +129,70 @@ public class Repeat extends RealmObject {
 
     public void setNotifySunday(boolean notifySunday) {
         isNotifySunday = notifySunday;
+    }
+
+    public boolean isNotifySameDay() {
+        return isNotifySameDay;
+    }
+
+    public void setNotifySameDay(boolean notifySameDay) {
+        isNotifySameDay = notifySameDay;
+    }
+
+    public boolean isNotifySameDOW() {
+        return isNotifySameDOW;
+    }
+
+    public void setNotifySameDOW(boolean notifySameDOW) {
+        isNotifySameDOW = notifySameDOW;
+    }
+
+    public int getNotifySameDOW() {
+        return notifySameDOW;
+    }
+
+    public void setNotifySameDOW(int notifySameDOW) {
+        this.notifySameDOW = notifySameDOW;
+    }
+
+    public int getNotifySameDOWOrdinal() {
+        return notifySameDOWOrdinal;
+    }
+
+    public void setNotifySameDOWOrdinal(int notifySameDOWOrdinal) {
+        this.notifySameDOWOrdinal = notifySameDOWOrdinal;
+    }
+
+    public boolean isNotifySameLastDay() {
+        return isNotifySameLastDay;
+    }
+
+    public void setNotifySameLastDay(boolean notifySameLastDay) {
+        isNotifySameLastDay = notifySameLastDay;
+    }
+
+    public boolean isNoEnd() {
+        return isNoEnd;
+    }
+
+    public void setNoEnd(boolean noEnd) {
+        isNoEnd = noEnd;
+    }
+
+    public boolean isEndCount() {
+        return isEndCount;
+    }
+
+    public void setEndCount(boolean endCount) {
+        isEndCount = endCount;
+    }
+
+    public boolean isEndDate() {
+        return isEndDate;
+    }
+
+    public void setEndDate(boolean endDate) {
+        isEndDate = endDate;
     }
 
     public int getNotifyRemainCount() {

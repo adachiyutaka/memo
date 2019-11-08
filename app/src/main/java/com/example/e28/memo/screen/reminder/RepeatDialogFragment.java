@@ -103,19 +103,16 @@ public class RepeatDialogFragment extends DialogFragment {
         repeat = new Repeat();
         repeat.setNotifyEndDate(now.getTime());
 
-        // 週ごとにリピートする場合の詳細を指定するViewを作成
-        final FlexboxLayout dayOfWeekFragment = dialog.findViewById(R.id.fragment_day_of_week);
-        String[] dayOfWeekStrings = {"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"};
-        checkBoxes = new CheckBox[7];
-        for (int i = 0 ; i < dayOfWeekStrings.length ; i++) {
-            final CheckBox dOWCheckBox = dialog.findViewById(getResources().getIdentifier("check_box_" + dayOfWeekStrings[i], "id", context.getPackageName()));
-        }
+        Boolean isNewRepeat = true;
 
-        // TODO:初期値の設定
+        // 通知間隔の値を受け取るEditTextを作成
         intervalEditText = dialog.findViewById(R.id.text_view_interval);
-        int interval = (Objects.nonNull(repeat.getRepeatInterval()) && repeat.getRepeatInterval() != 0)? repeat.getRepeatInterval() : 1; // repeatに設定がない場合、初期値を1とする
+        // 既存のリピート情報を読み取り（設定がない場合、初期値を1とする）
+        int interval = (isNewRepeat)? 1 : repeat.getRepeatInterval();
         intervalEditText.setText(String.valueOf(interval), TextView.BufferType.NORMAL);
+        // 入力制限（1~99）を設定する
         intervalEditText.setFilters(new InputFilter[]{ new InputFilterMinMax("1", "99", intervalEditText)});
+        // 通知間隔が「1」だった場合に表記を更新するリスナーをセット
         intervalEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,25 +120,69 @@ public class RepeatDialogFragment extends DialogFragment {
             }
         });
 
-        // 月ごとにリピートする場合の詳細を指定するViewを作成
+
+        // 通知間隔が「週ごと」の場合に表示する曜日チェックボックスを作成
+        final FlexboxLayout dayOfWeekFragment = dialog.findViewById(R.id.fragment_day_of_week);
+        checkBoxes = new CheckBox[7];
+        String[] dayOfWeekStrings = {"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"};
+        // 曜日ボタンの既存のリピート情報を読み取り
+        boolean[] checkedWeek = new boolean[7];
+        if (repeat.getRepeatScale() == 2) {
+            if (repeat.isNotifyMonday()) checkedWeek[0] = true;
+            if (repeat.isNotifyMonday()) checkedWeek[1] = true;
+            if (repeat.isNotifyMonday()) checkedWeek[2] = true;
+            if (repeat.isNotifyMonday()) checkedWeek[3] = true;
+            if (repeat.isNotifyMonday()) checkedWeek[4] = true;
+            if (repeat.isNotifyMonday()) checkedWeek[5] = true;
+            if (repeat.isNotifyMonday()) checkedWeek[6] = true;
+        }
+        // 曜日チェックボックスにリスナーと初期値をセット
+        for (int i = 0 ; i < dayOfWeekStrings.length ; i++) {
+            final CheckBox dOWCheckBox = dialog.findViewById(getResources().getIdentifier("check_box_" + dayOfWeekStrings[i], "id", context.getPackageName()));
+            if (repeat.isNotifySameDOW()) {
+                // 既存の情報をセット
+                if(checkedWeek[i]) dOWCheckBox.setChecked(true);
+            } else {
+                // 既存の情報がない場合、現在の曜日をセット
+                if(now.get(Calendar.DAY_OF_WEEK) == i) dOWCheckBox.setChecked(true);
+                // 月ごと、週ごとのボタン郡は、初期状態ではすべて非表示
+                dayOfWeekFragment.setVisibility(View.GONE);
+            }
+        }
+
+
+        // 通知間隔が「月ごと」の場合に表示する「同じ日」、「第1金曜日」などのラジオボタンを作成
         final RadioButton sameDayRadioButton = dialog.findViewById(R.id.radio_button_same_day);
         final RadioButton sameDOWRadioButton = dialog.findViewById(R.id.radio_button_same_dow);
-        final RadioButton sameLastRadioButton = dialog.findViewById(R.id.radio_button_same_last);
-        sameDOWRadioButton.setText("その月の第" + now.get(Calendar.DAY_OF_WEEK_IN_MONTH) + week[now.get(Calendar.DAY_OF_WEEK)] + "曜日");
+        final RadioButton sameLastDayRadioButton = dialog.findViewById(R.id.radio_button_same_last_day);
+        // 月ごとのラジオボタンに初期値を設定
+        if (repeat.getRepeatInterval() == 3) {
+            // 既存の情報をセット
+            if (repeat.isNotifySameDay) sameDayRadioButton.setChecked(true);
+            if (repeat.isNotifySameDOW) {
+                sameDOWRadioButton.setChecked(true);
+                sameDOWRadioButton.setText("その月の第" + String.valueOf(repeat.getNotifySameDOWOrdinal())+ week[repeat.getNotifySameDOW()] + "曜日");
+            }
+            if (repeat.isNotifySameLastDay) sameLastDayRadioButton.setChecked(true);
+        } else {
+            // 既存の情報がない場合、「その月の同じ日」をセット
+            sameDayRadioButton.setChecked(true);
+            // 「第1金曜日」などのラジオボタンに現在の値をセット
+            sameDOWRadioButton.setText("その月の第" + now.get(Calendar.DAY_OF_WEEK_IN_MONTH) + week[now.get(Calendar.DAY_OF_WEEK)] + "曜日");
+            // 月ごと、週ごとのボタン郡は、初期状態ではすべて非表示
+            sameDayRadioButton.setVisibility(View.GONE);
+            sameDOWRadioButton.setVisibility(View.GONE);
+            sameLastRadioButton.setVisibility(View.GONE);
+        }
 
-        // 月ごと、週ごとのViewは、初期状態ではすべて非表示
-        dayOfWeekFragment.setVisibility(View.GONE);
-        sameDayRadioButton.setVisibility(View.GONE);
-        sameDOWRadioButton.setVisibility(View.GONE);
-        sameLastRadioButton.setVisibility(View.GONE);
 
-        //
+        //　通知間隔を受け取るスピナーを作成
         scaleSpinner = dialog.findViewById(R.id.spinner_scale);
         everyAdapter = ArrayAdapter.createFromResource(context, R.array.time_scale_every, android.R.layout.simple_spinner_item);
         everyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         intervalAdapter = ArrayAdapter.createFromResource(context, R.array.time_scale, android.R.layout.simple_spinner_item);
         intervalAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        updateIntervalSpinner();
+        // スピナーにリスナーを設定
         scaleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -177,47 +218,63 @@ public class RepeatDialogFragment extends DialogFragment {
                         break;
                 }
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
+        // 既存のデータを読み込んで設定
+        int intervalPosition = (isNewRepeat)? 0 : repeat.getRepeatInterval();
+        scaleSpinner.setSelection(intervalPosition);
+        updateIntervalSpinner();
 
 
+        // 通知終了日の設定ラジオボタンを作成
         RadioButton noEndRadioButton = dialog.findViewById(R.id.radio_button_no_end);
         RadioButton countRadioButton = dialog.findViewById(R.id.radio_button_repeat_count);
         RadioButton dateRadioButton = dialog.findViewById(R.id.radio_button_end_date);
-        final View[][] radioButtons = {{noEndRadioButton, null}, {countRadioButton, countEditText}, {dateRadioButton, dateTextView}};
+        final RadioButton[] radioButtons = {noEndRadioButton, countRadioButton, dateRadioButton};
+        LinearLayout noEndGroup = dialog.findViewById(R.id.Group_no_end);
+        LinearLayout countGroup = dialog.findViewById(R.id.Group_count);
+        LinearLayout dateGroup = dialog.findViewById(R.id.Group_date);
+        final LinearLayout[] radioGroups = {noEndGroup, countGroup, dateGroup};
 
-        for (int i = 0 ; i < radioButtons.length ; i++) {
+        // ラジオグループのように動かすためのリスナーを設定
+        for (int i = 0 ; i < radioGroups.length ; i++) {
             final int I = i;
-            radioButtons[I][0].setOnClickListener(new View.OnClickListener() {
+            // ラジオボタンの文字色を、チェック / 非チェックで切り替えるリスナーをセット
+            radioGroups[I].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    // 一旦全てのViewを非チェック状態にする
                     for(int j = 0 ; j < radioButtons.length ; j++) {
-                        RadioButton radioButton = (RadioButton)radioButtons[j][0];
+                        RadioButton radioButton = (RadioButton)radioButtons[j];
                         radioButton.setChecked(false);
                         radioButton.setTextColor(Color.GRAY);
                     }
-                    RadioButton radioButton = (RadioButton)radioButtons[I][0];
+                    countEditText.setTextColor(Color.GRAY);
+                    dateTextView.setTextColor(Color.GRAY);
+                    // クリックされたグループをチェック状態にする
+                    RadioButton radioButton = (RadioButton)radioButtons[I];
                     radioButton.setChecked(true);
                     radioButton.setTextColor(Color.BLACK);
+                    switch (I) {
+                        case 0:
+                            break;
+                        case 1:
+                            countEditText.setTextColor(Color.BLACK);
+                            break;
+                        case 2:
+                            dateTextView.setTextColor(Color.BLACK);
+                            break;
+                    }
                 }
             });
         }
 
-
         countEditText = dialog.findViewById(R.id.edit_text_repeat_count);
         countEditText.setFilters(new InputFilter[]{ new InputFilterMinMax("1", "999", countEditText)});
-        int count = (Objects.nonNull(repeat.getNotifyRemainCount()))? repeat.getNotifyRemainCount() : 1; // repeatに設定がない場合、初期値を1とする
-        countEditText.setText(String.valueOf(count), TextView.BufferType.NORMAL);
 
         dateTextView = dialog.findViewById(R.id.text_view_end_date);
-        now.add(Calendar.MONTH, 1);
-        dateTextView.setText(format.format(now.getTime()));
-        now.add(Calendar.MONTH, -1);
-
         dateTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -238,6 +295,25 @@ public class RepeatDialogFragment extends DialogFragment {
                 datePickerDialog.show();
             }
         });
+
+
+        // ラジオグループに初期値を設定
+        noEndRadioButton.performClick();
+        if (repeat.isNoEnd) noEndRadioButton.performClick();
+        if (repeat.isEndCount) {
+            countRadioButton.performClick();
+            countEditText.setText(repeat.getNotifyRemainCount());
+        } else {
+            countEditText.setText("10");
+        }
+        if (repeat.isEndDate) {
+            dateRadioButton.performClick();
+            dateTextView.setText(format.format(repeat.getNotifyEndDate()));
+        } else {
+            now.add(Calendar.MONTH, 1);
+            dateTextView.setText(format.format(now.getTime()));
+            now.add(Calendar.MONTH, -1);
+        }
 
         Button buttonSave = dialog.findViewById(R.id.button_save);
         buttonSave.setOnClickListener(new View.OnClickListener() {
@@ -288,7 +364,7 @@ public class RepeatDialogFragment extends DialogFragment {
         int timeScale = scaleSpinner.getSelectedItemPosition();
         String timeScaleString[] = {"日", "週", "月", "年"};
 
-                switch (timeScale) {
+        switch (timeScale) {
             case 0: // 通知間隔が「日」の場合は、その他に付属する情報なし
                 break;
             case 1: // 通知間隔が「週」の場合は、水曜日、金曜日などの指定を取得する
@@ -312,10 +388,10 @@ public class RepeatDialogFragment extends DialogFragment {
 
         extraTimeScaleString = (Objects.nonNull(extraTimeScaleString))? "、" + extraTimeScaleString : "";
 
-            if (timeInterval == 1) {
-                summryFrequency = "毎" + timeScaleString[timeScale] + extraTimeScaleString;
-            } else {
-                summryFrequency = String.valueOf(timeInterval) + timeScaleString[timeScale] + "ごとに" + extraTimeScaleString;
+        if (timeInterval == 1) {
+            summryFrequency = "毎" + timeScaleString[timeScale] + extraTimeScaleString;
+        } else {
+            summryFrequency = String.valueOf(timeInterval) + timeScaleString[timeScale] + "ごとに" + extraTimeScaleString;
         }
 
     }
@@ -350,7 +426,7 @@ public class RepeatDialogFragment extends DialogFragment {
                 } else if (max < input) { // 最大値以上の場合、強制的に最大値を表示
                     editText.setText(String.valueOf(max));
                 }
-                    return null;
+                return null;
             } catch (NumberFormatException nfe) { }
             editText.setText(String.valueOf(min));
             return null;
@@ -362,4 +438,3 @@ public class RepeatDialogFragment extends DialogFragment {
         }
     }
 }
-

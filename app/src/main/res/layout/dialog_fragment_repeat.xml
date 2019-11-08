@@ -68,70 +68,97 @@
         android:layout_margin="8dp"
         android:text="@string/text_view_scale" />
 
-    <RadioButton
-        android:id="@+id/radio_button_no_end"
+    <LinearLayout
+        android:id="@+id/Group_no_end"
+        android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/text_view_time_end"
         android:layout_alignBottom="@+id/text_view_time_end"
-        android:layout_toEndOf="@+id/text_view_time_end"
-        android:layout_weight="1"
-        android:text="@string/radio_button_no_end" />
+        android:layout_toEndOf="@+id/text_view_time_end">
 
-    <RadioButton
-        android:id="@+id/radio_button_repeat_count"
+        <RadioButton
+            android:id="@+id/radio_button_no_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/radio_button_no_end" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/Group_count"
+        android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/radio_button_no_end"
-        android:layout_below="@+id/radio_button_no_end"
-        android:layout_marginStart="0dp"
-        android:layout_weight="1"
-        android:text="@string/radio_button_count" />
+        android:layout_alignStart="@+id/Group_no_end"
+        android:layout_below="@+id/Group_no_end">
 
-    <EditText
-        android:id="@+id/edit_text_repeat_count"
+        <RadioButton
+            android:id="@+id/radio_button_repeat_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginStart="0dp"
+            android:layout_weight="1"
+            android:text="@string/radio_button_count" />
+
+        <EditText
+            android:id="@+id/edit_text_repeat_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/radio_button_repeat_count"
+            android:layout_alignBottom="@+id/radio_button_repeat_count"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_toEndOf="@+id/radio_button_repeat_count"
+            android:inputType="date"
+            android:maxLength="3"
+            android:text="0" />
+
+        <TextView
+            android:id="@+id/text_view_repeat_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/radio_button_repeat_count"
+            android:layout_alignBottom="@+id/radio_button_repeat_count"
+            android:layout_toEndOf="@+id/edit_text_repeat_count"
+            android:text="@string/text_view_repeat_time" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/Group_date"
+        android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/radio_button_repeat_count"
-        android:layout_alignBottom="@+id/radio_button_repeat_count"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_toEndOf="@+id/radio_button_repeat_count"
-        android:inputType="date"
-        android:maxLength="3"
-        android:text="0" />
+        android:layout_alignStart="@+id/Group_count"
+        android:layout_below="@+id/Group_count">
 
-    <TextView
-        android:id="@+id/text_view_repeat_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/radio_button_repeat_count"
-        android:layout_alignBottom="@+id/radio_button_repeat_count"
-        android:layout_toEndOf="@+id/edit_text_repeat_count"
-        android:text="@string/text_view_repeat_time" />
+        <RadioButton
+            android:id="@+id/radio_button_end_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/radio_button_no_end"
+            android:layout_below="@+id/radio_button_repeat_count"
+            android:layout_margin="0dp"
+            android:layout_weight="1"
+            android:text="@string/radio_button_date" />
 
-    <RadioButton
-        android:id="@+id/radio_button_end_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/radio_button_no_end"
-        android:layout_below="@+id/radio_button_repeat_count"
-        android:layout_margin="0dp"
-        android:layout_weight="1"
-        android:text="@string/radio_button_date" />
+        <TextView
+            android:id="@+id/text_view_end_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/radio_button_end_date"
+            android:layout_alignBottom="@+id/radio_button_end_date"
+            android:layout_margin="8dp"
+            android:layout_toEndOf="@+id/radio_button_end_date"
+            android:text="1/1"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/text_view_end_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/radio_button_end_date"
-        android:layout_alignBottom="@+id/radio_button_end_date"
-        android:layout_margin="8dp"
-        android:layout_toEndOf="@+id/radio_button_end_date"
-        android:text="1/1"
-        android:textColor="?android:attr/textColorPrimary"
-        android:textSize="18sp" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/button_save"
