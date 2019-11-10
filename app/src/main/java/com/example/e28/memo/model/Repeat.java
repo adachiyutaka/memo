@@ -16,16 +16,16 @@ public class Repeat extends RealmObject {
     public Date updatedAt;
     public Integer repeatScale; //リピートなし=0、日=1、週=2、月=3、年=4
     public int repeatInterval;
+    public boolean isNotifySunday;
     public boolean isNotifyMonday;
     public boolean isNotifyTuesday;
     public boolean isNotifyWednesday;
     public boolean isNotifyThursday;
     public boolean isNotifyFriday;
     public boolean isNotifySaturday;
-    public boolean isNotifySunday;
     public boolean isNotifySameDay;
     public boolean isNotifySameDOW;
-    public int notifySameDOW; //月 = 0, 火 = 1, 水 = 2, 木 = 3, 金 = 4, 土 = 5, 日 =6
+    public int notifySameDOW; //日 = 0, 月 = 1, 火 = 2, 水 = 3, 木 = 4, 金 = 5, 土 = 6
     public int notifySameDOWOrdinal;
     public boolean isNotifySameLastDay;
     public boolean isNoEnd;

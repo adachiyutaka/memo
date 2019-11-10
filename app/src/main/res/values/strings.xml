@@ -70,7 +70,7 @@
     <string name="time_scale_year">年ごと</string>
     <string name="text_view_frequency_title">頻度</string>
     <string name="text_view_scale">間隔</string>
-    <string name="radio_button_no_end">くり返さない</string>
+    <string name="radio_button_no_end">終了しない</string>
     <string name="radio_button_count">指定した回数だけ</string>
     <string name="radio_button_date">指定した日付まで</string>
     <string name="button_finish">完了</string>

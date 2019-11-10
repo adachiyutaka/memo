@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
     <RadioGroup
-        android:id="@+id/radio_group_day"
+        android:id="@+id/radio_group_same_day"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 

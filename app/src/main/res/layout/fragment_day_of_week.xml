@@ -11,6 +11,13 @@
     app:justifyContent="flex_start">
 
     <CheckBox
+        android:id="@+id/check_box_sunday"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sunday"
+        app:layout_constraintStart_toEndOf="@+id/check_box_saturday" />
+
+    <CheckBox
         android:id="@+id/check_box_monday"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -52,12 +59,5 @@
         android:layout_height="wrap_content"
         android:text="@string/saturday"
         app:layout_constraintStart_toEndOf="@+id/check_box_friday" />
-
-    <CheckBox
-        android:id="@+id/check_box_sunday"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/sunday"
-        app:layout_constraintStart_toEndOf="@+id/check_box_saturday" />
 
 </com.google.android.flexbox.FlexboxLayout>
