@@ -182,14 +182,14 @@ public class ReminderDialogFragment extends DialogFragment{
                     case 3:
                         if (datePickerDialog == null) {
                             datePickerDialog = new DatePickerDialog(getActivity(),
-                                new DatePickerDialog.OnDateSetListener() {
-                                    @Override
-                                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                                        remindTime.set(year, month, dayOfMonth);
-                                        dateAdapter.setTime(remindTime);
-                                        dateAdapter.notifyDataSetChanged();
-                                    }
-                                }, year, month, dayOfMonth);
+                                    new DatePickerDialog.OnDateSetListener() {
+                                        @Override
+                                        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                                            remindTime.set(year, month, dayOfMonth);
+                                            dateAdapter.setTime(remindTime);
+                                            dateAdapter.notifyDataSetChanged();
+                                        }
+                                    }, year, month, dayOfMonth);
                             datePickerDialog.getDatePicker().setMinDate(now.getTimeInMillis());
                         } else {
                             datePickerDialog.updateDate(remindTime.get(Calendar.YEAR), remindTime.get(Calendar.MONTH), remindTime.get(Calendar.DAY_OF_MONTH));
@@ -284,19 +284,14 @@ public class ReminderDialogFragment extends DialogFragment{
         });
 
 
-        // RepeatSpinner表示用リスト
-        String[][] repeatSpinnerItem = {{"リピートなし", null},
-                {"毎日", null},
-                {"毎週", null},
-                {"毎月", null},
-                {"毎年", null},
-                {"詳細設定", null}};
-
         // RepeatSpinnerの設定
-        repeat = new Repeat();
-
         repeatAdapter = new ReminderSpinnerAdapter(getActivity());
-        repeatAdapter.setList(repeatSpinnerItem, 2);
+        if (isInitialRepeat) {
+            repeatAdapter.setList(createRepeatSpinnerItem("曜日や終了時期を設定"), 2);
+        } else {
+            // repeatAdapter.setList(createRepeatSpinnerItem(createRepeatSummary(Realm.where(repeat.class).equalTo("id", todo.getRepeatId()), 2);
+            repeatAdapter.setList(createRepeatSpinnerItem("repeatサマリー"), 2);
+        }
         repeatSpinner.setAdapter(repeatAdapter);
         repeatSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -328,11 +323,16 @@ public class ReminderDialogFragment extends DialogFragment{
 
                         // リマインダーダイアログ上のボタンのクリック処理
                         repeatDialogFragment.setRepeatDialogFragmentListener(new RepeatDialogFragment.RepeatDialogFragmentListener() {
+                            // リマインダーの保存ボタン
                             @Override
                             public void onSaveClicked(long repeatId) {
-                                // リマインダーの保存ボタン
+                                // todoに保存されたrepeatのIDをセット
                                 todo.setRepeat(true);
                                 todo.setRepeatId(repeatId);
+                                isInitialRepeat = false;
+                                // RepeatSpinnerの選択肢を作成したrepeatに合わせて更新
+                                repeat = realm.where(Repeat.class).equalTo("id", repeatId).findFirst();
+                                repeatAdapter.setList(createRepeatSpinnerItem(repeat.getSummary()), 2);
                             }
                         });
                 }
@@ -487,5 +487,17 @@ public class ReminderDialogFragment extends DialogFragment{
                 break;
         }
         return nextId;
+    }
+
+
+    // RepeatSpinnerの選択肢の更新用メソッド
+    public String[][] createRepeatSpinnerItem(String customRepeat) {
+        String[][] repeatSpinnerItem = {{"リピートなし", null},
+                {"毎日", null},
+                {"毎週", null},
+                {"毎月", null},
+                {"毎年", null},
+                {customRepeat, null}};
+        return repeatSpinnerItem;
     }
 }

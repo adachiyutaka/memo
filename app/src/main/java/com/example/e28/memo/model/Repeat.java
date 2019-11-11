@@ -34,6 +34,7 @@ public class Repeat extends RealmObject {
     public int notifyRemainCount; //設定回数
     public int notifyEndCount; //残り回数
     public Date notifyEndDate;
+    public String summary;
 
     public long getId() {
         return id;
@@ -73,6 +74,14 @@ public class Repeat extends RealmObject {
 
     public void setRepeatInterval(int repeatInterval) {
         this.repeatInterval = repeatInterval;
+    }
+
+    public boolean isNotifySunday() {
+        return isNotifySunday;
+    }
+
+    public void setNotifySunday(boolean notifySunday) {
+        isNotifySunday = notifySunday;
     }
 
     public boolean isNotifyMonday() {
@@ -121,14 +130,6 @@ public class Repeat extends RealmObject {
 
     public void setNotifySaturday(boolean notifySaturday) {
         isNotifySaturday = notifySaturday;
-    }
-
-    public boolean isNotifySunday() {
-        return isNotifySunday;
-    }
-
-    public void setNotifySunday(boolean notifySunday) {
-        isNotifySunday = notifySunday;
     }
 
     public boolean isNotifySameDay() {
@@ -217,5 +218,13 @@ public class Repeat extends RealmObject {
 
     public void setNotifyEndDate(Date notifyEndDate) {
         this.notifyEndDate = notifyEndDate;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 }

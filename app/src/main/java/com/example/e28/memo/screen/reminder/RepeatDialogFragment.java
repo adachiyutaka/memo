@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
@@ -14,8 +15,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.InputFilter;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,6 +63,7 @@ public class RepeatDialogFragment extends DialogFragment {
     RepeatDialogFragmentListener listener;
     long repeatId;
     Repeat repeat;
+    Boolean isNewRepeat;
     android.support.v4.app.FragmentManager fragmentManager;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
     EditText intervalEditText;
@@ -68,7 +72,8 @@ public class RepeatDialogFragment extends DialogFragment {
     ArrayAdapter<CharSequence> intervalAdapter;
     Calendar now;
     String week[];
-    CheckBox checkBoxes[];
+    CheckBox dOWCheckBoxes[];
+    RadioGroup sameDayRadioGroup;
     RadioButton sameDayRadioButton;
     RadioButton sameDOWRadioButton;
     RadioButton sameLastDayRadioButton;
@@ -80,6 +85,7 @@ public class RepeatDialogFragment extends DialogFragment {
     RadioButton countRadioButton;
     RadioButton dateRadioButton;
     RadioButton[] radioButtons;
+    TextView summaryTextView;
 
     boolean initialView;
     String TAG = "mytext";
@@ -123,7 +129,7 @@ public class RepeatDialogFragment extends DialogFragment {
 
         // リピートの初期値を設定
         repeatId = getArguments().getLong(REPEAT_ID);
-        Boolean isNewRepeat = !getArguments().getBoolean(IS_REPEAT);
+        isNewRepeat = !getArguments().getBoolean(IS_REPEAT);
         if (isNewRepeat) {
             //登録のない場合は新規作成
             repeat = new Repeat();
@@ -148,14 +154,14 @@ public class RepeatDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 updateIntervalSpinner();
-                updateSummry();
+                updateSummary();
             }
         });
 
 
         // 通知間隔が「週ごと」の場合に表示する曜日チェックボックスを作成
         final FlexboxLayout dayOfWeekFragment = dialog.findViewById(R.id.fragment_day_of_week);
-        checkBoxes = new CheckBox[7];
+        dOWCheckBoxes = new CheckBox[7];
         String[] dayOfWeekStrings = {"sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"};
         // 曜日チェックボックスにリスナーと初期値をセット
         for (int i = 0 ; i < dayOfWeekStrings.length ; i++) {
@@ -163,7 +169,7 @@ public class RepeatDialogFragment extends DialogFragment {
             dOWCheckBox.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    updateSummry();
+                    updateSummary();
                 }
             });
             if (repeat.getRepeatInterval() == 2) {
@@ -197,7 +203,7 @@ public class RepeatDialogFragment extends DialogFragment {
                 // 月ごと、週ごとのボタン郡は、初期状態ではすべて非表示
                 dayOfWeekFragment.setVisibility(View.GONE);
             }
-            checkBoxes[i] = dOWCheckBox;
+            dOWCheckBoxes[i] = dOWCheckBox;
         }
 
 
@@ -206,14 +212,14 @@ public class RepeatDialogFragment extends DialogFragment {
         sameDOWRadioButton = dialog.findViewById(R.id.radio_button_same_dow);
         sameLastDayRadioButton = dialog.findViewById(R.id.radio_button_same_last_day);
         // ラジオグループ変更時にサマリーを更新する
-        RadioGroup sameDayRadioGroup = dialog.findViewById(R.id.radio_group_same_day);
+        sameDayRadioGroup = dialog.findViewById(R.id.radio_group_same_day);
         sameDayRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 if (initialView) {
                     initialView = false;
                 } else {
-                    updateSummry();
+                    updateSummary();
                 }
             }
         });
@@ -281,7 +287,7 @@ public class RepeatDialogFragment extends DialogFragment {
                         break;
                 }
                 // サマリーを更新する
-                updateSummry();
+                updateSummary();
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
@@ -321,7 +327,7 @@ public class RepeatDialogFragment extends DialogFragment {
                             dateTextView.setTextColor(Color.BLACK);
                             break;
                     }
-                    updateSummry();
+                    updateSummary();
                 }
             });
         }
@@ -338,7 +344,7 @@ public class RepeatDialogFragment extends DialogFragment {
                 countEditText.setTextColor(Color.BLACK);
                 countTextView.setTextColor(Color.BLACK);
                 countRadioButton.setTextColor(Color.BLACK);
-                updateSummry();
+                updateSummary();
             }
         });
 
@@ -357,7 +363,7 @@ public class RepeatDialogFragment extends DialogFragment {
                                     dateRadioButton.setChecked(true);
                                     dateTextView.setTextColor(Color.BLACK);
                                     dateRadioButton.setTextColor(Color.BLACK);
-                                    updateSummry();
+                                    updateSummary();
                                 }
                             }, year, month + 1, dayOfMonth);
                     datePickerDialog.getDatePicker().setMinDate(now.getTimeInMillis());
@@ -388,16 +394,88 @@ public class RepeatDialogFragment extends DialogFragment {
         }
 
 
+        // 保存ボタンの処理
         Button buttonSave = dialog.findViewById(R.id.button_save);
         buttonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                repeat.setId(repeatId);
+                if (isNewRepeat) {
+                    repeat.setCreatedAt(now.getTime());
+                } else {
+                    repeat.setUpdatedAt(now.getTime());
+                }
+                repeat.setRepeatInterval(Integer.parseInt(intervalEditText.getText().toString()));
+                int timeScale = scaleSpinner.getSelectedItemPosition();
+                repeat.setRepeatScale(timeScale + 1);
+                if(timeScale == 1) {
+                    for (int i = 0; i < dOWCheckBoxes.length; i++) {
+                        switch (i) {
+                            case 0:
+                                repeat.setNotifySunday(dOWCheckBoxes[i].isChecked());
+                                break;
+                            case 1:
+                                repeat.setNotifyMonday(dOWCheckBoxes[i].isChecked());
+                                break;
+                            case 2:
+                                repeat.setNotifyTuesday(dOWCheckBoxes[i].isChecked());
+                                break;
+                            case 3:
+                                repeat.setNotifyWednesday(dOWCheckBoxes[i].isChecked());
+                                break;
+                            case 4:
+                                repeat.setNotifyThursday(dOWCheckBoxes[i].isChecked());
+                                break;
+                            case 5:
+                                repeat.setNotifyFriday(dOWCheckBoxes[i].isChecked());
+                                break;
+                            case 6:
+                                repeat.setNotifySaturday(dOWCheckBoxes[i].isChecked());
+                                break;
+                        }
+                    }
+                } else if (timeScale == 2) {
+                    switch (sameDayRadioGroup.getCheckedRadioButtonId()) {
+                        case R.id.radio_button_same_day:
+                            repeat.setNotifySameDay(true);
+                            break;
+                        case R.id.radio_button_same_dow:
+                            repeat.setNotifySameDOW(now.get(Calendar.DAY_OF_WEEK));
+                            repeat.setNotifySameDOWOrdinal(now.get(Calendar.DAY_OF_WEEK_IN_MONTH));
+                            break;
+                        case R.id.radio_button_same_last_day:
+                            repeat.setNotifySameLastDay(true);
+                            break;
+                    }
+                }
+                int checkedRadioButtonId = 0;
+                for (RadioButton radioButton : radioButtons) {
+                    checkedRadioButtonId = (radioButton.isChecked())? radioButton.getId() : null;
+                }
+                switch (checkedRadioButtonId) {
+                    case R.id.radio_button_no_end:
+                        repeat.setNoEnd(true);
+                        break;
+                    case R.id.radio_button_repeat_count:
+                        repeat.setEndCount(true);
+                        repeat.setNotifyEndCount(Integer.parseInt(countEditText.getText().toString()));
+                        break;
+                    case R.id.radio_button_end_date:
+                        repeat.setEndDate(true);
+                        repeat.setNotifyEndDate(notifyEndDate.getTime());
+                        break;
+                }
+
+                repeat.setSummary(summaryTextView.getText().toString());
+
+                // Realmにrepeatを保存
+                saveRealmRepeat(repeat);
                 listener.onSaveClicked(repeatId);
             }
         });
 
         // サマリーを表示
-        updateSummry();
+        updateSummary();
 
         return dialog;
     }
@@ -430,11 +508,11 @@ public class RepeatDialogFragment extends DialogFragment {
         scaleSpinner.setSelection(position);
     }
 
-    public void updateSummry() {
+    public void updateSummary() {
 
-        TextView summryTextView = dialog.findViewById(R.id.text_view_repeat_summary);
-        String summryFrequency;
-        String summryEnd = "";
+        summaryTextView = dialog.findViewById(R.id.text_view_repeat_summary);
+        String summaryFrequency;
+        String summaryEnd = "";
         String extraTimeScaleString = null;
 
         int timeInterval = Integer.valueOf(intervalEditText.getText().toString());
@@ -446,11 +524,11 @@ public class RepeatDialogFragment extends DialogFragment {
                 break;
             case 1: // 通知間隔が「週」の場合は、水曜日、金曜日などの指定を取得する
                 extraTimeScaleString = "";
-                for (int i = 0; i < checkBoxes.length; i++) {
+                for (int i = 0; i < dOWCheckBoxes.length; i++) {
                     if (i == 0) {
-                        extraTimeScaleString = (checkBoxes[i].isChecked())? week[i] + "曜日" : "";
+                        extraTimeScaleString = (dOWCheckBoxes[i].isChecked())? week[i] + "曜日" : "";
                     } else {
-                        extraTimeScaleString += (checkBoxes[i].isChecked())?  "、" + week[i] + "曜日" : "";
+                        extraTimeScaleString += (dOWCheckBoxes[i].isChecked())?  "、" + week[i] + "曜日" : "";
                     }
                 }
                 break;
@@ -474,31 +552,29 @@ public class RepeatDialogFragment extends DialogFragment {
         }
 
         if (timeInterval == 1) {
-            summryFrequency = "毎" + timeScaleString[timeScale] + extraTimeScaleString;
+            summaryFrequency = "毎" + timeScaleString[timeScale] + extraTimeScaleString;
         } else {
-            summryFrequency = String.valueOf(timeInterval) + timeScaleString[timeScale] + "ごとに" + extraTimeScaleString;
+            summaryFrequency = String.valueOf(timeInterval) + timeScaleString[timeScale] + "ごとに" + extraTimeScaleString;
         }
 
         for (int i = 0; i < radioButtons.length; i++) {
             if (radioButtons[i].isChecked()) {
                 switch (i) {
                     case 0:
-                        summryEnd = "";
+                        summaryEnd = "";
                         break;
                     case 1:
-                        summryEnd = "（" + countEditText.getText().toString() + "回）";
+                        summaryEnd = "（" + countEditText.getText().toString() + "回）";
                         break;
                     case 2:
-                        summryEnd = "（" + dateTextView.getText().toString() + "まで）";
+                        summaryEnd = "（" + dateTextView.getText().toString() + "まで）";
                         break;
                 }
             }
         }
 
-        summryTextView.setText(summryFrequency + "くり返し" +  summryEnd);
+        summaryTextView.setText(summaryFrequency + "くり返し" +  summaryEnd);
     }
-
-
 
 
     public class InputFilterMinMax implements InputFilter {
@@ -553,5 +629,24 @@ public class RepeatDialogFragment extends DialogFragment {
         countEditText.setTextColor(Color.GRAY);
         countTextView.setTextColor(Color.GRAY);
         dateTextView.setTextColor(Color.GRAY);
+    }
+
+
+    // RealmにRepeatを保存する
+    public void saveRealmRepeat(final Repeat repeat){
+        try {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    realm.copyToRealmOrUpdate(repeat);
+                }
+            });
+
+            // recyclerViewの更新を求めるintentを送る
+            Intent intent = new Intent("LIST_UPDATE");
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        } finally {
+            Log.d("realm","saveRepeat:success");
+        }
     }
 }
