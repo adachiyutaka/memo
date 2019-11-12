@@ -64,7 +64,8 @@ public class ReminderDialogFragment extends DialogFragment{
     Realm realm;
     Todo todo;
     long todoId;
-    // Repeat repeat;
+    Repeat repeat;
+    long repeatId;
     Calendar now;
     Calendar uneditedRemindTime;
     Calendar remindTime;
@@ -74,8 +75,6 @@ public class ReminderDialogFragment extends DialogFragment{
     private AlarmManager am;
     private PendingIntent pending;
     private int requestCode = 1;
-    long repeatId;
-    Repeat repeat;
     public static final String REPEAT_ID = "com.example.e28.memo.screen.REPEAT_ID";
     public static final String IS_REPEAT = "com.example.e28.memo.screen.IS_REPEAT";
     ReminderSpinnerAdapter dateAdapter;
@@ -95,6 +94,8 @@ public class ReminderDialogFragment extends DialogFragment{
 
         // Realmのインスタンスを生成
         realm = Realm.getDefaultInstance();
+
+        repeat = new Repeat();
 
         final String[] prefKeyList = getResources().getStringArray(R.array.pref_key_reminder_array);
 
@@ -289,8 +290,7 @@ public class ReminderDialogFragment extends DialogFragment{
         if (isInitialRepeat) {
             repeatAdapter.setList(createRepeatSpinnerItem("曜日や終了時期を設定"), 2);
         } else {
-            // repeatAdapter.setList(createRepeatSpinnerItem(createRepeatSummary(Realm.where(repeat.class).equalTo("id", todo.getRepeatId()), 2);
-            repeatAdapter.setList(createRepeatSpinnerItem("repeatサマリー"), 2);
+            repeatAdapter.setList(createRepeatSpinnerItem(repeat.getSummary()), 2);
         }
         repeatSpinner.setAdapter(repeatAdapter);
         repeatSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -358,6 +358,7 @@ public class ReminderDialogFragment extends DialogFragment{
         });
 
 
+        // TODO:View側にtodoへのデータセットをやらせてしまっているが、本来はここでやるべき
         // 保存ボタンの処理
         // ここで通知時間を確定する
         dialog.findViewById(R.id.button_save).setOnClickListener(new OnClickListener() {
@@ -372,7 +373,7 @@ public class ReminderDialogFragment extends DialogFragment{
                     todo.setUpdatedAt(now.getTimeInMillis());
                 }
                 saveRealmTodo(todo);
-                scheduleNotification("通知成功！", remindTime);
+                scheduleNotification(todoId, remindTime);
                 listener.onSaveClicked(todoId);
                 dialog.dismiss();
             }
@@ -397,18 +398,19 @@ public class ReminderDialogFragment extends DialogFragment{
         realm.close();
     }
 
-    private void scheduleNotification(String content, Calendar calendar){
+    private void scheduleNotification(long memoId, Calendar remindTime){
 
+        // AlarmReceiverにブロードキャスト用のintentを作成
         Intent intent = new Intent(getActivity(), AlarmReceiver.class);
-        intent.putExtra("RequestCode",content);
+        intent.putExtra("memoId", memoId);
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(),requestCode, intent, 0);
+        // 指定時間後に動作し、ブロードキャスト用のintentを起動させるPendingIntentを作成
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), requestCode, intent, 0);
 
         // アラームをセットする
         AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(ALARM_SERVICE);
-
         if (alarmManager != null) {
-            alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(calendar.getTimeInMillis(), null), pendingIntent);
+            alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(remindTime.getTimeInMillis(), null), pendingIntent);
 
             // トーストで設定されたことをを表示
             Toast.makeText(getActivity(),"リマインダーを設定しました", Toast.LENGTH_SHORT).show();

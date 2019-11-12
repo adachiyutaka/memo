@@ -68,7 +68,7 @@ public class RepeatDialogFragment extends DialogFragment {
     android.support.v4.app.FragmentTransaction fragmentTransaction;
     EditText intervalEditText;
     Spinner scaleSpinner;
-    ArrayAdapter<CharSequence> everyAdapter;
+    TextView everyDayTextView;
     ArrayAdapter<CharSequence> intervalAdapter;
     Calendar now;
     String week[];
@@ -98,7 +98,6 @@ public class RepeatDialogFragment extends DialogFragment {
 
         // Realmのインスタンス作成
         realm = Realm.getDefaultInstance();
-
         initialView = true;
 
         // 年月日表示フォーマット
@@ -133,18 +132,15 @@ public class RepeatDialogFragment extends DialogFragment {
         if (isNewRepeat) {
             //登録のない場合は新規作成
             repeat = new Repeat();
-            repeat.setRepeatScale(1);
+            repeat.setRepeatScale(0);
             repeat.setNoEnd(true);
             repeat.setRepeatInterval(1);
-            repeat.setRepeatScale(0);
         } else {
             //既存のrepeatIdだった場合はRealmから読み込み
             repeat = realm.where(Repeat.class).equalTo("id", repeatId).findFirst();
         }
-
-
         // 通知間隔の値を受け取るEditTextを作成
-        intervalEditText = dialog.findViewById(R.id.text_view_interval);
+        intervalEditText = dialog.findViewById(R.id.edit_text_interval);
         // 既存のリピート情報を読み取り
         intervalEditText.setText(String.valueOf(repeat.getRepeatInterval()), TextView.BufferType.NORMAL);
         // 入力制限（1~99）を設定する
@@ -153,10 +149,14 @@ public class RepeatDialogFragment extends DialogFragment {
         intervalEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateIntervalSpinner();
+                updateInterval();
                 updateSummary();
             }
         });
+
+
+        // 通知間隔の横に「毎日」などを表示するTextViewを作成
+        everyDayTextView = dialog.findViewById(R.id.text_view_every_day);
 
 
         // 通知間隔が「週ごと」の場合に表示する曜日チェックボックスを作成
@@ -247,8 +247,6 @@ public class RepeatDialogFragment extends DialogFragment {
 
         //　通知間隔を受け取るスピナーを作成
         scaleSpinner = dialog.findViewById(R.id.spinner_scale);
-        everyAdapter = ArrayAdapter.createFromResource(context, R.array.time_scale_every, android.R.layout.simple_spinner_item);
-        everyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         intervalAdapter = ArrayAdapter.createFromResource(context, R.array.time_scale, android.R.layout.simple_spinner_item);
         intervalAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // スピナーにリスナーを設定
@@ -286,6 +284,8 @@ public class RepeatDialogFragment extends DialogFragment {
                         sameLastDayRadioButton.setVisibility(View.GONE);
                         break;
                 }
+                // 通知間隔のスピナーの横の「毎日」などの表示を更新
+                updateInterval();
                 // サマリーを更新する
                 updateSummary();
             }
@@ -295,7 +295,6 @@ public class RepeatDialogFragment extends DialogFragment {
         });
         // 既存のデータを読み込んで設定
         scaleSpinner.setSelection(repeat.getRepeatScale());
-        updateIntervalSpinner();
 
 
         // 通知終了日の設定ラジオボタンを作成
@@ -303,7 +302,6 @@ public class RepeatDialogFragment extends DialogFragment {
         countRadioButton = dialog.findViewById(R.id.radio_button_repeat_count);
         dateRadioButton = dialog.findViewById(R.id.radio_button_end_date);
         radioButtons = new RadioButton[]{noEndRadioButton, countRadioButton, dateRadioButton};
-
         // ラジオグループのように動かすためのリスナーを設定
         for (int i = 0 ; i < radioButtons.length ; i++) {
             final int I = i;
@@ -327,6 +325,7 @@ public class RepeatDialogFragment extends DialogFragment {
                             dateTextView.setTextColor(Color.BLACK);
                             break;
                     }
+                    // サマリーを更新する
                     updateSummary();
                 }
             });
@@ -474,7 +473,7 @@ public class RepeatDialogFragment extends DialogFragment {
             }
         });
 
-        // サマリーを表示
+        // サマリーを更新する
         updateSummary();
 
         return dialog;
@@ -493,19 +492,30 @@ public class RepeatDialogFragment extends DialogFragment {
     }
 
 
-    // 通知間隔のSpinnerを設定された値によって更新する
-    public void updateIntervalSpinner() {
+    // 通知間隔が1の場合「毎日」などを表示する
+    public void updateInterval() {
 
-        // Adapterの変更で選択された場所が変わらないように、現在のポジションを再設定する
-        int position = scaleSpinner.getSelectedItemPosition();
-
+        // 通知間隔のEditTextから現在の間隔を判定する
         if (Integer.parseInt(intervalEditText.getText().toString()) == 1 || Objects.isNull(intervalEditText.getText())) {
-            scaleSpinner.setAdapter(everyAdapter);
+            // 通知間隔のSpinnerから現在の値を判定する
+            switch(scaleSpinner.getSelectedItemPosition()) {
+                case 0:
+                    everyDayTextView.setText("（毎日）");
+                    break;
+                case 1:
+                    everyDayTextView.setText("（毎週）");
+                    break;
+                case 2:
+                    everyDayTextView.setText("（毎月）");
+                    break;
+                case 3:
+                    everyDayTextView.setText("（毎年）");
+                    break;
+            }
+            everyDayTextView.setVisibility(View.VISIBLE);
         } else {
-            scaleSpinner.setAdapter(intervalAdapter);
+            everyDayTextView.setVisibility(View.GONE);
         }
-
-        scaleSpinner.setSelection(position);
     }
 
     public void updateSummary() {
@@ -517,6 +527,7 @@ public class RepeatDialogFragment extends DialogFragment {
 
         int timeInterval = Integer.valueOf(intervalEditText.getText().toString());
         int timeScale = scaleSpinner.getSelectedItemPosition();
+        Log.d(TAG, "updateSummary: timeScale init" + timeScale);
         String timeScaleString[] = {"日", "週", "月", "年"};
 
         switch (timeScale) {
@@ -552,6 +563,7 @@ public class RepeatDialogFragment extends DialogFragment {
         }
 
         if (timeInterval == 1) {
+            Log.d(TAG, "updateSummary: timeScale" + timeScale);
             summaryFrequency = "毎" + timeScaleString[timeScale] + extraTimeScaleString;
         } else {
             summaryFrequency = String.valueOf(timeInterval) + timeScaleString[timeScale] + "ごとに" + extraTimeScaleString;
@@ -597,7 +609,9 @@ public class RepeatDialogFragment extends DialogFragment {
         @Override
         public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
             try {
-                int input = Integer.parseInt(source.toString());
+                String destString = dest.toString();
+                // 入力済みの文字 + 入力中の文字 をintに変換　（ex: 10 の1と0の間に 5 を入力する場合、↓は 1 + 5 + 0 = 150 となる）
+                int input = Integer.parseInt(destString.substring(0, dstart) + source.toString() + destString.substring(dstart));
                 if (isInRange(min, max, input)) { // 最大値と最小値の間に収まる場合
                     return null;
                 } else if (input < min) { // 最小値以下、または、空欄（null）の場合、強制的に最小値を表示
@@ -608,7 +622,6 @@ public class RepeatDialogFragment extends DialogFragment {
                 return null;
             } catch (NumberFormatException nfe) {
             }
-            editText.setText(String.valueOf(min));
             return null;
         }
 

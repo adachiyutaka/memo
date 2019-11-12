@@ -32,7 +32,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         // TODO: 2019/10/17 ↓これ何？よくわかってない
         Log.d("AlarmBroadcastReceiver", "onReceive() pid=" + android.os.Process.myPid());
 
-        String content = intent.getStringExtra("RequestCode");
+        long memoId = intent.getLongExtra("RequestCode", -1);
 
         //
         //requestCode 実際はMemoのIDにするべきところ
@@ -80,7 +80,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                         // android標準アイコンから
                         .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
                         .setContentText(message)
-                        .setSubText(content)
+                        .setSubText(String.valueOf(memoId))
                         .setAutoCancel(true)
                         .setContentIntent(pendingIntent)
                         .setWhen(System.currentTimeMillis())
