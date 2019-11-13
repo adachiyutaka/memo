@@ -77,9 +77,9 @@ public class WriteActivity extends AppCompatActivity {
         realm = Realm.getDefaultInstance();
 
         // Memoに新しいIdをセットする
+        memo = new Memo();
         memoId = getRealmNextId("Memo");
         memo.setId(memoId);
-        saveRealmMemo(memo);
 
         // 保存ボタンでの保存と新規作成
         Button btnSave = findViewById(R.id.button_save);
@@ -94,6 +94,7 @@ public class WriteActivity extends AppCompatActivity {
                 // 新しいMemoモデルと新しいidをセット
                 memoId = getRealmNextId("Memo");
                 memo = new Memo();
+                memo.setId(memoId);
             }
         });
 
@@ -170,22 +171,6 @@ public class WriteActivity extends AppCompatActivity {
                 }
             }
         });
-
-        // フラグメントテスト
-
-        fragmentBtn = findViewById(R.id.button_fragment);
-        fragmentBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentClass myFragment = new FragmentClass();
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragmentContainer, myFragment);
-                transaction.addToBackStack(null);
-                transaction.commit();
-            }
-        });
-
-        // フラグメントテスト
     }
 
     @Override

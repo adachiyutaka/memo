@@ -154,6 +154,8 @@ public class RepeatDialogFragment extends DialogFragment {
             }
         });
 
+        Log.d(TAG, "onCreateDialog: isNewRepeat" + isNewRepeat);
+
 
         // 通知間隔の横に「毎日」などを表示するTextViewを作成
         everyDayTextView = dialog.findViewById(R.id.text_view_every_day);
