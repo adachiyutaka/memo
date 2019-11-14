@@ -21,6 +21,7 @@ import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -28,6 +29,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -64,6 +66,7 @@ public class RepeatDialogFragment extends DialogFragment {
     long repeatId;
     Repeat repeat;
     Boolean isNewRepeat;
+    Boolean isInitialSetting;
     android.support.v4.app.FragmentManager fragmentManager;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
     EditText intervalEditText;
@@ -154,8 +157,6 @@ public class RepeatDialogFragment extends DialogFragment {
             }
         });
 
-        Log.d(TAG, "onCreateDialog: isNewRepeat" + isNewRepeat);
-
 
         // 通知間隔の横に「毎日」などを表示するTextViewを作成
         everyDayTextView = dialog.findViewById(R.id.text_view_every_day);
@@ -166,11 +167,16 @@ public class RepeatDialogFragment extends DialogFragment {
         dOWCheckBoxes = new CheckBox[7];
         String[] dayOfWeekStrings = {"sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"};
         // 曜日チェックボックスにリスナーと初期値をセット
+        isInitialSetting = true;
         for (int i = 0 ; i < dayOfWeekStrings.length ; i++) {
             final CheckBox dOWCheckBox = dialog.findViewById(getResources().getIdentifier("check_box_" + dayOfWeekStrings[i], "id", context.getPackageName()));
             dOWCheckBox.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    updateSummary();
+                    if (!isInitialSetting) {
+                        keepCheckedOne((CheckBox)v);
+                    }
                     updateSummary();
                 }
             });
@@ -207,6 +213,7 @@ public class RepeatDialogFragment extends DialogFragment {
             }
             dOWCheckBoxes[i] = dOWCheckBox;
         }
+        isInitialSetting = false;
 
 
         // 通知間隔が「月ごと」の場合に表示する「同じ日」、「第1金曜日」などのラジオボタンを作成
@@ -225,6 +232,7 @@ public class RepeatDialogFragment extends DialogFragment {
                 }
             }
         });
+
 
         // 月ごとのラジオボタンに初期値を設定
         if (repeat.getRepeatInterval() == 3) {
@@ -251,6 +259,7 @@ public class RepeatDialogFragment extends DialogFragment {
         scaleSpinner = dialog.findViewById(R.id.spinner_scale);
         intervalAdapter = ArrayAdapter.createFromResource(context, R.array.time_scale, android.R.layout.simple_spinner_item);
         intervalAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        scaleSpinner.setAdapter(intervalAdapter);
         // スピナーにリスナーを設定
         scaleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -295,8 +304,10 @@ public class RepeatDialogFragment extends DialogFragment {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-        // 既存のデータを読み込んで設定
-        scaleSpinner.setSelection(repeat.getRepeatScale());
+        // 初期値をセット（新規作成時もrepeatScaleは値が存在する）
+        scaleSpinner.setSelection(repeat.getRepeatScale(), false);
+        // 通知間隔のスピナーの横の「毎日」などの表示を更新
+        updateInterval();
 
 
         // 通知終了日の設定ラジオボタンを作成
@@ -468,7 +479,6 @@ public class RepeatDialogFragment extends DialogFragment {
                 }
 
                 repeat.setSummary(summaryTextView.getText().toString());
-
                 // Realmにrepeatを保存
                 saveRealmRepeat(repeat);
                 listener.onSaveClicked(repeatId);
@@ -498,7 +508,7 @@ public class RepeatDialogFragment extends DialogFragment {
     public void updateInterval() {
 
         // 通知間隔のEditTextから現在の間隔を判定する
-        if (Integer.parseInt(intervalEditText.getText().toString()) == 1 || Objects.isNull(intervalEditText.getText())) {
+        if (Integer.parseInt(intervalEditText.getText().toString()) == 1) {
             // 通知間隔のSpinnerから現在の値を判定する
             switch(scaleSpinner.getSelectedItemPosition()) {
                 case 0:
@@ -620,6 +630,11 @@ public class RepeatDialogFragment extends DialogFragment {
                     editText.setText(String.valueOf(min));
                 } else if (max < input) { // 最大値以上の場合、強制的に最大値を表示
                     editText.setText(String.valueOf(max));
+                } else if (source.equals("") && dest.toString().length() == 0) {
+                    //backspace was clicked, do not accept that change,
+                    //unless user is deleting the last char
+                    String deletedCharacter = destString.substring(dstart, dend);
+                    return deletedCharacter;
                 }
                 return null;
             } catch (NumberFormatException nfe) {
@@ -663,5 +678,15 @@ public class RepeatDialogFragment extends DialogFragment {
         } finally {
             Log.d("realm","saveRepeat:success");
         }
+    }
+
+
+    // チェックされている曜日の数を取得し、0だった場合は、チェックを外せないようにする
+    public void keepCheckedOne(CompoundButton buttonView) {
+        int checkedCount = 0;
+        for (int i = 0; i < dOWCheckBoxes.length; i++) {
+            if (dOWCheckBoxes[i].isChecked()) checkedCount ++;
+        }
+        if (checkedCount == 0) buttonView.setChecked(true);
     }
 }

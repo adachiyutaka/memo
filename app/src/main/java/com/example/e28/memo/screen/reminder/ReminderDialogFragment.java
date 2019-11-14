@@ -131,29 +131,24 @@ public class ReminderDialogFragment extends DialogFragment{
         // TodoのIDを取得し、セットされた通知開始時間、リピート情報を取得する
         todoId = getArguments().getLong(TODO_ID);
         remindTime = Calendar.getInstance();
-
         if (realm.where(Todo.class).equalTo("id", todoId).findFirst() == null) {
             // 新規作成されたTodoだった場合、新規作成する
             todo = new Todo();
             // ID、現在の時間をセットする
             remindTime.setTimeInMillis(now.getTimeInMillis());
             // 時間選択スピナーの第1項目を初期設定にする
-            //Arrays.fill(isInitialSetting, true);
             isInitialDate = true;
             isInitialTime = true;
             isInitialRepeat = true;
-
         } else {
             // 既存のTodoだった場合、その時間を取得する
             todo = realm.where(Todo.class).equalTo("id", todoId).findFirst();
             remindTime.setTimeInMillis(todo.getNotifyStartTime());
             // 時間選択スピナーの第1項目をユーザーが選択した時間の表示にする
-            Arrays.fill(isInitialSetting, false);
+            isInitialDate = false;
+            isInitialTime = false;
+            isInitialRepeat = false;
         }
-
-
-        Log.d(TAG, "onCreateDialog: initialsetting:" + isInitialRepeat + "isInitialDate:" + isInitialDate + "isInitialTime:"+ isInitialTime);
-
 
 
 

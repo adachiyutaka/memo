@@ -40,8 +40,8 @@
         android:id="@+id/text_view_every_day"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/spinner_scale"
-        android:layout_alignBottom="@+id/spinner_scale"
+        android:layout_alignBaseline="@+id/edit_text_interval"
+        android:layout_alignBottom="@+id/edit_text_interval"
         android:layout_toEndOf="@+id/spinner_scale"
         android:layout_margin="8dp"/>
 
