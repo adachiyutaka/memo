@@ -142,7 +142,7 @@ public class ReminderDialogFragment extends DialogFragment{
             isInitialRepeat = true;
         } else {
             // 既存のTodoだった場合、その時間を取得する
-            todo = realm.where(Todo.class).equalTo("id", todoId).findFirst();
+            todo = realm.copyFromRealm(realm.where(Todo.class).equalTo("id", todoId).findFirst());
             remindTime.setTimeInMillis(todo.getNotifyStartTime());
             // 時間選択スピナーの第1項目をユーザーが選択した時間の表示にする
             isInitialDate = false;
@@ -318,15 +318,18 @@ public class ReminderDialogFragment extends DialogFragment{
                         if (todo.isRepeat()) {
                             repeatId = todo.getRepeatId();
                             bundle.putBoolean(IS_REPEAT, true);
+                            Log.d(TAG, "reminderDialog: repeatId   " + repeatId);
                         } else {
                             repeatId = getRealmNextId("Repeat");
+                            Log.d(TAG, "reminderDialog: initialize repeatId   " + repeatId);
+
                             bundle.putBoolean(IS_REPEAT, false);
                         }
                         bundle.putLong(REPEAT_ID, repeatId);
                         repeatDialogFragment.setArguments(bundle);
                         repeatDialogFragment.show(getFragmentManager(), "RepeatFragment");
 
-                        // リマインダーダイアログ上のボタンのクリック処理
+                        // RepeatDialog上のボタンのクリック処理
                         repeatDialogFragment.setRepeatDialogFragmentListener(new RepeatDialogFragment.RepeatDialogFragmentListener() {
                             // リマインダーの保存ボタン
                             @Override

@@ -1,5 +1,7 @@
 package com.example.e28.memo.model;
 
+import java.util.Date;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -13,7 +15,7 @@ public class Todo extends RealmObject {
     public long id;
     public long createdAt = 0;
     public long updatedAt = 0;
-    public long notifyStartTime = 0;
+    public Date notifyStartTime;
     public boolean isRepeat;
     public long repeatId;
 
@@ -41,11 +43,11 @@ public class Todo extends RealmObject {
         this.updatedAt = updatedAt;
     }
 
-    public long getNotifyStartTime() {
+    public Date getNotifyStartTime() {
         return notifyStartTime;
     }
 
-    public void setNotifyStartTime(long notifyStartTime) {
+    public void setNotifyStartTime(Date notifyStartTime) {
         this.notifyStartTime = notifyStartTime;
     }
 

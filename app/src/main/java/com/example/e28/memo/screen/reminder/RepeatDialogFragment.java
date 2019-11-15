@@ -75,6 +75,7 @@ public class RepeatDialogFragment extends DialogFragment {
     ArrayAdapter<CharSequence> intervalAdapter;
     Calendar now;
     String week[];
+    FlexboxLayout dayOfWeekFragment;
     CheckBox dOWCheckBoxes[];
     RadioGroup sameDayRadioGroup;
     RadioButton sameDayRadioButton;
@@ -131,16 +132,19 @@ public class RepeatDialogFragment extends DialogFragment {
 
         // リピートの初期値を設定
         repeatId = getArguments().getLong(REPEAT_ID);
+
+        Log.d(TAG, "repeatDialog: repeatID" + repeatId);
         isNewRepeat = !getArguments().getBoolean(IS_REPEAT);
         if (isNewRepeat) {
             //登録のない場合は新規作成
             repeat = new Repeat();
+            repeat.setId(repeatId);
             repeat.setRepeatScale(0);
             repeat.setNoEnd(true);
             repeat.setRepeatInterval(1);
         } else {
-            //既存のrepeatIdだった場合はRealmから読み込み
-            repeat = realm.where(Repeat.class).equalTo("id", repeatId).findFirst();
+            //既存のrepeatIdだった場合はRealmからUnmanaged状態で読み込み
+            repeat = realm.copyFromRealm(realm.where(Repeat.class).equalTo("id", repeatId).findFirst());
         }
         // 通知間隔の値を受け取るEditTextを作成
         intervalEditText = dialog.findViewById(R.id.edit_text_interval);
@@ -160,99 +164,6 @@ public class RepeatDialogFragment extends DialogFragment {
 
         // 通知間隔の横に「毎日」などを表示するTextViewを作成
         everyDayTextView = dialog.findViewById(R.id.text_view_every_day);
-
-
-        // 通知間隔が「週ごと」の場合に表示する曜日チェックボックスを作成
-        final FlexboxLayout dayOfWeekFragment = dialog.findViewById(R.id.fragment_day_of_week);
-        dOWCheckBoxes = new CheckBox[7];
-        String[] dayOfWeekStrings = {"sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"};
-        // 曜日チェックボックスにリスナーと初期値をセット
-        isInitialSetting = true;
-        for (int i = 0 ; i < dayOfWeekStrings.length ; i++) {
-            final CheckBox dOWCheckBox = dialog.findViewById(getResources().getIdentifier("check_box_" + dayOfWeekStrings[i], "id", context.getPackageName()));
-            dOWCheckBox.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    updateSummary();
-                    if (!isInitialSetting) {
-                        keepCheckedOne((CheckBox)v);
-                    }
-                    updateSummary();
-                }
-            });
-            if (repeat.getRepeatInterval() == 2) {
-                // 既存の情報をセット
-                switch (i) {
-                    case 0:
-                        dOWCheckBox.setChecked(repeat.isNotifySunday());
-                        break;
-                    case 1:
-                        dOWCheckBox.setChecked(repeat.isNotifyMonday());
-                        break;
-                    case 2:
-                        dOWCheckBox.setChecked(repeat.isNotifyTuesday());
-                        break;
-                    case 3:
-                        dOWCheckBox.setChecked(repeat.isNotifyWednesday());
-                        break;
-                    case 4:
-                        dOWCheckBox.setChecked(repeat.isNotifyThursday());
-                        break;
-                    case 5:
-                        dOWCheckBox.setChecked(repeat.isNotifyFriday());
-                        break;
-                    case 6:
-                        dOWCheckBox.setChecked(repeat.isNotifySaturday());
-                        break;
-                }
-            } else {
-                // 既存の情報がない場合、現在の曜日をセット
-                if(now.get(Calendar.DAY_OF_WEEK) - 1 == i) dOWCheckBox.setChecked(true);
-                // 月ごと、週ごとのボタン郡は、初期状態ではすべて非表示
-                dayOfWeekFragment.setVisibility(View.GONE);
-            }
-            dOWCheckBoxes[i] = dOWCheckBox;
-        }
-        isInitialSetting = false;
-
-
-        // 通知間隔が「月ごと」の場合に表示する「同じ日」、「第1金曜日」などのラジオボタンを作成
-        sameDayRadioButton = dialog.findViewById(R.id.radio_button_same_day);
-        sameDOWRadioButton = dialog.findViewById(R.id.radio_button_same_dow);
-        sameLastDayRadioButton = dialog.findViewById(R.id.radio_button_same_last_day);
-        // ラジオグループ変更時にサマリーを更新する
-        sameDayRadioGroup = dialog.findViewById(R.id.radio_group_same_day);
-        sameDayRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (initialView) {
-                    initialView = false;
-                } else {
-                    updateSummary();
-                }
-            }
-        });
-
-
-        // 月ごとのラジオボタンに初期値を設定
-        if (repeat.getRepeatInterval() == 3) {
-            // 既存の情報をセット
-            if (repeat.isNotifySameDay) sameDayRadioButton.setChecked(true);
-            if (repeat.isNotifySameDOW) {
-                sameDOWRadioButton.setChecked(true);
-                sameDOWRadioButton.setText("その月の第" + String.valueOf(repeat.getNotifySameDOWOrdinal())+ week[repeat.getNotifySameDOW()] + "曜日");
-            }
-            if (repeat.isNotifySameLastDay) sameLastDayRadioButton.setChecked(true);
-        } else {
-            // 既存の情報がない場合、「その月の同じ日」をセット
-            sameDayRadioButton.setChecked(true);
-            // 「第1金曜日」などのラジオボタンに現在の値をセット
-            sameDOWRadioButton.setText("その月の第" + now.get(Calendar.DAY_OF_WEEK_IN_MONTH) + week[now.get(Calendar.DAY_OF_WEEK)] + "曜日");
-            // 月ごと、週ごとのボタン郡は、初期状態ではすべて非表示
-            sameDayRadioButton.setVisibility(View.GONE);
-            sameDOWRadioButton.setVisibility(View.GONE);
-            sameLastDayRadioButton.setVisibility(View.GONE);
-        }
 
 
         //　通知間隔を受け取るスピナーを作成
@@ -308,6 +219,99 @@ public class RepeatDialogFragment extends DialogFragment {
         scaleSpinner.setSelection(repeat.getRepeatScale(), false);
         // 通知間隔のスピナーの横の「毎日」などの表示を更新
         updateInterval();
+
+
+        // 通知間隔が「週ごと」の場合に表示する曜日チェックボックスを作成
+        dayOfWeekFragment = dialog.findViewById(R.id.fragment_day_of_week);
+        dOWCheckBoxes = new CheckBox[7];
+        String[] dayOfWeekStrings = {"sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"};
+        // 曜日チェックボックスにリスナーと初期値をセット
+        isInitialSetting = true;
+        for (int i = 0 ; i < dayOfWeekStrings.length ; i++) {
+            final CheckBox dOWCheckBox = dialog.findViewById(getResources().getIdentifier("check_box_" + dayOfWeekStrings[i], "id", context.getPackageName()));
+            dOWCheckBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    updateSummary();
+                    if (!isInitialSetting) {
+                        keepCheckedOne((CheckBox)v);
+                    }
+                    updateSummary();
+                }
+            });
+            if (repeat.getRepeatInterval() == 1) {
+                // 既存の情報をセット
+                switch (i) {
+                    case 0:
+                        dOWCheckBox.setChecked(repeat.isNotifySunday());
+                        break;
+                    case 1:
+                        dOWCheckBox.setChecked(repeat.isNotifyMonday());
+                        break;
+                    case 2:
+                        dOWCheckBox.setChecked(repeat.isNotifyTuesday());
+                        break;
+                    case 3:
+                        dOWCheckBox.setChecked(repeat.isNotifyWednesday());
+                        break;
+                    case 4:
+                        dOWCheckBox.setChecked(repeat.isNotifyThursday());
+                        break;
+                    case 5:
+                        dOWCheckBox.setChecked(repeat.isNotifyFriday());
+                        break;
+                    case 6:
+                        dOWCheckBox.setChecked(repeat.isNotifySaturday());
+                        break;
+                }
+            } else {
+                // 既存の情報がない場合、現在の曜日をセット
+                if(now.get(Calendar.DAY_OF_WEEK) - 1 == i) dOWCheckBox.setChecked(true);
+                // 月ごと、週ごとのボタン郡は、初期状態ではすべて非表示
+                dayOfWeekFragment.setVisibility(View.GONE);
+            }
+            dOWCheckBoxes[i] = dOWCheckBox;
+        }
+        isInitialSetting = false;
+
+
+        // 通知間隔が「月ごと」の場合に表示する「同じ日」、「第1金曜日」などのラジオボタンを作成
+        sameDayRadioButton = dialog.findViewById(R.id.radio_button_same_day);
+        sameDOWRadioButton = dialog.findViewById(R.id.radio_button_same_dow);
+        sameLastDayRadioButton = dialog.findViewById(R.id.radio_button_same_last_day);
+        // ラジオグループ変更時にサマリーを更新する
+        sameDayRadioGroup = dialog.findViewById(R.id.radio_group_same_day);
+        sameDayRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (initialView) {
+                    initialView = false;
+                } else {
+                    updateSummary();
+                }
+            }
+        });
+
+
+        // 月ごとのラジオボタンに初期値を設定
+        if (repeat.getRepeatInterval() == 2) {
+            // 既存の情報をセット
+            if (repeat.isNotifySameDay) sameDayRadioButton.setChecked(true);
+            if (repeat.isNotifySameDOW) {
+                sameDOWRadioButton.setChecked(true);
+                sameDOWRadioButton.setText("その月の第" + String.valueOf(repeat.getNotifySameDOWOrdinal())+ week[repeat.getNotifySameDOW()] + "曜日");
+            }
+            if (repeat.isNotifySameLastDay) sameLastDayRadioButton.setChecked(true);
+        } else {
+            // 既存の情報がない場合、「その月の同じ日」をセット
+            sameDayRadioButton.setChecked(true);
+            // 「第1金曜日」などのラジオボタンに現在の値をセット
+            sameDOWRadioButton.setText("その月の第" + now.get(Calendar.DAY_OF_WEEK_IN_MONTH) + week[now.get(Calendar.DAY_OF_WEEK)] + "曜日");
+            // 月ごと、週ごとのボタン郡は、初期状態ではすべて非表示
+            sameDayRadioButton.setVisibility(View.GONE);
+            sameDOWRadioButton.setVisibility(View.GONE);
+            sameLastDayRadioButton.setVisibility(View.GONE);
+        }
 
 
         // 通知終了日の設定ラジオボタンを作成
@@ -392,7 +396,7 @@ public class RepeatDialogFragment extends DialogFragment {
         if (repeat.isNoEnd) noEndRadioButton.performClick();
         if (repeat.isEndCount) {
             countRadioButton.performClick();
-            countEditText.setText(repeat.getNotifyRemainCount());
+            countEditText.setText(String.valueOf(repeat.getNotifyRemainCount()));
         } else {
             countEditText.setText("10");
         }
@@ -411,7 +415,6 @@ public class RepeatDialogFragment extends DialogFragment {
         buttonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                repeat.setId(repeatId);
                 if (isNewRepeat) {
                     repeat.setCreatedAt(now.getTime());
                 } else {
@@ -419,7 +422,7 @@ public class RepeatDialogFragment extends DialogFragment {
                 }
                 repeat.setRepeatInterval(Integer.parseInt(intervalEditText.getText().toString()));
                 int timeScale = scaleSpinner.getSelectedItemPosition();
-                repeat.setRepeatScale(timeScale + 1);
+                repeat.setRepeatScale(timeScale);
                 if(timeScale == 1) {
                     for (int i = 0; i < dOWCheckBoxes.length; i++) {
                         switch (i) {
@@ -462,7 +465,9 @@ public class RepeatDialogFragment extends DialogFragment {
                 }
                 int checkedRadioButtonId = 0;
                 for (RadioButton radioButton : radioButtons) {
-                    checkedRadioButtonId = (radioButton.isChecked())? radioButton.getId() : null;
+                    if (radioButton.isChecked()) {
+                        checkedRadioButtonId = radioButton.getId();
+                    }
                 }
                 switch (checkedRadioButtonId) {
                     case R.id.radio_button_no_end:
@@ -470,7 +475,9 @@ public class RepeatDialogFragment extends DialogFragment {
                         break;
                     case R.id.radio_button_repeat_count:
                         repeat.setEndCount(true);
-                        repeat.setNotifyEndCount(Integer.parseInt(countEditText.getText().toString()));
+                        int notifyEndCount = Integer.parseInt(countEditText.getText().toString());
+                        repeat.setNotifyEndCount(notifyEndCount);
+                        repeat.setNotifyRemainCount(notifyEndCount);
                         break;
                     case R.id.radio_button_end_date:
                         repeat.setEndDate(true);
@@ -482,6 +489,7 @@ public class RepeatDialogFragment extends DialogFragment {
                 // Realmにrepeatを保存
                 saveRealmRepeat(repeat);
                 listener.onSaveClicked(repeatId);
+                dialog.dismiss();
             }
         });
 
@@ -539,8 +547,8 @@ public class RepeatDialogFragment extends DialogFragment {
 
         int timeInterval = Integer.valueOf(intervalEditText.getText().toString());
         int timeScale = scaleSpinner.getSelectedItemPosition();
-        Log.d(TAG, "updateSummary: timeScale init" + timeScale);
-        String timeScaleString[] = {"日", "週", "月", "年"};
+        String timeScaleStringOne[] = {"日", "週", "月", "年"};
+        String timeScaleString[] = {"日", "週", "か月", "年"};
 
         switch (timeScale) {
             case 0: // 通知間隔が「日」の場合は、その他に付属する情報なし
@@ -575,8 +583,7 @@ public class RepeatDialogFragment extends DialogFragment {
         }
 
         if (timeInterval == 1) {
-            Log.d(TAG, "updateSummary: timeScale" + timeScale);
-            summaryFrequency = "毎" + timeScaleString[timeScale] + extraTimeScaleString;
+            summaryFrequency = "毎" + timeScaleStringOne[timeScale] + extraTimeScaleString;
         } else {
             summaryFrequency = String.valueOf(timeInterval) + timeScaleString[timeScale] + "ごとに" + extraTimeScaleString;
         }

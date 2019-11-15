@@ -14,7 +14,7 @@ public class Repeat extends RealmObject {
     public long id;
     public Date createdAt;
     public Date updatedAt;
-    public Integer repeatScale; //リピートなし=0、日=1、週=2、月=3、年=4
+    public Integer repeatScale; //日=0、週=1、月=2、年=3
     public int repeatInterval;
     public boolean isNotifySunday;
     public boolean isNotifyMonday;
