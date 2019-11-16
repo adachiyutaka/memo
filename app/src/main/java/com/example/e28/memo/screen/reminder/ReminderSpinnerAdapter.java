@@ -14,6 +14,9 @@ import com.example.e28.memo.model.Repeat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Objects;
+
+import io.realm.Realm;
 
 import static android.content.ContentValues.TAG;
 
@@ -47,6 +50,7 @@ public class ReminderSpinnerAdapter extends BaseAdapter {
         String formatDate1 = formatA.format(calendar.getTime());
         Log.d(TAG, "onCreateDialog: set adapter remindTime : " + formatDate1);
     }
+
     public void setRepeat(Repeat repeat) {
         this.repeat = repeat;
     }
@@ -86,28 +90,7 @@ public class ReminderSpinnerAdapter extends BaseAdapter {
                 textViewSelectedTime.setText(calendar.get(Calendar.HOUR_OF_DAY) + "時" + String.format("%02d", calendar.get(Calendar.MINUTE)) + "分");
                 break;
             case 2: // リピートを指定するSpinner
-                String textRepeat = "リピートなし";
-//                switch (repeat.getRepeatScale()) {
-//                    case 0:
-//                        textRepeat = "リピートなし";
-//                        break;
-//                    case 1:
-//                        textRepeat = "毎日";
-//                        break;
-//                    case 2:
-//                        textRepeat = "毎週";
-//                        break;
-//                    case 3:
-//                        textRepeat = "毎月";
-//                        break;
-//                    case 4:
-//                        textRepeat = "毎年";
-//                        break;
-//                    default:
-//                        textRepeat = "リピートなし";
-//                        break;
-//                }
-                textViewSelectedTime.setText(textRepeat);
+                textViewSelectedTime.setText(mDataList[position][0]);
                 break;
         }
 

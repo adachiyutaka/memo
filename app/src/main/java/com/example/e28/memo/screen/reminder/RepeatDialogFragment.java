@@ -216,9 +216,12 @@ public class RepeatDialogFragment extends DialogFragment {
             }
         });
         // 初期値をセット（新規作成時もrepeatScaleは値が存在する）
-        scaleSpinner.setSelection(repeat.getRepeatScale(), false);
+        scaleSpinner.setSelection(repeat.getRepeatScale() - 1, false);
         // 通知間隔のスピナーの横の「毎日」などの表示を更新
         updateInterval();
+
+
+        Log.d(TAG, "onCreateDialog: repeat.getRepeatInterval():  " + repeat.getRepeatInterval());
 
 
         // 通知間隔が「週ごと」の場合に表示する曜日チェックボックスを作成
@@ -239,7 +242,7 @@ public class RepeatDialogFragment extends DialogFragment {
                     updateSummary();
                 }
             });
-            if (repeat.getRepeatInterval() == 1) {
+            if (repeat.getRepeatScale() - 1 == 1) {
                 // 既存の情報をセット
                 switch (i) {
                     case 0:
@@ -275,6 +278,42 @@ public class RepeatDialogFragment extends DialogFragment {
         isInitialSetting = false;
 
 
+
+        boolean isDOWStr = false;
+        String weekStr = "";
+        for (int i = 0; i < 6; i++) {
+            switch (i) {
+                case 0:
+                    isDOWStr = repeat.isNotifySunday();
+                    break;
+                case 1:
+                    isDOWStr = repeat.isNotifyMonday();
+                    break;
+                case 2:
+                    isDOWStr = repeat.isNotifyTuesday();
+                    break;
+                case 3:
+                    isDOWStr = repeat.isNotifyWednesday();
+                    break;
+                case 4:
+                    isDOWStr = repeat.isNotifyThursday();
+                    break;
+                case 5:
+                    isDOWStr = repeat.isNotifyFriday();
+                    break;
+                case 6:
+                    isDOWStr = repeat.isNotifySaturday();
+                    break;
+            }
+            weekStr = weekStr + "  :    " + dayOfWeekStrings[i] + " : " + String.valueOf(isDOWStr);
+        }
+
+        Log.d(TAG, "onCreateDialog: week:   " + weekStr);
+
+
+
+
+
         // 通知間隔が「月ごと」の場合に表示する「同じ日」、「第1金曜日」などのラジオボタンを作成
         sameDayRadioButton = dialog.findViewById(R.id.radio_button_same_day);
         sameDOWRadioButton = dialog.findViewById(R.id.radio_button_same_dow);
@@ -294,8 +333,9 @@ public class RepeatDialogFragment extends DialogFragment {
 
 
         // 月ごとのラジオボタンに初期値を設定
-        if (repeat.getRepeatInterval() == 2) {
+        if (repeat.getRepeatScale() - 1 == 2) {
             // 既存の情報をセット
+            Log.d(TAG, "onCreateDialog: isNotifySameDay:   " + repeat.isNotifySameDay + "   repeat.isNotifySameDOW:   " + repeat.isNotifySameDOW + "    repeat.isNotifySameLastDay:   "+ repeat.isNotifySameLastDay);
             if (repeat.isNotifySameDay) sameDayRadioButton.setChecked(true);
             if (repeat.isNotifySameDOW) {
                 sameDOWRadioButton.setChecked(true);
@@ -306,7 +346,7 @@ public class RepeatDialogFragment extends DialogFragment {
             // 既存の情報がない場合、「その月の同じ日」をセット
             sameDayRadioButton.setChecked(true);
             // 「第1金曜日」などのラジオボタンに現在の値をセット
-            sameDOWRadioButton.setText("その月の第" + now.get(Calendar.DAY_OF_WEEK_IN_MONTH) + week[now.get(Calendar.DAY_OF_WEEK)] + "曜日");
+            sameDOWRadioButton.setText("その月の第" + now.get(Calendar.DAY_OF_WEEK_IN_MONTH) + week[now.get(Calendar.DAY_OF_WEEK) - 1] + "曜日");
             // 月ごと、週ごとのボタン郡は、初期状態ではすべて非表示
             sameDayRadioButton.setVisibility(View.GONE);
             sameDOWRadioButton.setVisibility(View.GONE);
@@ -422,7 +462,7 @@ public class RepeatDialogFragment extends DialogFragment {
                 }
                 repeat.setRepeatInterval(Integer.parseInt(intervalEditText.getText().toString()));
                 int timeScale = scaleSpinner.getSelectedItemPosition();
-                repeat.setRepeatScale(timeScale);
+                repeat.setRepeatScale(timeScale + 1);
                 if(timeScale == 1) {
                     for (int i = 0; i < dOWCheckBoxes.length; i++) {
                         switch (i) {
@@ -455,6 +495,7 @@ public class RepeatDialogFragment extends DialogFragment {
                             repeat.setNotifySameDay(true);
                             break;
                         case R.id.radio_button_same_dow:
+                            repeat.setNotifySameDOW(true);
                             repeat.setNotifySameDOW(now.get(Calendar.DAY_OF_WEEK));
                             repeat.setNotifySameDOWOrdinal(now.get(Calendar.DAY_OF_WEEK_IN_MONTH));
                             break;
@@ -486,6 +527,7 @@ public class RepeatDialogFragment extends DialogFragment {
                 }
 
                 repeat.setSummary(summaryTextView.getText().toString());
+                repeat.setCustomRepeat(true);
                 // Realmにrepeatを保存
                 saveRealmRepeat(repeat);
                 listener.onSaveClicked(repeatId);

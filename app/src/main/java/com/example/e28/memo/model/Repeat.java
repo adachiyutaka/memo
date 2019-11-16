@@ -14,7 +14,8 @@ public class Repeat extends RealmObject {
     public long id;
     public Date createdAt;
     public Date updatedAt;
-    public Integer repeatScale; //日=0、週=1、月=2、年=3
+    public boolean isCustomRepeat;
+    public int repeatScale; //リピートなし=0、日=1、週=2、月=3、年=4
     public int repeatInterval;
     public boolean isNotifySunday;
     public boolean isNotifyMonday;
@@ -60,11 +61,19 @@ public class Repeat extends RealmObject {
         this.updatedAt = updatedAt;
     }
 
-    public Integer getRepeatScale() {
+    public boolean isCustomRepeat() {
+        return isCustomRepeat;
+    }
+
+    public void setCustomRepeat(boolean customRepeat) {
+        isCustomRepeat = customRepeat;
+    }
+
+    public int getRepeatScale() {
         return repeatScale;
     }
 
-    public void setRepeatScale(Integer repeatScale) {
+    public void setRepeatScale(int repeatScale) {
         this.repeatScale = repeatScale;
     }
 

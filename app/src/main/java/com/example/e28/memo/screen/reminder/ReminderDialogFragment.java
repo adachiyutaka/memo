@@ -77,6 +77,7 @@ public class ReminderDialogFragment extends DialogFragment{
     private int requestCode = 1;
     public static final String REPEAT_ID = "com.example.e28.memo.screen.REPEAT_ID";
     public static final String IS_REPEAT = "com.example.e28.memo.screen.IS_REPEAT";
+    ReclickableSpinner repeatSpinner;
     ReminderSpinnerAdapter dateAdapter;
     ReminderSpinnerAdapter timeAdapter;
     ReminderSpinnerAdapter repeatAdapter;
@@ -84,18 +85,17 @@ public class ReminderDialogFragment extends DialogFragment{
     boolean isInitialTime;
     boolean isInitialRepeat;
     boolean[] isInitialSetting = {isInitialDate, isInitialTime, isInitialRepeat};
+    boolean isUpdateSelection;
     DatePickerDialog datePickerDialog;
     TimePickerDialog timePickerDialog;
 
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    public Dialog onCreateDialog(final Bundle savedInstanceState) {
 
         context = getActivity().getApplicationContext();
 
         // Realmのインスタンスを生成
         realm = Realm.getDefaultInstance();
-
-        repeat = new Repeat();
 
         final String[] prefKeyList = getResources().getStringArray(R.array.pref_key_reminder_array);
 
@@ -118,6 +118,7 @@ public class ReminderDialogFragment extends DialogFragment{
 
         int week_int = now.get(Calendar.DAY_OF_WEEK);//曜日を数値で取得
 
+
         // フルスクリーンでレイアウトを表示する
         final Dialog dialog = new Dialog(getActivity());
         dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
@@ -126,7 +127,11 @@ public class ReminderDialogFragment extends DialogFragment{
         // 一度選択したアイテムを、再度クリックできるように拡張したスピナーを使用する
         ReclickableSpinner dateSpinner = dialog.findViewById(R.id.spinner_date);
         ReclickableSpinner timeSpinner = dialog.findViewById(R.id.spinner_time);
-        ReclickableSpinner repeatSpinner = dialog.findViewById(R.id.spinner_repeat);
+        repeatSpinner = dialog.findViewById(R.id.spinner_repeat);
+
+        // 時間選択スピナーの第1項目を初期設定にする
+        isInitialDate = true;
+        isInitialTime = true;
 
         // TodoのIDを取得し、セットされた通知開始時間、リピート情報を取得する
         todoId = getArguments().getLong(TODO_ID);
@@ -134,23 +139,25 @@ public class ReminderDialogFragment extends DialogFragment{
         if (realm.where(Todo.class).equalTo("id", todoId).findFirst() == null) {
             // 新規作成されたTodoだった場合、新規作成する
             todo = new Todo();
+            repeat = new Repeat();
+            repeat.setRepeatScale(0);
             // ID、現在の時間をセットする
             remindTime.setTimeInMillis(now.getTimeInMillis());
-            // 時間選択スピナーの第1項目を初期設定にする
-            isInitialDate = true;
-            isInitialTime = true;
             isInitialRepeat = true;
         } else {
             // 既存のTodoだった場合、その時間を取得する
             todo = realm.copyFromRealm(realm.where(Todo.class).equalTo("id", todoId).findFirst());
-            remindTime.setTimeInMillis(todo.getNotifyStartTime());
-            // 時間選択スピナーの第1項目をユーザーが選択した時間の表示にする
-            isInitialDate = false;
-            isInitialTime = false;
+            repeat = realm.copyFromRealm(realm.where(Repeat.class).equalTo("id", repeatId).findFirst());
+            if (todo.isRepeat()) {
+                repeatId = todo.getRepeatId();
+            } else {
+                repeatId = getRealmNextId("Repeat");
+            }
+            remindTime.setTime(todo.getNotifyStartTime());
             isInitialRepeat = false;
         }
 
-
+        Log.d(TAG, "onCreateDialog: isInitialRepeat" + isInitialRepeat);
 
         String[][] dateSpinnerItem = {{"今日", null},
                 {"明日", null},
@@ -166,13 +173,13 @@ public class ReminderDialogFragment extends DialogFragment{
                 switch (position) {
                     case 0:
                         if (isInitialDate){
-                            // 選択項目（現在の日付）を表示
-                            remindTime.setTime(now.getTime());
+                            // 読み込み時に初期設定したremindTimeをそのまま表示
+                            isInitialDate = false;
                             break;
                         } else {
                             // 第1項目にユーザーが選択した日時を表示
                             // ユーザーが第1項目を選択した場合は、初期設定の項目が表示されるように isInitialDate = true に変更
-                            isInitialDate = true;
+                            remindTime.setTime(now.getTime());
                             break;
                         }
                     case 1:
@@ -186,21 +193,24 @@ public class ReminderDialogFragment extends DialogFragment{
                         now.add(Calendar.DAY_OF_MONTH, -7);
                         break;
                     case 3:
-                        if (datePickerDialog == null) {
-                            datePickerDialog = new DatePickerDialog(getActivity(),
-                                    new DatePickerDialog.OnDateSetListener() {
-                                        @Override
-                                        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                                            remindTime.set(year, month, dayOfMonth);
-                                            dateAdapter.setTime(remindTime);
-                                            dateAdapter.notifyDataSetChanged();
-                                        }
-                                    }, year, month, dayOfMonth);
-                            datePickerDialog.getDatePicker().setMinDate(now.getTimeInMillis());
-                        } else {
-                            datePickerDialog.updateDate(remindTime.get(Calendar.YEAR), remindTime.get(Calendar.MONTH), remindTime.get(Calendar.DAY_OF_MONTH));
+                        if (!isUpdateSelection) {
+
+                            if (datePickerDialog == null) {
+                                datePickerDialog = new DatePickerDialog(getActivity(),
+                                        new DatePickerDialog.OnDateSetListener() {
+                                            @Override
+                                            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                                                remindTime.set(year, month, dayOfMonth);
+                                                dateAdapter.setTime(remindTime);
+                                                dateAdapter.notifyDataSetChanged();
+                                            }
+                                        }, year, month, dayOfMonth);
+                                datePickerDialog.getDatePicker().setMinDate(now.getTimeInMillis());
+                            } else {
+                                datePickerDialog.updateDate(remindTime.get(Calendar.YEAR), remindTime.get(Calendar.MONTH), remindTime.get(Calendar.DAY_OF_MONTH));
+                            }
+                            datePickerDialog.show();
                         }
-                        datePickerDialog.show();
                         break;
                 }
                 // 選択した時間をAdapterに渡し、表示の更新を行う
@@ -210,6 +220,7 @@ public class ReminderDialogFragment extends DialogFragment{
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
+
 
         // スピナー表示用のプリファレンスの設定時間リスト　（例：8, 05）
         Resources res = getResources();
@@ -250,12 +261,12 @@ public class ReminderDialogFragment extends DialogFragment{
                 switch (position) {
                     case 0:
                         if (isInitialTime){
-                            // 選択項目（現在の時間）を表示
+                            // 読み込み時に初期設定したremindTimeをそのまま表示
+                            isInitialTime = false;
+                            break;
                         } else {
                             // 第1項目にユーザーが選択した日時を表示
                             // ユーザーが第1項目を選択した場合は、初期設定の項目が表示されるように isInitialTime = true に変更
-                            isInitialTime = true;
-                            break;
                         }
                     case 1:
                     case 2:
@@ -264,21 +275,24 @@ public class ReminderDialogFragment extends DialogFragment{
                         remindTime.set(Calendar.MINUTE, prefTime[position][1]);
                         break;
                     case 4:
-                        if (timePickerDialog == null) {
-                            timePickerDialog = new TimePickerDialog(getActivity(),
-                                    new TimePickerDialog.OnTimeSetListener() {
-                                        @Override
-                                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                            // 現在の時間を表すCalendarの時間と分と秒を0にリセット
-                                            setCalenderDate(remindTime, hourOfDay, minute);
-                                            timeAdapter.setTime(remindTime);
-                                            timeAdapter.notifyDataSetChanged();
-                                        }
-                                    }, hour, minute, true);
-                        } else {
-                            timePickerDialog.updateTime(remindTime.get(Calendar.HOUR_OF_DAY), remindTime.get(Calendar.MINUTE));
+                        if (!isUpdateSelection) {
+
+                            if (timePickerDialog == null) {
+                                timePickerDialog = new TimePickerDialog(getActivity(),
+                                        new TimePickerDialog.OnTimeSetListener() {
+                                            @Override
+                                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                                // 現在の時間を表すCalendarの時間と分と秒を0にリセット
+                                                setCalenderDate(remindTime, hourOfDay, minute);
+                                                timeAdapter.setTime(remindTime);
+                                                timeAdapter.notifyDataSetChanged();
+                                            }
+                                        }, hour, minute, true);
+                            } else {
+                                timePickerDialog.updateTime(remindTime.get(Calendar.HOUR_OF_DAY), remindTime.get(Calendar.MINUTE));
+                            }
+                            timePickerDialog.show();
                         }
-                        timePickerDialog.show();
                         break;
                 }
                 // 選択した時間をAdapterに渡し、表示の更新を行う
@@ -293,62 +307,78 @@ public class ReminderDialogFragment extends DialogFragment{
         // RepeatSpinnerの設定
         repeatAdapter = new ReminderSpinnerAdapter(getActivity());
         if (isInitialRepeat) {
-            repeatAdapter.setList(createRepeatSpinnerItem("曜日や終了時期を設定"), 2);
+            updateRepeatSpinnerItem("曜日や終了時期を設定");
         } else {
-            repeatAdapter.setList(createRepeatSpinnerItem(repeat.getSummary()), 2);
+            Log.d(TAG, "onCreateDialog: repeat.getSummary()" + repeat.getSummary());
+            updateRepeatSpinnerItem(repeat.getSummary());
         }
-        repeatSpinner.setAdapter(repeatAdapter);
         repeatSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switch (position) {
-                    case 0:
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                        repeat.setRepeatScale(position);
-                        break;
-                    case 5:
-                        // ↓が　
-                        // RepeatDialog repeatDialogFragment = new RepeatDialogFragment();　//だとうごかなかった
-                        repeatDialogFragment = new RepeatDialogFragment();
-                        // MemoのID、TodoのIDをReminderDialogに渡す
-                        Bundle bundle = new Bundle();
-                        if (todo.isRepeat()) {
-                            repeatId = todo.getRepeatId();
-                            bundle.putBoolean(IS_REPEAT, true);
-                            Log.d(TAG, "reminderDialog: repeatId   " + repeatId);
-                        } else {
-                            repeatId = getRealmNextId("Repeat");
-                            Log.d(TAG, "reminderDialog: initialize repeatId   " + repeatId);
-
-                            bundle.putBoolean(IS_REPEAT, false);
-                        }
-                        bundle.putLong(REPEAT_ID, repeatId);
-                        repeatDialogFragment.setArguments(bundle);
-                        repeatDialogFragment.show(getFragmentManager(), "RepeatFragment");
-
-                        // RepeatDialog上のボタンのクリック処理
-                        repeatDialogFragment.setRepeatDialogFragmentListener(new RepeatDialogFragment.RepeatDialogFragmentListener() {
-                            // リマインダーの保存ボタン
-                            @Override
-                            public void onSaveClicked(long repeatId) {
-                                // todoに保存されたrepeatのIDをセット
-                                todo.setRepeat(true);
-                                todo.setRepeatId(repeatId);
-                                isInitialRepeat = false;
-                                // RepeatSpinnerの選択肢を作成したrepeatに合わせて更新
-                                repeat = realm.where(Repeat.class).equalTo("id", repeatId).findFirst();
-                                repeatAdapter.setList(createRepeatSpinnerItem(repeat.getSummary()), 2);
+                    switch (position) {
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            repeat.setRepeatScale(position);
+                            break;
+                        case 5:
+                            repeatDialogFragment = new RepeatDialogFragment();
+                            // MemoのID、TodoのIDをReminderDialogに渡す
+                            Bundle bundle = new Bundle();
+                            if (todo.isRepeat()) {
+                                bundle.putBoolean(IS_REPEAT, true);
+                                Log.d(TAG, "reminderDialog: getRealmRepeatId   " + repeatId);
+                            } else {
+                                Log.d(TAG, "reminderDialog: initialize repeatId   " + repeatId);
+                                bundle.putBoolean(IS_REPEAT, false);
                             }
-                        });
-                }
+                            bundle.putLong(REPEAT_ID, repeatId);
+                            repeatDialogFragment.setArguments(bundle);
+
+
+                            // updateRepeatSpinnerItemでクリック処理が行われた際にダイアログの表示をスキップする
+                            if (!isUpdateSelection) {
+                                // RepeatDialogを表示する
+                                repeatDialogFragment.show(getFragmentManager(), "RepeatFragment");
+                            }
+
+
+                            // RepeatDialog上のボタンのクリック処理
+                            repeatDialogFragment.setRepeatDialogFragmentListener(new RepeatDialogFragment.RepeatDialogFragmentListener() {
+                                // リマインダーの保存ボタン
+                                @Override
+                                public void onSaveClicked(long repeatId) {
+                                    // todoに保存されたrepeatのIDをセット
+                                    todo.setRepeat(true);
+                                    todo.setRepeatId(repeatId);
+                                    isInitialRepeat = false;
+                                    // RepeatSpinnerの選択肢を作成したrepeatに合わせて更新
+                                    repeat = realm.copyFromRealm(realm.where(Repeat.class).equalTo("id", repeatId).findFirst());
+                                    updateRepeatSpinnerItem(repeat.getSummary());
+
+                                    Log.d(TAG, "onSaveClicked: repeat.getSummary() ;  " + repeat.getSummary().toString());
+                                    Log.d(TAG, "onSaveClicked: isInitialRepeat ;  " + isInitialRepeat);
+                                }
+                            });
+                            break;
+                    }
+                isUpdateSelection = false;
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
+        // 初期設定の読み込み
+        isUpdateSelection = true;
+        if (repeat.isCustomRepeat) {
+            repeatSpinner.setSelection(5);
+        } else {
+            repeatSpinner.setSelection(repeat.getRepeatScale());
+        }
+
+
 
         // 削除ボタンの処理
         dialog.findViewById(R.id.button_delete).setOnClickListener(new OnClickListener() {
@@ -374,7 +404,7 @@ public class ReminderDialogFragment extends DialogFragment{
             public void onClick(View v) {
                 // Todoモデルの要素をセットし保存する
                 todo.setId(todoId);
-                todo.setNotifyStartTime(remindTime.getTimeInMillis());
+                todo.setNotifyStartTime(remindTime.getTime());
                 if (todo.createdAt == 0) {
                     todo.setCreatedAt(now.getTimeInMillis());
                 } else {
@@ -501,13 +531,22 @@ public class ReminderDialogFragment extends DialogFragment{
 
 
     // RepeatSpinnerの選択肢の更新用メソッド
-    public String[][] createRepeatSpinnerItem(String customRepeat) {
+    public void updateRepeatSpinnerItem(String customRepeat) {
         String[][] repeatSpinnerItem = {{"リピートなし", null},
                 {"毎日", null},
                 {"毎週", null},
                 {"毎月", null},
                 {"毎年", null},
                 {customRepeat, null}};
-        return repeatSpinnerItem;
+
+        repeatAdapter.setList(repeatSpinnerItem, 2);
+
+        // Adapterを更新すると選択したpositionが初期化されるため、選択済みのpositionを再設定する
+        int position = repeatSpinner.getSelectedItemPosition();
+
+        // setSelection()で、SpinnerのonItemSelected()が反応してしまうため、一時的に無効化する
+        isUpdateSelection = true;
+        repeatSpinner.setAdapter(repeatAdapter);
+        repeatSpinner.setSelection(position, false);
     }
 }
