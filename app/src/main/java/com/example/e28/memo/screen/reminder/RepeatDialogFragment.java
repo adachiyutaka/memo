@@ -526,6 +526,7 @@ public class RepeatDialogFragment extends DialogFragment {
                         break;
                 }
 
+                repeat.setId(repeatId);
                 repeat.setSummary(summaryTextView.getText().toString());
                 repeat.setCustomRepeat(true);
                 // Realmにrepeatを保存

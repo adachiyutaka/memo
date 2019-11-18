@@ -40,22 +40,22 @@ public class AlarmCreator {
             return;
         }
 
-        // AlarmReceiverにブロードキャストを行うintentを作成
-        Intent intent = new Intent(getActivity(), AlarmReceiver.class);
-// 通知内容と通知のリピートを紐付けるために各IDを渡す
-        Bundle bundle = new Bundle();
-        bundle.putLong("MEMO_ID", memoId);
-        bundle.putInt("TODOLIST_ID", todoListId);
-        intent.putExtras(bundle);
-
-        // 指定時間後に動作し、ブロードキャスト用のintentを起動させるPendingIntentを作成
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), requestCode, intent, 0);
-
-        // アラームをセットする
-        AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(ALARM_SERVICE);
-        if (alarmManager != null) {
-            alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(getNextRemindTime(startTime, repeat).getTimeInMillis(), null), pendingIntent);
-        }
+//        // AlarmReceiverにブロードキャストを行うintentを作成
+//        Intent intent = new Intent(getActivity, AlarmReceiver.class);
+//// 通知内容と通知のリピートを紐付けるために各IDを渡す
+//        Bundle bundle = new Bundle();
+//        bundle.putLong("MEMO_ID", memoId);
+//        bundle.putInt("TODOLIST_ID", todoListId);
+//        intent.putExtras(bundle);
+//
+//        // 指定時間後に動作し、ブロードキャスト用のintentを起動させるPendingIntentを作成
+//        PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), requestCode, intent, 0);
+//
+//        // アラームをセットする
+//        AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(ALARM_SERVICE);
+//        if (alarmManager != null) {
+//            alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(getNextRemindTime(startTime, repeat).getTimeInMillis(), null), pendingIntent);
+//        }
     }
 
 
@@ -70,7 +70,7 @@ public class AlarmCreator {
         int startDOW = remindTime.get(Calendar.DAY_OF_WEEK); // 通知開始日の曜日
 
         // 初回の通知開始時間を基準に時間を加算する
-        remindTime.setTime(startTime.getTime())
+        remindTime.setTime(startTime.getTime());
 
 
         switch (repeat.getRepeatScale()) {

@@ -140,10 +140,12 @@ public class ReminderDialogFragment extends DialogFragment{
             // 新規作成されたTodoだった場合、新規作成する
             todo = new Todo();
             repeat = new Repeat();
+            repeatId = getRealmNextId("Repeat");
             repeat.setRepeatScale(0);
             // ID、現在の時間をセットする
             remindTime.setTimeInMillis(now.getTimeInMillis());
             isInitialRepeat = true;
+            Log.d(TAG, "ReminderDialog: isNewMemoId: true");
         } else {
             // 既存のTodoだった場合、その時間を取得する
             todo = realm.copyFromRealm(realm.where(Todo.class).equalTo("id", todoId).findFirst());
@@ -155,6 +157,7 @@ public class ReminderDialogFragment extends DialogFragment{
             }
             remindTime.setTime(todo.getNotifyStartTime());
             isInitialRepeat = false;
+            Log.d(TAG, "ReminderDialog: isNewMemoId: false");
         }
 
         Log.d(TAG, "onCreateDialog: isInitialRepeat" + isInitialRepeat);
@@ -403,6 +406,7 @@ public class ReminderDialogFragment extends DialogFragment{
             @Override
             public void onClick(View v) {
                 // Todoモデルの要素をセットし保存する
+                todo.setRepeat(true);
                 todo.setId(todoId);
                 todo.setNotifyStartTime(remindTime.getTime());
                 if (todo.createdAt == 0) {
@@ -411,7 +415,8 @@ public class ReminderDialogFragment extends DialogFragment{
                     todo.setUpdatedAt(now.getTimeInMillis());
                 }
                 saveRealmTodo(todo);
-                scheduleNotification(todoId, remindTime);
+                // TODO: AlarmReceiverを作ったらもとに戻す
+          //      scheduleNotification(todoId, remindTime);
                 listener.onSaveClicked(todoId);
                 dialog.dismiss();
             }
