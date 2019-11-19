@@ -8,6 +8,7 @@ import java.util.Date;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.support.v4.app.FragmentTransaction;
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -54,7 +55,6 @@ public class WriteActivity extends AppCompatActivity {
     long memoId;
     long todoId;
     ArrayList<Long> tagIdList = new ArrayList<>();
-    RealmList<Todo> todoRealmList = new RealmList<>();
 
     EditText memoInput;
     ToggleButton highlightBtn;
@@ -115,6 +115,7 @@ public class WriteActivity extends AppCompatActivity {
             }
         });
 
+
         // リマインダーボタン押下でダイアログを表示
         Button reminderBtn = findViewById(R.id.button_reminder);
         reminderBtn.setOnClickListener(new View.OnClickListener() {
@@ -127,7 +128,7 @@ public class WriteActivity extends AppCompatActivity {
                 bundle.putLong(MEMO_ID, memo.getId());
                 if (memo.isTodo) {
                     // 既にTodoのIDが設定されている場合は、memoから読み取る
-                    bundle.putLong(TODO_ID, todoRealmList.get(0).getId());
+                    bundle.putLong(TODO_ID, memo.getTodoList().get(0).getId());
                 } else {
                     // まだTodoのIDが設定されていない場合は新規作成する
                     bundle.putLong(TODO_ID, getRealmNextId("Todo"));
@@ -141,9 +142,12 @@ public class WriteActivity extends AppCompatActivity {
                     public void onSaveClicked(long todoId) {
                         // リマインダーの保存ボタン
                         memo.setTodo(true);
-                        todoRealmList = new RealmList<>();
+                        RealmList<Todo> todoRealmList = new RealmList<>();
                         todoRealmList.add(realm.where(Todo.class).equalTo("id", todoId).findFirst());
+                        Log.d("Content", "onSaveClicked: todoId   " + todoId + "   todoRealmList : repeatId" + todoRealmList.get(0).getRepeatId() + "  repeat summary : " + realm.copyFromRealm(realm.where(Repeat.class).equalTo("id", todoRealmList.get(0).getRepeatId()).findFirst()).getSummary());
                         memo.setTodoList(todoRealmList);
+
+                        Log.d("Content", "onSaveClicked: todoRealmList" + todoRealmList.get(0));
                     }
 
                     @Override

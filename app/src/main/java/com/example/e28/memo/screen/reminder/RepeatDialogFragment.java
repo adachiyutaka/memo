@@ -529,6 +529,7 @@ public class RepeatDialogFragment extends DialogFragment {
                 repeat.setId(repeatId);
                 repeat.setSummary(summaryTextView.getText().toString());
                 repeat.setCustomRepeat(true);
+                Log.d(TAG, "save repeat: id   " + repeatId + "   :summary  " + repeat.getSummary());
                 // Realmにrepeatを保存
                 saveRealmRepeat(repeat);
                 listener.onSaveClicked(repeatId);

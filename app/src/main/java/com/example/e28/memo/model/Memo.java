@@ -83,6 +83,7 @@ public class Memo extends RealmObject {
 
     public boolean isTodo() {
         return isTodo;
+
     }
 
     public void setTodo(boolean todo) {
@@ -94,7 +95,7 @@ public class Memo extends RealmObject {
     }
 
     public void setTodoList(RealmList<Todo> todoList) {
-        todoList = todoList;
+        this.todoList = todoList;
     }
 
     public boolean isHighlight() {

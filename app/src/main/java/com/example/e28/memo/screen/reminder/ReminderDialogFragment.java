@@ -129,9 +129,11 @@ public class ReminderDialogFragment extends DialogFragment{
         ReclickableSpinner timeSpinner = dialog.findViewById(R.id.spinner_time);
         repeatSpinner = dialog.findViewById(R.id.spinner_repeat);
 
+
         // 時間選択スピナーの第1項目を初期設定にする
         isInitialDate = true;
         isInitialTime = true;
+
 
         // TodoのIDを取得し、セットされた通知開始時間、リピート情報を取得する
         todoId = getArguments().getLong(TODO_ID);
@@ -146,19 +148,27 @@ public class ReminderDialogFragment extends DialogFragment{
             remindTime.setTimeInMillis(now.getTimeInMillis());
             isInitialRepeat = true;
             Log.d(TAG, "ReminderDialog: isNewMemoId: true");
+            Log.d(TAG, "load todo: id   " + repeatId + "   :summary  " + repeat.getSummary());
         } else {
             // 既存のTodoだった場合、その時間を取得する
             todo = realm.copyFromRealm(realm.where(Todo.class).equalTo("id", todoId).findFirst());
             repeat = realm.copyFromRealm(realm.where(Repeat.class).equalTo("id", repeatId).findFirst());
             if (todo.isRepeat()) {
                 repeatId = todo.getRepeatId();
+                Log.d(TAG, "load todo: id  " + todoId);
             } else {
                 repeatId = getRealmNextId("Repeat");
+                Log.d(TAG, "initialize todo: id  " + todoId);
             }
             remindTime.setTime(todo.getNotifyStartTime());
             isInitialRepeat = false;
+
             Log.d(TAG, "ReminderDialog: isNewMemoId: false");
+            Log.d(TAG, "load todo: id   " + repeatId + "   :summary  " + repeat.getSummary());
         }
+
+
+
 
         Log.d(TAG, "onCreateDialog: isInitialRepeat" + isInitialRepeat);
 
@@ -415,6 +425,10 @@ public class ReminderDialogFragment extends DialogFragment{
                     todo.setUpdatedAt(now.getTimeInMillis());
                 }
                 saveRealmTodo(todo);
+
+                Log.d(TAG, "save todo: id   " + todo.getRepeatId() + "   :summary  " + realm.copyFromRealm(realm.where(Repeat.class).equalTo("id",todo.getRepeatId()).findFirst()).getSummary());
+
+                Log.d(TAG, "save todo: id  " + todoId);
                 // TODO: AlarmReceiverを作ったらもとに戻す
           //      scheduleNotification(todoId, remindTime);
                 listener.onSaveClicked(todoId);
