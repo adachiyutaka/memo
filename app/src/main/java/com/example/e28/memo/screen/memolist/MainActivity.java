@@ -1,65 +1,24 @@
 package com.example.e28.memo.screen.memolist;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.example.e28.memo.R;
-import com.example.e28.memo.model.Memo;
-
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
-import io.realm.RealmResults;
 
-import static android.content.ContentValues.TAG;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    Realm realm;
-
-    TaggedRecyclerViewAdapter adapter;
-
-    // DB変更の有無を受信してrecyclerViewを更新するレシーバー
-    private BroadcastReceiver listUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            adapter.notifyDataSetChanged();
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
-        int id3 = getResources().getIdentifier("pref_title_root","string", "com.example.e28.memo");
-
-        Log.d(TAG, "onPreferenceClick: id3 "  +id3);
-
-        int id = R.string.action_highlight;
-
-        Realm.init(getApplicationContext());
-
-        // create your Realm configuration
-        RealmConfiguration config = new RealmConfiguration.
-                Builder().
-                deleteRealmIfMigrationNeeded().
-                build();
-        Realm.setDefaultConfiguration(config);
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -74,23 +33,14 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //recyclerView
-        realm = Realm.getDefaultInstance();
-        RealmResults<Memo> memoRealmResults = realm.where(Memo.class).findAll();
-        adapter = new TaggedRecyclerViewAdapter(memoRealmResults);
-
-        RecyclerView recyclerView = findViewById(R.id.recycler_view_memos);
-
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-
-        recyclerView.setHasFixedSize(true);
-
-        recyclerView.setLayoutManager(llm);
-
-        recyclerView.setAdapter(adapter);
-
-        // recyclerView更新用のレシーバーを作成
-        LocalBroadcastManager.getInstance(this).registerReceiver(listUpdateReceiver, new IntentFilter("LIST_UPDATE"));
+        // savedInstanceStateがnullでない場合は前回のFragmentが自動で復元されるのでnullの場合のみ処理
+        if (savedInstanceState == null) {
+            // トップ画面のFragmentを表示
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.container_fragment_index, new IndexFragment())
+                    .commit();
+        }
     }
 
     @Override
@@ -169,15 +119,5 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
-
-        // realmのインスタンスを閉じる
-        realm.close();
-        // recyclerView更新用のレシーバーを破棄
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(listUpdateReceiver);
     }
 }

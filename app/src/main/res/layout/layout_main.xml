@@ -24,8 +24,8 @@
     </android.support.design.widget.AppBarLayout>
 
     <!-- content -->
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view_memos"
+    <FrameLayout
+        android:id="@+id/container_fragment_index"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

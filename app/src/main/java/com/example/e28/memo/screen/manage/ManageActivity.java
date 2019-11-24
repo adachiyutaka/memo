@@ -2,22 +2,16 @@ package com.example.e28.memo.screen.manage;
 
 import android.app.TimePickerDialog;
 import android.os.Bundle;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TimePicker;
 import android.widget.Toast;
-
 import com.example.e28.memo.R;
-import com.example.e28.memo.screen.memolist.MainActivity;
 
-import java.security.KeyManagementException;
 import java.util.Calendar;
 
 public class ManageActivity extends AppCompatActivity implements PreferenceFragmentCompat.OnPreferenceStartScreenCallback{
