@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<android.support.v4.widget.NestedScrollView
+    android:id="@+id/nested_scroll_view"
+    android:overScrollMode="never"
+    android:layout_marginTop="?attr/actionBarSize"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <RelativeLayout
+            android:id="@+id/container_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true">
+            <include layout="@layout/test_name_card"/>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/container_memo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/container_name"
+            android:layout_alignParentStart="true">
+            <include layout="@layout/recycler_view_memo"/>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/container_memo_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/container_name"
+            android:layout_toEndOf="@+id/container_memo">
+            <include layout="@layout/test_memo_text"/>
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</android.support.v4.widget.NestedScrollView>
+
+</LinearLayout>

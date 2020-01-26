@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity
             // トップ画面のFragmentを表示
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.container_fragment_index, new IndexFragment())
+                    .replace(R.id.container_fragment_index, new NoteFragment())
                     .commit();
         }
     }
