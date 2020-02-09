@@ -10,11 +10,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
+    <FrameLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
 
         <RelativeLayout
             android:id="@+id/container_name"
@@ -26,23 +25,24 @@
 
         <LinearLayout
             android:id="@+id/container_memo"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/container_name"
-            android:layout_alignParentStart="true">
+            android:layout_weight="1"
+            android:layout_marginTop="200px">
             <include layout="@layout/recycler_view_memo"/>
         </LinearLayout>
 
         <RelativeLayout
             android:id="@+id/container_memo_text"
+            android:layout_gravity="right"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/container_name"
-            android:layout_toEndOf="@+id/container_memo">
+            android:layout_marginTop="200px"
+            android:layout_marginLeft="100px">
             <include layout="@layout/test_memo_text"/>
         </RelativeLayout>
 
-    </RelativeLayout>
+    </FrameLayout>
 
 </android.support.v4.widget.NestedScrollView>
 

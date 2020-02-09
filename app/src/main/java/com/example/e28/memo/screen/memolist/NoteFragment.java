@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,11 +12,14 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.example.e28.memo.R;
 import com.example.e28.memo.model.Tag;
@@ -26,6 +30,8 @@ import java.util.List;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
+import static android.support.constraint.Constraints.TAG;
+
 /**
  * Created by User on 2019/11/24.
  */
@@ -35,6 +41,12 @@ public class NoteFragment extends Fragment {
     Realm realm;
 
     NoteRecyclerViewAdapter adapter;
+
+    RecyclerView recyclerView;
+
+    ArrayList<String> datasource = new ArrayList<>();
+
+    int widthParentView;
 
     // DB変更の有無を受信してrecyclerViewを更新するレシーバー
     private BroadcastReceiver listUpdateReceiver = new BroadcastReceiver() {
@@ -48,7 +60,6 @@ public class NoteFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_note, container, false);
-        final EditText memoEditText = view.findViewById(R.id.edit_text_memo);
 
         //ノートタイトルを表示するRecyclerView
         realm = Realm.getDefaultInstance();
@@ -59,62 +70,133 @@ public class NoteFragment extends Fragment {
 
         RealmResults<Tag> tagRealmResults = realm.where(Tag.class).findAll();
 
-        final ArrayList<String> datasource = new ArrayList<>();
-        for (int i = 0; i < 10; i++ ) {
+        for (int i = 100; i < 110; i++ ) {
             datasource.add(String.valueOf(i));
         }
 
-        adapter = new NoteRecyclerViewAdapter(datasource);
+        recyclerView = view.findViewById(R.id.recycler_view_memo);
 
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view_memo);
+        final LinearLayout nameCard = view.findViewById(R.id.linear_layout_name_card);
 
-        LinearLayoutManager llm = new LinearLayoutManager(getContext());
+        ViewTreeObserver observer = nameCard.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener()
+                {
+                    @Override
+                    public void onGlobalLayout()
+                    {
+                        widthParentView = 1000;
+                                nameCard.getWidth();
+                        Log.d("MainActivity : ", "ボタン幅 = " + nameCard.getWidth());
+                        Log.d("MainActivity : ", "ボタン高さ = " + nameCard.getHeight());
+                    }
+                });
 
+        adapter = new NoteRecyclerViewAdapter(datasource, widthParentView);
+
+        LinearLayoutManager llm = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL, false);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(llm);
         recyclerView.setAdapter(adapter);
 
-        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener(){
+//        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener(){
+//            @Override
+//            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+//                if(e.getAction() == MotionEvent.ACTION_DOWN){
+//                    memoEditText.setVisibility(View.GONE);
+//                }else if(e.getAction() == MotionEvent.ACTION_UP){
+//                    memoEditText.setVisibility(View.VISIBLE);
+//                }
+//                return false;
+//            }
+
+//            @Override
+//            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+//            }
+//
+//            @Override
+//            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+//            }
+//        });
+//
+
+
+        ItemTouchHelper mHelper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
             @Override
-            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-                if(e.getAction() == MotionEvent.ACTION_DOWN){
-                    memoEditText.setVisibility(View.GONE);
-                }else if(e.getAction() == MotionEvent.ACTION_UP){
-                    memoEditText.setVisibility(View.VISIBLE);
-                }
+            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+//ここでドラッグ動作、Swipe動作を指定します
+//ドラッグさせたくないとか、Swipeさせたくない場合はここで分岐してアクションを指定しないことでドラッグできない行などを指定できます
+//ドラッグは長押しで自動的に開始されます
+                return makeFlag(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.RIGHT) | makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) |
+                        makeFlag(ItemTouchHelper.ACTION_STATE_DRAG, ItemTouchHelper.DOWN | ItemTouchHelper.UP);
+            }
+
+
+            //ドラッグで場所を移動した際の処理を記述します
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder viewHolder1) {
+                (recyclerView.getAdapter()).notifyItemMoved(viewHolder.getAdapterPosition(), viewHolder1.getAdapterPosition());
                 return true;
             }
 
-            @Override
-            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-            }
 
+            //選択ステータスが変更された場合の処理を指定します
+//この例ではAdapterView内のcontainerViewを表示にしています
+//containerViewには背景色を指定しており、ドラッグが開始された際に見やすくなるようにしています
+//            @Override
+//            public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+//                super.onSelectedChanged(viewHolder, actionState);
+//
+//                if (actionState == ItemTouchHelper.ACTION_STATE_DRAG)
+//                    ((adapter.holder) viewHolder).container.setVisibility(View.VISIBLE);
+//            }
+            //選択が終わった時（Dragが終わった時など）の処理を指定します
+//今回はアイテムをDropした際にcontainerViewを非表示にして通常表示に戻しています
+//            @Override
+//            public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+//                super.clearView(recyclerView, viewHolder);
+//                ((adapter.holder) viewHolder).container.setVisibility(View.GONE);
+//            }
+
+
+            //Swipeされた際の処理です。
+//
             @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int i) {
+                int fromPos = viewHolder.getAdapterPosition();
+                datasource.remove(fromPos);
+                (recyclerView.getAdapter()).notifyItemRemoved(fromPos);
             }
         });
 
-        ItemTouchHelper itemDecor = new ItemTouchHelper(
-                new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
-                        ItemTouchHelper.RIGHT) {
+        mHelper.attachToRecyclerView(recyclerView);
+        recyclerView.addItemDecoration(mHelper);
+        recyclerView.setAdapter(adapter);
 
 
-                    @Override
-                    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                        final int fromPos = viewHolder.getAdapterPosition();
-                        final int toPos = target.getAdapterPosition();
-                        adapter.notifyItemMoved(fromPos, toPos);
-                        return true;
-                    }
-
-                    @Override
-                    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                        final int fromPos = viewHolder.getAdapterPosition();
-                        datasource.remove(fromPos);
-                        adapter.notifyItemRemoved(fromPos);
-                    }
-                });
-        //itemDecor.attachToRecyclerView(recyclerView);
+//  ItemTouchHelper.SimpleCallbackを使った例（スワイプが動かない）
+//        ItemTouchHelper itemDecor = new ItemTouchHelper(
+//                new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
+//                        ItemTouchHelper.RIGHT) {
+//
+//
+//                    @Override
+//                    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+//                        final int fromPos = viewHolder.getAdapterPosition();
+//                        final int toPos = target.getAdapterPosition();
+//                        adapter.notifyItemMoved(fromPos, toPos);
+//                        return true;
+//                    }
+//
+//                    @Override
+//                    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+//                        final int fromPos = viewHolder.getAdapterPosition();
+//                        datasource.remove(fromPos);
+//                        adapter.notifyItemRemoved(fromPos);
+//                        Log.d(TAG, "onSwiped: success");
+//                    }
+//                });
+//        itemDecor.attachToRecyclerView(recyclerView);
 
         // RecyclerView更新用のレシーバーを作成
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(listUpdateReceiver, new IntentFilter("LIST_UPDATE"));
