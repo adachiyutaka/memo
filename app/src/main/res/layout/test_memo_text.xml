@@ -8,5 +8,6 @@
         android:layout_width="match_parent"
         android:layout_height="500dp"
         android:text="TEST"
+        android:alpha="0.25"
         android:background="@android:color/holo_blue_light"/>
 </LinearLayout>

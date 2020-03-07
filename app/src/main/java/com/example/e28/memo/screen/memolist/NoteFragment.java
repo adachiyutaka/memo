@@ -43,6 +43,7 @@ public class NoteFragment extends Fragment {
     NoteRecyclerViewAdapter adapter;
 
     RecyclerView recyclerView;
+    EditText editText;
 
     ArrayList<String> datasource = new ArrayList<>();
 
@@ -75,6 +76,27 @@ public class NoteFragment extends Fragment {
         }
 
         recyclerView = view.findViewById(R.id.recycler_view_memo);
+        editText = view.findViewById(R.id.edit_text_memo);
+        editText = addTextChangedListener(this);
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            //TextViewに入力された値をリアルタイムで反映
+            datasouce(0) = s;
+            recyclerView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+        }
+    }
 
         final LinearLayout nameCard = view.findViewById(R.id.linear_layout_name_card);
 
