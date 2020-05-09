@@ -30,7 +30,7 @@ public class IndexRecyclerViewAdapter extends RecyclerView.Adapter<IndexRecycler
 
         public ViewHolder(View itemView) {
             super(itemView);
-            tagTextView = itemView.findViewById(R.id.text_view_tag_name);
+            tagTextView = itemView.findViewById(R.id.text_view);
         }
     }
 
@@ -40,7 +40,7 @@ public class IndexRecyclerViewAdapter extends RecyclerView.Adapter<IndexRecycler
 
     @Override
     public IndexRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_index, parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.test_memo_card, parent,false);
         IndexRecyclerViewAdapter.ViewHolder viewHolder = new IndexRecyclerViewAdapter.ViewHolder(view);
         return viewHolder;
     }

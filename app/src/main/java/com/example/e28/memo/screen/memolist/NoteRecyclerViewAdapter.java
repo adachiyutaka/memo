@@ -27,6 +27,11 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
     public View.OnTouchListener listener;
     public int widthRecyclerView;
 
+    public NoteRecyclerViewAdapter(ArrayList<String> datasource) {
+        this.datasource = datasource;
+
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView textView;
 

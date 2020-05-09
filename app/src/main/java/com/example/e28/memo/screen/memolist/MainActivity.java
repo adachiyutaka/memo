@@ -110,7 +110,9 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.menu_drawer) {
 
-        } else if (id == R.id.switch_style_column) {
+        } else if (id == R.id.test) {
+            Intent intent = new Intent(this, com.example.e28.memo.screen.memo_hole.MemoHoleActivity.class);
+            startActivity(intent);
 
         } else if (id == R.id.switch_style_sort) {
 

@@ -5,7 +5,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
-    <string name="switch_style_column">2カラム</string>
+    <string name="test">新レイアウトテスト</string>
     <string name="switch_style_sort">新しい順</string>
     <string name="switch_style_tag_group">タグでまとめて表示</string>
     <string name="nav_tag">タグの編集</string>
