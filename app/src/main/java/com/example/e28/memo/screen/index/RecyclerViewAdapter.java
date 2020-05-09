@@ -7,17 +7,20 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.e28.memo.R;
+import com.example.e28.memo.model.Tag;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
+
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>{
 
-    public ArrayList<String> datasource;
     public View.OnTouchListener listener;
+    public RealmResults<Tag> realmResults;
 
-    public RecyclerViewAdapter(ArrayList<String> datasource) {
-        this.datasource = datasource;
-
+    public RecyclerViewAdapter(RealmResults<Tag> realmResults) {
+        this.realmResults = realmResults;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -44,12 +47,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onBindViewHolder(RecyclerViewAdapter.ViewHolder holder, int position) {
-        holder.textViewTitle.setText(datasource.get(position));
+        Tag tag = realmResults.where().equalTo("id", position).findFirst();
+        holder.textViewTitle.setText(tag.getName());
         holder.textViewContent.setText("メモの内容");
     }
 
     @Override
     public int getItemCount() {
-        return datasource.size();
+        return realmResults.size();
     }
 }

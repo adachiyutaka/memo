@@ -80,7 +80,7 @@ public class MemoHoleActivity extends AppCompatActivity {
         }
 
         recyclerView = findViewById(R.id.recycler_view_index_);
-        adapter = new RecyclerViewAdapter(datasource);
+        adapter = new RecyclerViewAdapter(realm.where(Tag.class).findAll());
         LinearLayoutManager llm = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL, false);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(llm);
