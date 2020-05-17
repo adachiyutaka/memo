@@ -26,11 +26,11 @@ public class AlarmCreator {
     }
 
 
-    public void createAlarm(long memoId, int todoListId){
+    public void createAlarm(long memoId, long todoId){
 
         Realm realm = Realm.getDefaultInstance();
         Memo memo = realm.where(Memo.class).equalTo("id", memoId).findFirst();
-        Todo todo = memo.getTodoList().get(todoListId);
+        Todo todo = realm.where(Todo.class).equalTo("id", todoId).findFirst();
         Repeat repeat = realm.where(Repeat.class).equalTo("id", todo.getRepeatId()).findFirst();
         Calendar startTime = Calendar.getInstance();
         startTime.setTime(todo.getNotifyStartTime());
@@ -45,7 +45,7 @@ public class AlarmCreator {
 //// 通知内容と通知のリピートを紐付けるために各IDを渡す
 //        Bundle bundle = new Bundle();
 //        bundle.putLong("MEMO_ID", memoId);
-//        bundle.putInt("TODOLIST_ID", todoListId);
+//        bundle.putLong("TODO_ID", todoId);
 //        intent.putExtras(bundle);
 //
 //        // 指定時間後に動作し、ブロードキャスト用のintentを起動させるPendingIntentを作成

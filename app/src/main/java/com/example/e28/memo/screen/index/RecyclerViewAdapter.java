@@ -1,6 +1,7 @@
 package com.example.e28.memo.screen.index;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+
+import static android.support.constraint.Constraints.TAG;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>{
 
@@ -48,6 +51,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public void onBindViewHolder(RecyclerViewAdapter.ViewHolder holder, int position) {
         Tag tag = realmResults.where().equalTo("id", position).findFirst();
+        Log.d(TAG, "onBindViewHolder: position:" + position);
         holder.textViewTitle.setText(tag.getName());
         holder.textViewContent.setText("メモの内容");
     }

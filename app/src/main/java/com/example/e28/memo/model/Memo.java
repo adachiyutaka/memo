@@ -18,9 +18,9 @@ public class Memo extends RealmObject {
     public String text;
     public String imagePath;
     public boolean isTagged;
-    public RealmList<Tag> tagList;
+    public RealmList<Long> tagIdList;
     public boolean isTodo;
-    public RealmList<Todo> todoList;
+    public RealmList<Long> todoIdList;
     public boolean isHighlight;
     public boolean isChecked;
     public boolean isTrash;
@@ -73,29 +73,28 @@ public class Memo extends RealmObject {
         isTagged = tagged;
     }
 
-    public RealmList<Tag> getTagList() {
-        return tagList;
+    public RealmList<Long> getTagIdList() {
+        return tagIdList;
     }
 
-    public void setTagList(RealmList<Tag> tagList) {
-        this.tagList = tagList;
+    public void setTagIdList(RealmList<Long> tagIdList) {
+        this.tagIdList = tagIdList;
     }
 
     public boolean isTodo() {
         return isTodo;
-
     }
 
     public void setTodo(boolean todo) {
         isTodo = todo;
     }
 
-    public RealmList<Todo> getTodoList() {
-        return todoList;
+    public RealmList<Long> getTodoIdList() {
+        return todoIdList;
     }
 
-    public void setTodoList(RealmList<Todo> todoList) {
-        this.todoList = todoList;
+    public void setTodoIdList(RealmList<Long> todoIdList) {
+        this.todoIdList = todoIdList;
     }
 
     public boolean isHighlight() {

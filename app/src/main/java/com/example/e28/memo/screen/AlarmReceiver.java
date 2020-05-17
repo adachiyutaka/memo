@@ -17,6 +17,7 @@ import android.util.Log;
 import com.example.e28.memo.R;
 import com.example.e28.memo.model.Memo;
 import com.example.e28.memo.model.Repeat;
+import com.example.e28.memo.model.Todo;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -37,11 +38,12 @@ public class AlarmReceiver extends BroadcastReceiver {
         // Alarmから送られたIntentの内容を受け取る
         Bundle bundle = intent.getExtras();
         long memoId = bundle.getLong("MEMO_ID");
-        int todoListId = bundle.getInt("TODOLIST_ID");
+        long todoId = bundle.getLong("TODO_ID");
 
         Realm realm = Realm.getDefaultInstance();
         Memo memo = realm.where(Memo.class).equalTo("id", memoId).findFirst();
-        Repeat repeat = realm.where(Repeat.class).equalTo("id", memo.getTodoList().get(todoListId).getRepeatId()).findFirst();
+        Todo todo = realm.where(Todo.class).equalTo("id", todoId).findFirst();
+        Repeat repeat = realm.where(Repeat.class).equalTo("id", todo.getRepeatId()).findFirst();
         //logd で前後のremindCountを読み取り
         // リマインダーの残り回数を1回減らす
         repeat.setNotifyRemainCount(repeat.getNotifyRemainCount() - 1);
@@ -53,7 +55,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         //新しいアラームを設定する
         AlarmCreator alarmCreator = new AlarmCreator();
-        alarmCreator.createAlarm(memoId, todoListId);
+        alarmCreator.createAlarm(memoId, todoId);
 
         // 通知カードをタップした際に、アプリへ移動するためのIntent
         int requestCode = 1;

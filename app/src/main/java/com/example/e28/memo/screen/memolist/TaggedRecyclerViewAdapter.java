@@ -78,9 +78,10 @@ public class TaggedRecyclerViewAdapter extends RecyclerView.Adapter<TaggedRecycl
         }
 
         // タグがある場合は、ViewHolderにMemo.tagListの中身をにつなげた文章をセット
-        for (Tag tag : memo.getTagList()) {
-            tagStr += ", " + tag.getName();
-        }
+//        for (Long id : memo.getTagIdList()) {
+//
+//            tagStr += ", " + tag.getName();
+//        }
         if(memo.isTagged()){
             viewHolder.memoTag.setText(tagStr);
         }
