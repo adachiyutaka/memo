@@ -105,10 +105,7 @@ public class WriteActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(WriteActivity.this, com.example.e28.memo.screen.tagdialog.TagDialogActivity.class);
                 // Memoが持つタグのidリストを生成し、中身が0でない場合はintentで渡す
-                if (memo.getTagList() != null) {
-                    for (Tag tag : memo.getTagList()) {
-                        tagIdList.add(tag.getId());
-                    }
+                if (memo.getTagIdList() != null) {
                     intent.putExtra(TAG_ID_LIST, tagIdList);
                 }
                 startActivityForResult(intent, RESULT_TAG_LIST);
@@ -128,7 +125,7 @@ public class WriteActivity extends AppCompatActivity {
                 bundle.putLong(MEMO_ID, memo.getId());
                 if (memo.isTodo) {
                     // 既にTodoのIDが設定されている場合は、memoから読み取る
-                    bundle.putLong(TODO_ID, memo.getTodoList().get(0).getId());
+                    bundle.putLong(TODO_ID, memo.getTodoIdList().get(0));
                 } else {
                     // まだTodoのIDが設定されていない場合は新規作成する
                     bundle.putLong(TODO_ID, getRealmNextId("Todo"));
@@ -142,12 +139,11 @@ public class WriteActivity extends AppCompatActivity {
                     public void onSaveClicked(long todoId) {
                         // リマインダーの保存ボタン
                         memo.setTodo(true);
-                        RealmList<Todo> todoRealmList = new RealmList<>();
-                        todoRealmList.add(realm.where(Todo.class).equalTo("id", todoId).findFirst());
-                        Log.d("Content", "onSaveClicked: todoId   " + todoId + "   todoRealmList : repeatId" + todoRealmList.get(0).getRepeatId() + "  repeat summary : " + realm.copyFromRealm(realm.where(Repeat.class).equalTo("id", todoRealmList.get(0).getRepeatId()).findFirst()).getSummary());
-                        memo.setTodoList(todoRealmList);
+                        RealmList<Long> todoIdList = new RealmList<>();
+                        todoIdList.add(todoId);
+                        Log.d("Content", "onSaveClicked: todoId   " + todoId + "   todoRealmList : repeatId" + todoIdList.get(0) );
 
-                        Log.d("Content", "onSaveClicked: todoRealmList" + todoRealmList.get(0));
+                        Log.d("Content", "onSaveClicked: todoRealmList" + todoIdList.get(0));
                     }
 
                     @Override
@@ -201,13 +197,17 @@ public class WriteActivity extends AppCompatActivity {
 
         // タグのIDリストをExtraから得る
         if (requestCode == RESULT_TAG_LIST && null != data) {
-            tagIdList = (ArrayList<Long>) data.getSerializableExtra(TAG_ID_LIST);
+            ArrayList tagIdArrayList = (ArrayList<Long>) data.getSerializableExtra(TAG_ID_LIST);
             // タグのIDリストからタグのリストを作成
-            RealmList<Tag> tagRealmList = new RealmList<>();
-            for (Long id : tagIdList) {
-                tagRealmList.add(realm.where(Tag.class).equalTo("id", id).findFirst());
+//            RealmList<Tag> tagRealmList = new RealmList<>();
+//            for (Long id : tagIdList) {
+//                tagRealmList.add(realm.where(Tag.class).equalTo("id", id).findFirst());
+//            }
+            RealmList<Long> tagIdList = new RealmList<>();
+            for (Object id : tagIdArrayList){
+                tagIdList.add((long)id);
             }
-            memo.setTagList(tagRealmList);
+            memo.setTagIdList(tagIdList);
         }
         // 1つでもタグがセットされている場合、IsTaggedをセットする
         if (!tagIdList.isEmpty()) {

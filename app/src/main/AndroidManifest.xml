@@ -44,6 +44,15 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait" />
+
+        <!--        新レイアウトテスト用Activity-->
+        <activity
+            android:name=".screen.memo_hole.MemoHoleActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait" />
+        <!--        新レイアウトテスト用Activity-->
+
         <receiver
             android:name=".screen.AlarmReceiver">
             <!--android:process=":remote">-->

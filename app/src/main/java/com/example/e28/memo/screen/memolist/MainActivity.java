@@ -7,12 +7,18 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.example.e28.memo.R;
+import com.example.e28.memo.model.Memo;
+import com.example.e28.memo.model.Tag;
+
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.RealmList;
 
 
 public class MainActivity extends AppCompatActivity
@@ -30,6 +36,8 @@ public class MainActivity extends AppCompatActivity
                 build();
         Realm.setDefaultConfiguration(config);
 
+
+        Realm realm = Realm.getDefaultInstance();
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -110,7 +118,9 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.menu_drawer) {
 
-        } else if (id == R.id.switch_style_column) {
+        } else if (id == R.id.test) {
+            Intent intent = new Intent(this, com.example.e28.memo.screen.memo_hole.MemoHoleActivity.class);
+            startActivity(intent);
 
         } else if (id == R.id.switch_style_sort) {
 

@@ -5,9 +5,9 @@
     tools:showIn="navigation_view">
 
         <item
-            android:id="@+id/switch_style_column"
+            android:id="@+id/test"
             android:icon="@android:drawable/ic_menu_sort_by_size"
-            android:title="@string/switch_style_column" />
+            android:title="@string/test" />
         <item
             android:id="@+id/switch_style_sort"
             android:icon="@android:drawable/ic_menu_sort_by_size"

@@ -3,8 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/git-memo.iml" filepath="$PROJECT_DIR$/git-memo.iml" group="memo" />
       <module fileurl="file://$PROJECT_DIR$/memo.iml" filepath="$PROJECT_DIR$/memo.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/memo-app.iml" filepath="$PROJECT_DIR$/app/memo-app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/memo-app.iml" filepath="$PROJECT_DIR$/app/memo-app.iml" group="memo/app" />
     </modules>
   </component>
 </project>
